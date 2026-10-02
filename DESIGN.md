@@ -58,7 +58,10 @@ Former franchises have no page; they live in History. A franchise that rejoins g
 
 - Kill sheets: one standard TSV per tour, `assets/sheets/<numeral>.tsv` (II.tsv to X.tsv): Player, Team (franchise code), Conference, GP, Kills, then one column per game, C# for conference games, W# for wild card or play-ins, F# for finals, numbered within the stage. Every player appears under one site name. S2 sheets use the same layout.
 - Kirin's cleaned originals are kept unchanged in `assets/sheets/raw/`; the standard sheets were converted from them on 2 October 2026 and every player's game kills add up to their total. They beat the Google sheets and the all-time sheet wherever they disagree, and S1 totals are rebuilt from them.
-- II to V's sheets name no teams, so their boards show no team tags. X's kills cover its conference stage only.
+- A tour's board shows the team each player played for in that tour. VI to X take it from the sheet. II to V's sheets named none, so their teams come from Kirin's list of 2 October 2026, otherwise from the player's next listed team, and stay blank where that franchise did not exist yet (Varanius in II and III).
+- `src/data/career-teams.yaml` lists the players who played for two franchises; the all-time boards show both. Everyone else shows the franchise of their latest tour.
+- Merged names (one player, two spellings or two accounts) are applied in the sheets and recorded in `src/data/aliases.yaml`, left as written in a sheet, right as shown on the site.
+- X's kills cover its conference stage only.
 - After each S2 tour Kirin sends that tour's sheet; it is added and the site republished. The browser never fetches a sheet.
 - S2 sheets need each game's winner as well as the kills. Wins, win rates, standings and finals reached cannot come from kill sheets.
 - NationStates nations are used only behind the scenes: the dispatch gives I to VIII's award winners by nation, and they are turned into in-game names before anything is shown.
@@ -116,8 +119,9 @@ Primary is the field colour from Kirin's own dispatch banners; secondary comes f
 | TO | Bushrangers | #702D2D | #B59292 | white | former |
 | TSP | Spits | #3FB1DE | #092458 | dark | former |
 | TWP | Rumrunners | #291548 | #BD0000 | white | former |
+| LIB | (name to come) | #011333 | #C38D2B | white | former |
 
-- WC and STL have no dispatch banner, so both of their colours come from the logo.
+- WC, STL and LIB have no dispatch banner, so their colours come from the logo.
 - LILY's secondary is the logo's rainbow, used as a 4px band.
 - Several primaries are nearly as dark as the page (TWP, SO, TNP and SLD are under 1.5:1 against `--abyss`), so every franchise field carries a 1px inner rim in its secondary.
 - Status follows the folders and changes when a logo moves.
@@ -232,9 +236,9 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **Records.** Four tiles on `--deep`, each a gold Mono figure, a Mono label and the holder in Bold: 7 Titles (TO Bushrangers), 4 MVP awards (Miravana), 39 Kills in one tour (Wizard, RBRWT V), 7 Kills in one game (Wizard in V, Kirin in VI). Labels use "in", never a comma. Under the tiles, a full-width slanted gold "All stats" button with an arrow leads to the Stats page; the tiles stretch so the button's bottom lines up with the bottom of the kill leaders table.
 
-**Kill leaderboard** (Stats). Filter buttons in a row, slanted like the chips, `--surface-2` with Mono labels, the chosen one in `--gold` with ink; on phones the row scrolls sideways. Above each board, its name in Bold 28px and its facts in Mono on the right (date, player count, any note). The table is the kill leaders table, every player.
+**Kill leaderboard** (Stats). Filter buttons in a row, slanted like the chips, `--surface-2` with Mono labels, the chosen one in `--gold` with ink; on phones the row scrolls sideways. Above each board, its name in Bold 28px and its facts in Mono on the right (date, player count, any note). The table is the kill leaders table, every player. Its Team column shows franchise logos at 28px, two side by side for a player on `career-teams.yaml`; a franchise without a logo shows its code instead.
 
-**Kill leaders.** The S1 top ten beside the records. Columns: rank (rank 1 in gold, ties share a rank), Team (their last S1 franchise as a coloured code chip, every chip the same 46px width, in its own column so all player names start on one line), Player, then kills, games and kills per game in Mono, right-aligned. Games drop on phones.
+**Kill leaders.** The S1 top ten beside the records. Columns: rank (rank 1 in gold, ties share a rank), Team (logos, as on the leaderboard, in their own 92px column so all player names start on one line), Player, then kills, games and kills per game in Mono, right-aligned. Games drop on phones.
 
 **Tour page head.** The tour numeral in Display with the tour gradient, then a lower-third: date, host venue, host franchise.
 

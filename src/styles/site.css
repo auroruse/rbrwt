@@ -429,3 +429,8 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
 /* Slanted controls clip an outside focus ring, so theirs sits inside the shape */
 .filter:focus-visible, .watch a.go:focus-visible, .watch summary:focus-visible { outline: 2px solid var(--gold); outline-offset: -5px; }
 .cta:focus-visible, .filter[aria-pressed="true"]:focus-visible { outline: 2px solid var(--ink); outline-offset: -6px; }
+
+/* Team column: the franchise logos, two for a player who played for two */
+.marks { display: inline-flex; align-items: center; gap: 6px; vertical-align: middle; }
+.marks img { width: 28px; height: 28px; object-fit: contain; }
+.chip { background: var(--p, var(--surface-2)); color: var(--ink-on, var(--text-2)); }

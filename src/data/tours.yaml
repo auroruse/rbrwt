@@ -62,7 +62,7 @@
   champion: TO
   matches: 28
   sheet: VI.tsv
-  awards: { MVP: Miravana, TF: New Opolopia, RotM: Croblade, MI: Magrusa }
+  awards: { MVP: Miravana, TF: New Opolopia, RotM: Alfonzo, MI: Magrusa }
   replays:
     - { label: Conferences, url: "https://youtu.be/hKau1vIXZqU" }
     - { label: Finals, url: "https://youtu.be/ewgFl1FUoIk" }

@@ -1,23 +1,23 @@
 Player	Team	Conference	GP	Kills	F1	F2	F3	F4	F5	F6	F7	F8	F9	F10	F11	F12	F13	F14
-Robin			13	23		3	0	4	1	0	2	4	2	1	0	0	1	5
-Wizard			13	20		2	1	2	3	2	0	1	1	3	3	1	1	0
-Celia			5	7		0	4	3	0	0								
-Miravana			13	16		0	0	3	2	1	1	5	0	3	0	1	0	0
-Entropan			13	15		1	0	0	0	0	2	2	4	1	2	2	0	1
-Kirin			12	13		2	0	0	0	1	1	0	0	1	2		3	3
-Sakinko			13	13		1	2	0	0	0	0	1	1	0	2	3	3	0
-New Opolopia			13	12		0	2	0	1	2	3	0	1	0	0	3	0	0
-Gagium			13	11		0	0	0	2	1	1	1	0	1	0	2	0	3
+Robin	TO		13	23		3	0	4	1	0	2	4	2	1	0	0	1	5
+Wizard	TPoP		13	20		2	1	2	3	2	0	1	1	3	3	1	1	0
+Celia	STL		5	7		0	4	3	0	0								
+Miravana	TO		13	16		0	0	3	2	1	1	5	0	3	0	1	0	0
+Entropan	TL&C		13	15		1	0	0	0	0	2	2	4	1	2	2	0	1
+Kirin	TAL		12	13		2	0	0	0	1	1	0	0	1	2		3	3
+Sakinko	LIB		13	13		1	2	0	0	0	0	1	1	0	2	3	3	0
+New Opolopia	TPoP		13	12		0	2	0	1	2	3	0	1	0	0	3	0	0
+Gagium	TL&C		13	11		0	0	0	2	1	1	1	0	1	0	2	0	3
 Varanius			13	9		0	0	0	0	2	0	1	1	0	0	0	3	2
-Priola			12	8		2	0	0	0	1	5	0	0	0	0	0		0
-Anjan Kloss			13	8		1	1	2	3	0	0	0	0	0	1	0	0	0
-Merethin			13	5		0	0	0	0	2	0	1	0	1	0	0	1	0
-John Laurens			11	3		0	1	0	0	0	0	0	0	1	0	1		
-Lumeris			4	1		0	1	0	0									
-Pirzdavor			8	2							0	1	0	0	0	0	0	1
-Frailty			4	1											1	0	0	0
-Tomington			13	2		0	1	0	1	0	0	0	0	0	0	0	0	0
-BlackBlicky			13	2		0	0	0	0	1	0	0	0	0	1	0	0	0
-Dogeland			9	1						0	0	1	0	0	0	0	0	0
-Kakastania			5	0		0	0	0	0	0								
-Hemogard			8	0							0	0	0	0	0	0	0	0
+Priola	TAL		12	8		2	0	0	0	1	5	0	0	0	0	0		0
+Anjan Kloss	TL&C		13	8		1	1	2	3	0	0	0	0	0	1	0	0	0
+Merethin	STL		13	5		0	0	0	0	2	0	1	0	1	0	0	1	0
+John Laurens	TAL		11	3		0	1	0	0	0	0	0	0	1	0	1		
+Lumeris	STL		4	1		0	1	0	0									
+Pirzdavor	STL		8	2							0	1	0	0	0	0	0	1
+Graves	TAL		4	1											1	0	0	0
+Tomington	LIB		13	2		0	1	0	1	0	0	0	0	0	0	0	0	0
+BlackBlicky	TPoP		13	2		0	0	0	0	1	0	0	0	0	1	0	0	0
+Dogeland	STL		9	1						0	0	1	0	0	0	0	0	0
+Kakastania	LIB		5	0		0	0	0	0	0								
+Hemogard	LIB		8	0							0	0	0	0	0	0	0	0

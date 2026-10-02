@@ -1,0 +1,15 @@
+---
+// A player's franchise(s) as logos. A franchise without a logo on file falls back to its code.
+import { Image } from 'astro:assets';
+import { franchiseOrNull } from '../lib/data';
+interface Props { codes: string[] }
+const { codes } = Astro.props;
+---
+<span class="marks">
+  {codes.map((code) => {
+    const f = franchiseOrNull(code);
+    return f?.image
+      ? <Image src={f.image} alt={[f.code, f.name].filter(Boolean).join(' ')} title={[f.code, f.name].filter(Boolean).join(' ')} width={56} />
+      : <i class="chip">{code}</i>;
+  })}
+</span>

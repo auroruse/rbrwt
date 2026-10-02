@@ -120,3 +120,10 @@
   primary: "#291548"
   secondary: "#BD0000"
   ink: white
+
+- code: LIB
+  name: ""
+  logo: LIB.png
+  primary: "#011333"
+  secondary: "#C38D2B"
+  ink: white

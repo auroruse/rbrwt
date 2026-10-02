@@ -1,7 +1,8 @@
 ---
 import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
-import { AWARDS, franchise, franchiseOrNull, href, killLeaders, longDate, monthYear, records, tours } from '../lib/data';
+import TeamMarks from '../components/TeamMarks.astro';
+import { AWARDS, franchise, href, killLeaders, longDate, monthYear, records, tours } from '../lib/data';
 import { CARET, NEXT, PLAY } from '../lib/icons';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -91,15 +92,14 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
           <div>
             <p class="sub reveal">Kill leaders</p>
             <table class="leaders reveal">
-              <colgroup><col style="width:56px"><col style="width:74px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
+              <colgroup><col style="width:56px"><col style="width:92px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
               <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
               <tbody>
                 {killLeaders.map((p) => {
-                  const c = franchiseOrNull(p.team);
                   return (
-                    <tr style={c?.style}>
+                    <tr>
                       <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
-                      <td class="tm">{c && <i class="chip">{c.code}</i>}</td>
+                      <td class="tm"><TeamMarks codes={p.teams} /></td>
                       <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
                       <td class="n kills">{p.kills}</td>
                       <td class="n gp">{p.games}</td>

@@ -86,7 +86,9 @@ const GAME_COL = /^[CWF]\d+$/;
 const isNum = (v: string | undefined) => !!v && /^\d+$/.test(v.trim());
 
 type Player = { name: string; kills: number; games: number; team?: string };
-export type BoardRow = Player & { rank: number; kpg: number };
+export type BoardRow = Player & { rank: number; kpg: number; teams: string[] };
+// Players who played for two franchises: the all-time boards show both, in this order.
+const careers = yaml<Record<string, string[]>>('src/data/career-teams.yaml') ?? {};
 const players = new Map<string, Player>();
 const perTour = new Map<string, Map<string, Player>>();
 let bestTour = { kills: 0, name: '', tour: '' };
@@ -119,13 +121,18 @@ for (const t of tours) {
 }
 
 // Most kills first, fewer games breaking ties in the order; equal kills share a rank (1, 1, 3).
-const rank = (list: Player[]): BoardRow[] => {
+const rank = (list: Player[], career: boolean): BoardRow[] => {
   const sorted = [...list].sort((a, b) => b.kills - a.kills || a.games - b.games || a.name.localeCompare(b.name));
-  return sorted.map((p) => ({ ...p, rank: sorted.findIndex((q) => q.kills === p.kills) + 1, kpg: p.games ? p.kills / p.games : 0 }));
+  return sorted.map((p) => ({
+    ...p,
+    rank: sorted.findIndex((q) => q.kills === p.kills) + 1,
+    kpg: p.games ? p.kills / p.games : 0,
+    teams: (career && careers[p.name]) || (p.team ? [p.team] : []),
+  }));
 };
-export const allTimeBoard = rank([...players.values()]);
+export const allTimeBoard = rank([...players.values()], true);
 export const killLeaders = allTimeBoard.slice(0, 10);
-export const tourBoards = tours.map((t) => ({ tour: t, rows: perTour.has(t.num) ? rank([...perTour.get(t.num)!.values()]) : null }));
+export const tourBoards = tours.map((t) => ({ tour: t, rows: perTour.has(t.num) ? rank([...perTour.get(t.num)!.values()], false) : null }));
 
 // ---------------------------------------------------------------- records
 const tally = (values: (string | null)[]) => {

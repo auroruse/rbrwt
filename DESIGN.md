@@ -27,7 +27,7 @@ Every item is its own page. There is no About tab; the About section is the body
 2. The season band, laid across the seam where the header meets the water and spanning the whole screen: SEASON 2, RBRWT XI, the start. No date yet: "Date TBA". Once XI has a date, a countdown takes its place.
 3. About: the dispatch's Overview as the lead, the stats strip (tours played, matches played, franchises to date), the dispatch's Format as five numbered steps, and Joining the Tour as three steps in order.
 
-**Tours.** S2 tours from XI onward, one row each: numeral, date, host, champion once played. Each tour has its own page: format bracket, standings, kill leaderboard game by game, awards, replay links. Replays always link out, never embed.
+**Tours.** S2 tours from XI onward, one row each: numeral, date, host, champion once played. Each tour has its own page: format bracket, standings, kill leaderboard game by game, awards, replay links. Replays always link out, never embed. Until XI is played the page shows the Season 2 placeholder.
 
 **Franchises.** The S2 field as team cards, in alphabetical order of code until S2 has results. Later each card opens a franchise page, not built yet:
 1. The banner, playing the broadcast intro.
@@ -37,14 +37,14 @@ Every item is its own page. There is no About tab; the About section is the body
 
 Former franchises have no page; they live in History. A franchise that rejoins gets its page back, S1 tab included.
 
-**Stats.** The Season 1 kill leaderboard: every player across all tours by default, or one tour at a time through a row of filter buttons (All, I to X). Tour I has no kill sheet and says so; X's board carries "Conference stage only". A tour's board can be linked directly (`stats/#VI`). No charts. Season 2 joins with its own switch once XI is played.
+**Stats.** A season switch on the right of the head, S2 first and chosen. S2 shows the Season 2 placeholder until XI is played. S1 holds the kill leaderboard: every player across II to X by default, or one tour at a time through a row of filter buttons (All, II to X). Tour I has no kill sheet and no button; X's board carries "Conference stage only". Players are ranked by kills per game, and anyone under 10 games sits below everyone who reached 10. `stats/#s1` opens Season 1 and `stats/#VI` one of its tours. No charts.
 
-**History.** The S1 champions hanging from the rafters, the tours table, the records with the kill leaders' top ten, and a "Full leaderboard" button to Stats. S1 has no tour pages.
+**History.** The S1 champions hanging from the rafters, the tours table and the records. No leaderboard; that lives on Stats. S1 has no tour pages.
 
 ### Words
 
 - Broadcast voice, short. No intro paragraphs, no "welcome", nothing that explains what a page is. A heading and the content are the page.
-- Empty states are two or three words: "Date TBA", "Starts at XI", "Roster TBA".
+- Empty states are two or three words: "Date TBA", "Starts at XI", "Roster TBA". The one exception is the Season 2 placeholder's sentence, "Season 2 stats will be added here once the season starts.", as Kirin asked.
 - Players appear by in-game name only. NationStates nations are never shown. Garbelia appears as Garbelia everywhere.
 - Names never wrap onto a second line and never shrink to fit. A name too long for its space slides sideways and back under a fade at the right edge, the same way the football engine's names do.
 - Home regions use the names in the table under Franchise colours, linked to their NationStates region where one exists.
@@ -58,7 +58,7 @@ Former franchises have no page; they live in History. A franchise that rejoins g
 
 - Kill sheets: one standard TSV per tour, `assets/sheets/<numeral>.tsv` (II.tsv to X.tsv): Player, Team (franchise code), Conference, GP, Kills, then one column per game, C# for conference games, W# for wild card or play-ins, F# for finals, numbered within the stage. Every player appears under one site name. S2 sheets use the same layout.
 - Kirin's cleaned originals are kept unchanged in `assets/sheets/raw/`; the standard sheets were converted from them on 2 October 2026 and every player's game kills add up to their total. They beat the Google sheets and the all-time sheet wherever they disagree, and S1 totals are rebuilt from them.
-- A tour's board shows the team each player played for in that tour. VI to X take it from the sheet. II to V's sheets named none, so their teams come from Kirin's list of 2 October 2026, otherwise from the player's next listed team, and stay blank where that franchise did not exist yet (Varanius in II and III).
+- A tour's board shows the team each player played for in that tour. VI to X take it from the sheet. II to V's sheets named none, so their teams come from Kirin's list of 2 October 2026, otherwise from the player's next listed team. Varanius played II and III for TO.
 - `src/data/career-teams.yaml` lists the players who played for two franchises; the all-time boards show both. Everyone else shows the franchise of their latest tour.
 - Merged names (one player, two spellings or two accounts) are applied in the sheets and recorded in `src/data/aliases.yaml`, left as written in a sheet, right as shown on the site.
 - X's kills cover its conference stage only.
@@ -106,6 +106,7 @@ Primary is the field colour from Kirin's own dispatch banners; secondary comes f
 | CSS | Cannonballs | #FCCB55 | #212E52 | dark | S2 |
 | SLD | Exiles | #640229 | #FDAA14 | white | S2 |
 | TAL | Eagles | #3D5243 | #D2EAD2 | white | S2 |
+| TO | Bushrangers | #702D2D | #B59292 | white | S2 |
 | TPoP | Lightbringers | #D3A42C | #3A4239 | dark | S2 |
 | WC | Jokers | #476A9A | #ABCDFE | white | former |
 | ARN | Admirals | #BCB768 | #070B34 | dark | former |
@@ -116,25 +117,26 @@ Primary is the field colour from Kirin's own dispatch banners; secondary comes f
 | STL | Hyperion Guards | #294969 | #F3BA44 | white | former |
 | TL&C | Minutemen | #35485B | #B82E2E | white | former |
 | TNP | Rams | #01237C | #FFFFFF | white | former |
-| TO | Bushrangers | #702D2D | #B59292 | white | former |
-| TSP | Spits | #3FB1DE | #092458 | dark | former |
+| TSP | Iced Teas | #3FB1DE | #092458 | dark | former |
 | TWP | Rumrunners | #291548 | #BD0000 | white | former |
-| LIB | (name to come) | #011333 | #C38D2B | white | former |
+| LIB | Kaisers | #011333 | #C38D2B | white | former |
 
 - WC, STL and LIB have no dispatch banner, so their colours come from the logo.
 - LILY's secondary is the logo's rainbow, used as a 4px band.
 - Several primaries are nearly as dark as the page (TWP, SO, TNP and SLD are under 1.5:1 against `--abyss`), so every franchise field carries a 1px inner rim in its secondary.
 - Status follows the folders and changes when a logo moves.
 
-**Home regions** as shown on the site, set by Kirin on 2 October 2026. A former franchise's gets set when it rejoins.
+**Home regions** as shown on the site, set by Kirin on 2 October 2026; TO's, on its return on 3 October, is the one its dispatch entry gives. A former franchise's gets set when it rejoins.
 
 | Code | Shown as | Links to |
 |---|---|---|
 | CSS | Commonwealth of Sovereign States | nationstates.net/region=commonwealth_of_sovereign_states |
 | SLD | Solidarity | nationstates.net/region=nsleft |
 | TAL | Talonia | nationstates.net/region=talonia |
+| TO | The Outback | nationstates.net/region=the_outback |
 | TPoP | Perdition | nationstates.net/region=the_plains_of_perdition |
 | WC | Wild Card (inactive since 2 Oct 2026) | no link |
+| LIB | Liberlandia (former) | no link |
 
 Region links open in a new tab and carry a small arrow.
 
@@ -218,9 +220,9 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **Section head.** The Mega title on its own, no kicker or number above it; on the right, where there is one, the count in `--gold` Mono with a Label under it ("05 / Season 2", "10 / Season 1 tours"). One hairline under the whole head.
 
-**About.** The lead is the dispatch's Overview sentence in Medium 31px (22px on phones), with "the playable area is slowly flooding" in gold. Below it, the stats strip, built like the season band: the gold top line with its scan line, gold corner brackets, three readouts in a row divided by slanted hairlines, each a Mono label after a small gold square followed by its figure in white Mono 36px: Tours played 10, Matches played 209, Franchises to date 16. Below 1024px each label sits above its figure; on phones the readouts stack as rows, label left and figure right. Below, "Format" as five numbered steps on `--deep` with a 2px gold top edge (01 Conferences, 02 Qualifying, 03 Wild card, 04 Finals, 05 Seeding), each carrying the dispatch's sentence; five across, two on tablets, one on phones. Then "Joining the Tour" as one panel: the dispatch's opening sentence, then three steps in a row, each pointing at the next with a gold chevron on the divider: 01 Roster (3 starters + up to 3 subs), 02 Apply by DM (Garbelia, @garbelia_52399), 03 Logo + wordmark (Kirin, @auroruse). Each step is a Mono label over its value in Bold 24px, Discord handles in gold Mono. No descriptions under the contacts. Below 760px the steps stack and the chevrons point down.
+**About.** The lead is the dispatch's Overview sentence in Medium 31px (22px on phones), with "the playable area is slowly flooding" in gold. Below it, the stats strip, built like the season band: the gold top line with its scan line, gold corner brackets, three readouts in a row divided by slanted hairlines, each a Mono label after a small gold square followed by its figure in white Mono 36px: Tours played 10, Matches played 209, Franchises to date 17. Below 1024px each label sits above its figure; on phones the readouts stack as rows, label left and figure right. Below, "Format" as five numbered steps on `--deep` with a 2px gold top edge (01 Conferences, 02 Qualifying, 03 Wild card, 04 Finals, 05 Seeding), each carrying the dispatch's sentence; five across, two on tablets, one on phones. Then "Joining the Tour" as one panel: the dispatch's opening sentence, then three steps in a row, each pointing at the next with a gold chevron on the divider: 01 Roster (3 starters + up to 3 subs), 02 Apply by DM (Garbelia, @garbelia_52399), 03 Logo + wordmark (Kirin, @auroruse). Each step is a Mono label over its value in Bold 24px, Discord handles in gold Mono. No descriptions under the contacts. Below 760px the steps stack and the chevrons point down.
 
-**Team card** (Home's field). A 16:10 field in the primary with two diagonal stripes in the secondary and the 1px rim; the code in a chip at its top left (ink background, primary text); the logo at 60% of the card's width, bleeding off the right edge. Below, on `--deep`: the home region in Label (linked where it has a region), then the name in Team name type, then the roster as a depth chart, numbered in Mono with in-game names in Title: the three starters first, then the subs under a dashed rule, in Medium `--text-2` with a small outlined "Sub" tag. Every line is one line. Cards fill the row at 300px or wider: three across at full width, one on phones. With exactly four franchises the field is two by two instead, so no card is left alone on a row, and from 1180px each card turns sideways: the field on the left (44%, at least 260px tall, logo at 88% of it), region, name and roster on the right.
+**Team card** (Home's field). A 16:10 field in the primary with two diagonal stripes in the secondary and the 1px rim, which follows the cut across the top-left corner; the code in a chip at its top left (ink background, primary text); the logo at 60% of the card's width, bleeding off the right edge. Below, on `--deep`: the home region in Label (linked where it has a region), then the name in Team name type, then the roster as a depth chart, numbered in Mono with in-game names in Title: the three starters first, then the subs under a dashed rule, in Medium `--text-2` with a small outlined "Sub" tag. Every line is one line. Cards fill the row at 300px or wider: three across at full width, one on phones. With exactly four franchises the field is two by two instead, so no card is left alone on a row, and from 1180px each card turns sideways: the field on the left (44%, at least 260px tall, logo at 88% of it), region, name and roster on the right.
 
 **Logo tile** (Franchises). Square, primary field with the diagonal stripes and rim, logo at 70% of the tile, code chip and name below. Five across on desktop, three on tablets, two on phones.
 
@@ -234,11 +236,9 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **Tours table.** One row per S1 tour, oldest first, with the champion's primary as a 4px bar down its left edge. Columns: Tour, Date (Mono), Champion (28px logo and name), MVP, TF, RotM, MI by in-game name, and Replay, right-aligned. No venue column. Fixed widths of 80, 116, 180, 110, 140, 128, 144 and 112px, with any spare width shared out, sized so the longest entry in every column fits on one line. Every prize that wasn't awarded reads "Not awarded" in its own cell. A tour with one replay gets a slanted "Watch" chip; one with several gets "Watch" with a small caret, opening a menu of the parts (Koala, Kangaroo, Wild Card, Conferences, Finals) with their source, upward on the last three rows; none reads "No replay". No counts on the chips. X's TF carries "Conf. only". Between 760px and the table's 1010px it scrolls inside its frame; below 760px each row becomes a card.
 
-**Records.** Four tiles on `--deep`, each a gold Mono figure, a Mono label and the holder in Bold: 7 Titles (TO Bushrangers), 4 MVP awards (Miravana), 39 Kills in one tour (Wizard, RBRWT V), 7 Kills in one game (Wizard in V, Kirin in VI). Labels use "in", never a comma. Under the tiles, a full-width slanted gold "All stats" button with an arrow leads to the Stats page; the tiles stretch so the button's bottom lines up with the bottom of the kill leaders table.
+**Records.** Six tiles on `--deep` with the broadcast cut, three across, two on tablets, one on phones. Each carries its label in Mono after a small gold square at the top left, its context in `--text-3` at the top right, the figure in gold Mono 72px (56px on phones), and under a hairline every holder: logo, name in Bold, and the tour in Mono where it matters. Titles 7 (TO Bushrangers; I, II, IV, VI, VII, VIII, X), Titles in a row 3 (TO Bushrangers; VI to VIII), MVP awards 4 (Miravana; I, VI, VII, VIII), Kills in Season 1 169 (Kirin and Wizard; II to X), Kills in one tour 39 (Wizard, RBRWT V), Kills in one game 7 (Wizard in V, Kirin in VI). All computed from the data; a tie lists every holder. Labels use "in", never a comma.
 
-**Kill leaderboard** (Stats). Filter buttons in a row, slanted like the chips, `--surface-2` with Mono labels, the chosen one in `--gold` with ink; on phones the row scrolls sideways. Above each board, its name in Bold 28px and its facts in Mono on the right (date, player count, any note). The table is the kill leaders table, every player. Its Team column shows franchise logos at 28px, two side by side for a player on `career-teams.yaml`; a franchise without a logo shows its code instead.
-
-**Kill leaders.** The S1 top ten beside the records. Columns: rank (rank 1 in gold, ties share a rank), Team (logos, as on the leaderboard, in their own 92px column so all player names start on one line), Player, then kills, games and kills per game in Mono, right-aligned. Games drop on phones.
+**Kill leaderboard** (Stats). Filter buttons in a row, slanted like the chips, `--surface-2` with Mono labels, the chosen one in `--gold` with ink; on phones the row scrolls sideways. The season switch uses the same buttons. Above each board, its name in Bold 28px and its facts in Mono on the right (date, player count, any note). Columns: rank (rank 1 in gold, equal kills per game share a rank), Team, Player, then kills, games and kills per game in Mono, right-aligned, kills per game in `--text` as the figure the board is ranked by. The Team column has its own 92px so every player name starts on one line, and shows franchise logos at 28px, two side by side for a player on `career-teams.yaml`; a franchise without a logo shows its code instead. Games drop on phones. The players under 10 games follow a dashed rule and a Mono "Under 10 games" label; a board where nobody reached 10 has no rule.
 
 **Tour page head.** The tour numeral in Display with the tour gradient, then a lower-third: date, host venue, host franchise.
 
@@ -249,6 +249,8 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 **Tabs** (S2 and S1 on a franchise page). Labels on a hairline; the current tab gets the 2px `--gold` bar.
 
 **Empty state.** Two or three words in Label, `--text-3`, centred in the space the content would fill.
+
+**Season 2 placeholder** (Stats and Tours until XI is played). The season band grown into a panel: `--abyss` at 72%, the gold top line with its scan line, gold corner brackets. A "Season 2" Mono label, "Starts with RBRWT XI" in Bold up to 64px, the sentence "Season 2 stats will be added here once the season starts." ("tours" on Tours) in `--text-2`, then a readout row under a hairline: Next tour RBRWT XI, and Starts DATE TBA with the cursor, which becomes the countdown once XI has a date.
 
 **Footer.** On `--abyss` with a hairline above: the Rocket Bot Royale logo beside the three footer lines in 13px `--text-3`.
 

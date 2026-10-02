@@ -1,84 +1,107 @@
 ---
 import Site from '../layouts/Site.astro';
 import TeamMarks from '../components/TeamMarks.astro';
-import { allTimeBoard, longDate, tourBoards, type BoardRow } from '../lib/data';
+import S2Placeholder from '../components/S2Placeholder.astro';
+import { allTimeBoard, longDate, MIN_GAMES, season, sheetSpan, tourBoards, type BoardRow } from '../lib/data';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
-const withSheet = tourBoards.filter((b) => b.rows);
-const span = withSheet.length ? `${withSheet[0].tour.num} to ${withSheet[withSheet.length - 1].tour.num}` : '';
-const boards: { id: string; label: string; title: string; meta: string; rows: BoardRow[] | null }[] = [
-  { id: 'all', label: 'All', title: 'All tours', meta: `${span} · ${allTimeBoard.length} players`, rows: allTimeBoard },
-  ...tourBoards.map(({ tour, rows }) => ({
+// Only tours with a kill sheet get a board.
+const boards: { id: string; label: string; title: string; meta: string; rows: BoardRow[] }[] = [
+  { id: 'all', label: 'All', title: 'All tours', meta: `${sheetSpan} · ${allTimeBoard.length} players`, rows: allTimeBoard },
+  ...tourBoards.filter((b) => b.rows).map(({ tour, rows }) => ({
     id: tour.num,
     label: tour.num,
     title: `RBRWT ${tour.num}`,
-    meta: [longDate(tour.date), rows ? `${rows.length} players` : null, tour.sheet_note ?? null].filter(Boolean).join(' · '),
-    rows,
+    meta: [longDate(tour.date), `${rows!.length} players`, tour.sheet_note ?? null].filter(Boolean).join(' · '),
+    rows: rows!,
   })),
 ];
 ---
-<Site current="stats" inner title="Stats · RBR World Tour" description="Season 1 kill leaderboard of the Rocket Bot Royale World Tour, all tours or one at a time.">
+<Site current="stats" inner title="Stats · RBR World Tour" description={`Season ${season.season} statistics of the Rocket Bot Royale World Tour, and the Season 1 kill leaderboard.`}>
   <div class="depth">
     <div class="rays" aria-hidden="true"></div>
     <section class="sec sec-first sec-last" aria-labelledby="st-h">
       <div class="wrap">
         <header class="sec-head reveal">
           <h1 class="mega" id="st-h">Stats</h1>
-          <div class="sec-meta"><span class="sec-count">{pad2(allTimeBoard.length)}</span><span class="label">Season 1 players</span></div>
+          <div class="filters seasons" role="group" aria-label="Season">
+            <button type="button" class="filter" data-season="s2" aria-pressed="true">S{season.season}</button>
+            <button type="button" class="filter" data-season="s1" aria-pressed="false">S1</button>
+          </div>
         </header>
 
-        <p class="sub reveal">Kill leaderboard</p>
-        <div class="filters reveal" role="group" aria-label="Tour">
-          {boards.map((b, i) => <button type="button" class="filter" data-board={b.id} aria-pressed={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
+        <div id="season-s2">
+          <S2Placeholder what="stats" />
         </div>
 
-        {boards.map((b, i) => (
-          <div class="board" id={`board-${b.id}`} hidden={i !== 0}>
-            <div class="board-head"><h2>{b.title}</h2><span>{b.meta}</span></div>
-            {b.rows
-              ? (
-                <table class="leaders">
-                  <colgroup><col style="width:56px"><col style="width:92px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
-                  <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
-                  <tbody>
-                    {b.rows.map((p) => {
-                      return (
-                        <tr>
+        <div id="season-s1" hidden>
+          <p class="sub">Kill leaderboard</p>
+          <div class="filters" role="group" aria-label="Tour">
+            {boards.map((b, i) => <button type="button" class="filter" data-board={b.id} aria-pressed={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
+          </div>
+          {boards.map((b, i) => (
+            <div class="board" id={`board-${b.id}`} hidden={i !== 0}>
+              <div class="board-head"><h2>{b.title}</h2><span>{b.meta}</span></div>
+              <table class="leaders">
+                <colgroup><col style="width:56px"><col style="width:92px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
+                <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
+                <tbody>
+                  {b.rows.map((p, k) => {
+                    // A dashed rule and a label where the players under MIN_GAMES games begin.
+                    const split = p.low && k > 0 && !b.rows[k - 1].low;
+                    const lastAbove = !p.low && b.rows[k + 1]?.low;
+                    return (
+                      <Fragment>
+                        {split && <tr class="split"><td colspan="6">Under {MIN_GAMES} games</td></tr>}
+                        <tr class={lastAbove ? 'above-split' : undefined}>
                           <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
                           <td class="tm"><TeamMarks codes={p.teams} /></td>
                           <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
-                          <td class="n kills">{p.kills}</td>
+                          <td class="n">{p.kills}</td>
                           <td class="n gp">{p.games}</td>
-                          <td class="n">{p.kpg.toFixed(2)}</td>
+                          <td class="n key">{p.kpg.toFixed(2)}</td>
                         </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              )
-              : <div class="empty cut"><b>No kill sheet</b></div>}
-          </div>
-        ))}
+                      </Fragment>
+                    );
+                  })}
+                </tbody>
+              </table>
+            </div>
+          ))}
+        </div>
       </div>
     </section>
   </div>
 
   <script is:inline>
   (function () {
-    var buttons = document.querySelectorAll('.filter');
-    function show(id) {
-      buttons.forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.board === id ? 'true' : 'false'); });
+    var seasons = document.querySelectorAll('.filter[data-season]');
+    var tourButtons = document.querySelectorAll('.filter[data-board]');
+    function season(id) {
+      seasons.forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.season === id ? 'true' : 'false'); });
+      document.getElementById('season-s1').hidden = id !== 's1';
+      document.getElementById('season-s2').hidden = id === 's1';
+    }
+    function board(id) {
+      tourButtons.forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.board === id ? 'true' : 'false'); });
       document.querySelectorAll('.board').forEach(function (b) { b.hidden = b.id !== 'board-' + id; });
     }
-    buttons.forEach(function (b) {
+    seasons.forEach(function (b) {
       b.addEventListener('click', function () {
-        show(b.dataset.board);
-        history.replaceState(null, '', b.dataset.board === 'all' ? location.pathname : '#' + b.dataset.board);
+        season(b.dataset.season);
+        history.replaceState(null, '', b.dataset.season === 's1' ? '#s1' : location.pathname);
       });
     });
-    // A link can open one tour's board directly, for example stats/#VI.
+    tourButtons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        board(b.dataset.board);
+        history.replaceState(null, '', b.dataset.board === 'all' ? '#s1' : '#' + b.dataset.board);
+      });
+    });
+    // A link can open Season 1 (stats/#s1) or one of its tours (stats/#VI).
     var want = decodeURIComponent(location.hash.slice(1));
-    if (want && document.getElementById('board-' + want)) { show(want); }
+    if (want === 's1') { season('s1'); }
+    else if (want && document.getElementById('board-' + want)) { season('s1'); board(want); }
   })();
   </script>
 </Site>

@@ -106,9 +106,10 @@
   primary: "#702D2D"
   secondary: "#B59292"
   ink: white
+  home: { label: The Outback, region: the_outback }
 
 - code: TSP
-  name: Spits
+  name: Iced Teas
   logo: TSP.png
   primary: "#3FB1DE"
   secondary: "#092458"
@@ -122,8 +123,9 @@
   ink: white
 
 - code: LIB
-  name: ""
+  name: Kaisers
   logo: LIB.png
   primary: "#011333"
   secondary: "#C38D2B"
   ink: white
+  home: { label: Liberlandia }

@@ -86,12 +86,13 @@ const GAME_COL = /^[CWF]\d+$/;
 const isNum = (v: string | undefined) => !!v && /^\d+$/.test(v.trim());
 
 type Player = { name: string; kills: number; games: number; team?: string };
-export type BoardRow = Player & { rank: number; kpg: number; teams: string[] };
+// low: under MIN_GAMES games, so ranked below everyone who reached it.
+export type BoardRow = Player & { rank: number; kpg: number; low: boolean; teams: string[] };
+export const MIN_GAMES = 10;
 // Players who played for two franchises: the all-time boards show both, in this order.
 const careers = yaml<Record<string, string[]>>('src/data/career-teams.yaml') ?? {};
 const players = new Map<string, Player>();
 const perTour = new Map<string, Map<string, Player>>();
-let bestTour = { kills: 0, name: '', tour: '' };
 const gameHighs: { kills: number; name: string; tour: string }[] = [];
 
 for (const t of tours) {
@@ -114,42 +115,72 @@ for (const t of tours) {
     const p = players.get(name) ?? { name, kills: 0, games: 0 };
     p.kills += kills; p.games += games; p.team = team ?? p.team;
     players.set(name, p);
-    if (kills > bestTour.kills) bestTour = { kills, name, tour: t.num };
     for (const i of gameCols) if (isNum(r[i])) gameHighs.push({ kills: Number(r[i].trim()), name, tour: t.num });
   }
   perTour.set(t.num, board);
 }
 
-// Most kills first, fewer games breaking ties in the order; equal kills share a rank (1, 1, 3).
+// Best kills per game first, everyone under MIN_GAMES games below everyone who reached it.
+// More kills break ties in the order; equal kills per game share a rank (1, 1, 3).
+const kpgOf = (p: Player) => (p.games ? p.kills / p.games : 0);
 const rank = (list: Player[], career: boolean): BoardRow[] => {
-  const sorted = [...list].sort((a, b) => b.kills - a.kills || a.games - b.games || a.name.localeCompare(b.name));
-  return sorted.map((p) => ({
+  const rows = list.map((p) => ({ ...p, kpg: kpgOf(p), low: p.games < MIN_GAMES }));
+  rows.sort((a, b) => Number(a.low) - Number(b.low) || b.kpg - a.kpg || b.kills - a.kills || a.name.localeCompare(b.name));
+  return rows.map((p) => ({
     ...p,
-    rank: sorted.findIndex((q) => q.kills === p.kills) + 1,
-    kpg: p.games ? p.kills / p.games : 0,
+    rank: rows.findIndex((q) => q.low === p.low && q.kpg === p.kpg) + 1,
     teams: (career && careers[p.name]) || (p.team ? [p.team] : []),
   }));
 };
 export const allTimeBoard = rank([...players.values()], true);
-export const killLeaders = allTimeBoard.slice(0, 10);
 export const tourBoards = tours.map((t) => ({ tour: t, rows: perTour.has(t.num) ? rank([...perTour.get(t.num)!.values()], false) : null }));
 
 // ---------------------------------------------------------------- records
-const tally = (values: (string | null)[]) => {
-  const n = new Map<string, number>();
-  for (const v of values) if (v) n.set(v, (n.get(v) ?? 0) + 1);
-  return [...n.entries()].sort((a, b) => b[1] - a[1]);
-};
-const [titleCode, titleCount] = tally(tours.map((t) => t.champion))[0];
-const [mvpName, mvpCount] = tally(tours.map((t) => t.awards.MVP))[0];
-const topGame = Math.max(...gameHighs.map((g) => g.kills));
-const gameHolders = gameHighs.filter((g) => g.kills === topGame);
+// Six tiles for History. Ties list every holder; each holder carries the logos of the team(s) they set it with.
+export type Holder = { name: string; teams: string[]; note?: string };
+export type RecordTile = { figure: number; label: string; context: string; holders: Holder[] };
 
-export const records = [
-  { figure: titleCount, label: 'Titles', holder: `${titleCode} ${franchise(titleCode).name}` },
-  { figure: mvpCount, label: 'MVP awards', holder: mvpName },
-  { figure: bestTour.kills, label: 'Kills in one tour', holder: `${bestTour.name} · RBRWT ${bestTour.tour}` },
-  { figure: topGame, label: 'Kills in one game', holder: gameHolders.map((g) => `${g.name} (${g.tour})`).join(', ') },
+const latestTeams = (name: string): string[] => careers[name] ?? (players.get(name)?.team ? [players.get(name)!.team!] : []);
+const teamIn = (name: string, tour: string): string[] => {
+  const team = perTour.get(tour)?.get(name)?.team;
+  return team ? [team] : latestTeams(name);
+};
+const asFranchise = (code: string): Holder => ({ name: `${code} ${franchise(code).name}`, teams: [code] });
+const most = (m: Map<string, string[]>) => [...m.entries()].sort((a, b) => b[1].length - a[1].length)[0];
+const sheetTours = tours.filter((t) => t.sheet).map((t) => t.num);
+export const sheetSpan = sheetTours.length ? `${sheetTours[0]} to ${sheetTours[sheetTours.length - 1]}` : '';
+
+const titles = new Map<string, string[]>();
+const mvps = new Map<string, string[]>();
+for (const t of tours) {
+  titles.set(t.champion, [...(titles.get(t.champion) ?? []), t.num]);
+  if (t.awards.MVP) mvps.set(t.awards.MVP, [...(mvps.get(t.awards.MVP) ?? []), t.num]);
+}
+const [titleCode, titleTours] = most(titles);
+const [mvpName, mvpTours] = most(mvps);
+
+let streak = { code: '', from: '', to: '', n: 0 };
+for (let i = 0, run = 0; i < tours.length; i++) {
+  run = i > 0 && tours[i].champion === tours[i - 1].champion ? run + 1 : 1;
+  if (run > streak.n) streak = { code: tours[i].champion, from: tours[i - run + 1].num, to: tours[i].num, n: run };
+}
+
+const topKills = Math.max(0, ...allTimeBoard.map((p) => p.kills));
+const tourTotals = [...perTour.entries()].flatMap(([tour, board]) => [...board.values()].map((p) => ({ name: p.name, kills: p.kills, tour })));
+const topTour = Math.max(...tourTotals.map((x) => x.kills));
+const topGame = Math.max(...gameHighs.map((g) => g.kills));
+const unique = <T>(list: T[], key: (x: T) => string) => list.filter((x, i) => list.findIndex((y) => key(y) === key(x)) === i);
+
+export const records: RecordTile[] = [
+  { figure: titleTours.length, label: 'Titles', context: titleTours.join(', '), holders: [asFranchise(titleCode)] },
+  { figure: streak.n, label: 'Titles in a row', context: `${streak.from} to ${streak.to}`, holders: [asFranchise(streak.code)] },
+  { figure: mvpTours.length, label: 'MVP awards', context: mvpTours.join(', '), holders: [{ name: mvpName, teams: latestTeams(mvpName) }] },
+  { figure: topKills, label: 'Kills in Season 1', context: sheetSpan,
+    holders: allTimeBoard.filter((p) => p.kills === topKills).map((p) => ({ name: p.name, teams: p.teams })) },
+  { figure: topTour, label: 'Kills in one tour', context: 'One tour',
+    holders: tourTotals.filter((x) => x.kills === topTour).map((x) => ({ name: x.name, teams: teamIn(x.name, x.tour), note: `RBRWT ${x.tour}` })) },
+  { figure: topGame, label: 'Kills in one game', context: 'One game',
+    holders: unique(gameHighs.filter((g) => g.kills === topGame), (g) => g.name + g.tour).map((g) => ({ name: g.name, teams: teamIn(g.name, g.tour), note: `RBRWT ${g.tour}` })) },
 ];
 
 // ---------------------------------------------------------------- links

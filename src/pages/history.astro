@@ -2,8 +2,8 @@
 import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
 import TeamMarks from '../components/TeamMarks.astro';
-import { AWARDS, franchise, href, killLeaders, longDate, monthYear, records, tours } from '../lib/data';
-import { CARET, NEXT, PLAY } from '../lib/icons';
+import { AWARDS, franchise, longDate, monthYear, records, tours } from '../lib/data';
+import { CARET, PLAY } from '../lib/icons';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTube');
@@ -79,36 +79,20 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
           </div>
         </div>
 
-        <div class="block records">
-          <div class="rec-col">
-            <p class="sub reveal">Records</p>
-            <div class="rec-tiles">
-              {records.map((r, i) => (
-                <div class="rec cut reveal" style={`--i:${i}`}><b>{r.figure}</b><span class="k">{r.label}</span><span class="rec-who slide"><span>{r.holder}</span></span></div>
-              ))}
-            </div>
-            <a class="cta reveal" href={href('/stats/')}>Full leaderboard<Fragment set:html={NEXT} /></a>
-          </div>
-          <div>
-            <p class="sub reveal">Kill leaders</p>
-            <table class="leaders reveal">
-              <colgroup><col style="width:56px"><col style="width:92px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
-              <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
-              <tbody>
-                {killLeaders.map((p) => {
-                  return (
-                    <tr>
-                      <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
-                      <td class="tm"><TeamMarks codes={p.teams} /></td>
-                      <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
-                      <td class="n kills">{p.kills}</td>
-                      <td class="n gp">{p.games}</td>
-                      <td class="n">{p.kpg.toFixed(2)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
+        <div class="block">
+          <p class="sub reveal">Records</p>
+          <div class="records-grid">
+            {records.map((r, i) => (
+              <div class="rec2 cut reveal" style={`--i:${i}`}>
+                <div class="rec2-top"><span class="k">{r.label}</span><span class="c">{r.context}</span></div>
+                <b class="rec2-fig">{r.figure}</b>
+                <ul class="rec2-who">
+                  {r.holders.map((h) => (
+                    <li><TeamMarks codes={h.teams} /><span class="slide"><span>{h.name}{h.note && <i>{h.note}</i>}</span></span></li>
+                  ))}
+                </ul>
+              </div>
+            ))}
           </div>
         </div>
       </div>

@@ -145,11 +145,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   });
   document.addEventListener('click', function (e) { menus.forEach(function (d) { if (d.open && !d.contains(e.target)) { d.open = false; } }); });
 
-  // Countdown to the next tour, once it has a date (src/data/season.yaml).
-  var plate = document.getElementById('when-v');
-  var target = plate && plate.dataset.date ? new Date(plate.dataset.date) : null;
-  if (target && !isNaN(target)) {
-    var pad = function (n) { return String(n).padStart(2, '0'); };
+  // Countdowns to the next tour, once it has a date (src/data/season.yaml).
+  var pad = function (n) { return String(n).padStart(2, '0'); };
+  document.querySelectorAll('.js-countdown[data-date]').forEach(function (plate) {
+    var target = new Date(plate.dataset.date);
+    if (isNaN(target)) { return; }
     var tick = function () {
       var t = Math.max(0, Math.floor((target - Date.now()) / 1000));
       plate.innerHTML = pad(Math.floor(t / 86400)) + '<small>D</small>' + pad(Math.floor(t % 86400 / 3600)) + '<small>H</small>' +
@@ -157,7 +157,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     };
     tick();
     setInterval(tick, 1000);
-  }
+  });
 
   // Menu sheet for phones and tablets.
   var sheet = document.getElementById('sheet');

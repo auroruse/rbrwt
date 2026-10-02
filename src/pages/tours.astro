@@ -1,16 +1,18 @@
 ---
 import Site from '../layouts/Site.astro';
+import S2Placeholder from '../components/S2Placeholder.astro';
 import { season } from '../lib/data';
 ---
 <Site current="tours" inner title="Tours · RBR World Tour" description={`Season ${season.season} tours of the Rocket Bot Royale World Tour.`}>
   <div class="depth">
-    <section class="sec sec-first sec-last">
+    <div class="rays" aria-hidden="true"></div>
+    <section class="sec sec-first sec-last" aria-labelledby="to-h">
       <div class="wrap">
         <header class="sec-head reveal">
-          <h1 class="mega">Tours</h1>
+          <h1 class="mega" id="to-h">Tours</h1>
           <div class="sec-meta"><span class="sec-count">00</span><span class="label">Season {season.season} tours</span></div>
         </header>
-        <div class="empty cut reveal"><b>RBRWT {season.next.num}</b><span>{season.next.date ? 'Coming up' : 'Date TBA'}</span></div>
+        <S2Placeholder what="tours" />
       </div>
     </section>
   </div>

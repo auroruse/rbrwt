@@ -5,17 +5,15 @@ import barmark from '../../assets/header/wordmark.png';
 import footLogo from '../assets/pieces/logo.png';
 import { href } from '../lib/data';
 
-interface Props { title: string; description: string; current: 'home' | 'tours' | 'stats'; inner?: boolean }
+interface Props { title: string; description: string; current: 'home' | 'tours' | 'franchises' | 'stats' | 'history'; inner?: boolean }
 const { title, description, current, inner = false } = Astro.props;
 
-// About, Franchises and History are sections of Home; Tours and Stats are pages.
 const links = [
-  { label: 'Home', to: '/', sec: 'top', key: 'home' },
+  { label: 'Home', to: '/', key: 'home' },
   { label: 'Tours', to: '/tours/', key: 'tours' },
-  { label: 'Franchises', to: '/#franchises', sec: 'franchises' },
+  { label: 'Franchises', to: '/franchises/', key: 'franchises' },
   { label: 'Stats', to: '/stats/', key: 'stats' },
-  { label: 'History', to: '/#history', sec: 'history' },
-  { label: 'About', to: '/#about', sec: 'about' },
+  { label: 'History', to: '/history/', key: 'history' },
 ];
 const og = new URL(href('/og.png'), Astro.site).href;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
@@ -54,7 +52,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     </a>
     <nav class="nav" aria-label="Main">
       {links.map((l) => (
-        <a href={href(l.to)} data-sec={!inner ? l.sec : undefined} aria-current={l.key === current ? 'page' : undefined}>{l.label}</a>
+        <a href={href(l.to)} aria-current={l.key === current ? 'page' : undefined}>{l.label}</a>
       ))}
     </nav>
     <button class="menu-btn label" type="button" aria-expanded="false" aria-controls="sheet"><span>Menu</span></button>
@@ -68,7 +66,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
   </div>
   <nav aria-label="Main">
     {links.map((l) => (
-      <a href={href(l.to)} data-sec={!inner ? l.sec : undefined} aria-current={l.key === current ? 'page' : undefined}>{l.label}</a>
+      <a href={href(l.to)} aria-current={l.key === current ? 'page' : undefined}>{l.label}</a>
     ))}
   </nav>
 </div>
@@ -139,20 +137,6 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
     var ro = new ResizeObserver(function () { requestAnimationFrame(measure); });
     slides.forEach(function (b) { ro.observe(b); });
   } else { window.addEventListener('resize', measure); }
-
-  // On Home the menu follows the section in view.
-  var navLinks = document.querySelectorAll('nav a[data-sec]');
-  if (navLinks.length && 'IntersectionObserver' in window) {
-    var mark = function (id) {
-      navLinks.forEach(function (a) {
-        if (a.dataset.sec === id) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); }
-      });
-    };
-    var spy = new IntersectionObserver(function (entries) {
-      entries.forEach(function (en) { if (en.isIntersecting) { mark(en.target.id); } });
-    }, { rootMargin: '-45% 0px -50% 0px' });
-    ['top', 'about', 'franchises', 'history'].forEach(function (id) { var el = document.getElementById(id); if (el) { spy.observe(el); } });
-  }
 
   // Replay menus: one open at a time; a click elsewhere or Escape closes them.
   var menus = document.querySelectorAll('.watch details');

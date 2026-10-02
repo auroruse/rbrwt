@@ -1,5 +1,6 @@
 # One entry per tour, oldest first. Award winners by in-game name; null means not awarded.
-# matches: games played across every stage. sheet: the kill sheet in assets/sheets/ (none for I).
+# matches: games played across every stage. sheet: the kill sheet in assets/sheets/ (none for I);
+# sheet_note: a tag shown with that tour's kill board.
 # notes: a short tag shown after an award winner.
 
 - num: I
@@ -17,7 +18,7 @@
   host: TO
   champion: TO
   matches: 14
-  sheet: 2.tsv
+  sheet: II.tsv
   awards: { MVP: Robin, TF: Robin, RotM: Celia, MI: Entropan }
   replays: []
 
@@ -27,7 +28,7 @@
   host: TO
   champion: TPoP
   matches: 13
-  sheet: 3.tsv
+  sheet: III.tsv
   awards: { MVP: Wizard, TF: Celia, RotM: New Illyricum, MI: New Opolopia }
   replays:
     - { label: Replay, url: "https://youtu.be/QiEfAxIRyGU" }
@@ -38,7 +39,7 @@
   host: TPoP
   champion: TO
   matches: 21
-  sheet: 4.tsv
+  sheet: IV.tsv
   awards: { MVP: Robin, TF: Robin, RotM: Dyl, MI: Peanu-Butteria }
   replays:
     - { label: Replay, url: "https://youtu.be/ghapShSMItI" }
@@ -49,7 +50,7 @@
   host: TO
   champion: TL&C
   matches: 30
-  sheet: 5.tsv
+  sheet: V.tsv
   awards: { MVP: Entropan, TF: Wizard, RotM: Spode, MI: Garbelia }
   replays:
     - { label: Replay, url: "https://youtu.be/2GOOa2POe7c" }
@@ -60,7 +61,7 @@
   host: TL&C
   champion: TO
   matches: 28
-  sheet: 6.tsv
+  sheet: VI.tsv
   awards: { MVP: Miravana, TF: New Opolopia, RotM: Croblade, MI: Magrusa }
   replays:
     - { label: Conferences, url: "https://youtu.be/hKau1vIXZqU" }
@@ -72,7 +73,7 @@
   host: TO
   champion: TO
   matches: 26
-  sheet: 7.tsv
+  sheet: VII.tsv
   awards: { MVP: Miravana, TF: Kirin, RotM: Fishery, MI: WashFed }
   replays:
     - { label: Koala, url: "https://youtu.be/0Fz1PHhy7Iw" }
@@ -85,7 +86,7 @@
   host: TO
   champion: TO
   matches: 18
-  sheet: 8.tsv
+  sheet: VIII.tsv
   awards: { MVP: Miravana, TF: Miravana, RotM: Muspelgard, MI: Arty }
   replays:
     - { label: Koala, url: "https://drive.google.com/file/d/1swTfPEwi3omFOY28Cmoy3CUvHPQqLawJ/view" }
@@ -99,7 +100,7 @@
   host: TO
   champion: WC
   matches: 25
-  sheet: 9.tsv
+  sheet: IX.tsv
   awards: { MVP: Garbelia, TF: New Opolopia, RotM: Hellslayer, MI: Garbelia }
   replays:
     - { label: Koala, url: "https://youtu.be/F1N9f_oBgbU" }
@@ -113,7 +114,8 @@
   host: TPoP
   champion: TO
   matches: 25
-  sheet: 10 conf.tsv
+  sheet: X.tsv
+  sheet_note: Conference stage only
   awards: { MVP: Garbelia, TF: Kirin, RotM: New Charles, MI: Sans }
   notes: { TF: Conf. only }
   replays:

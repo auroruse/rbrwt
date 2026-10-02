@@ -7,17 +7,7 @@ import headerMark from '../../assets/header/header.png';
 import pLogo from '../assets/pieces/logo.png';
 import pWorld from '../assets/pieces/world.png';
 import pTour from '../assets/pieces/tour.png';
-import {
-  AWARDS, franchise, franchisesToDate, href, killLeaders, longDate, matchesPlayed, monthYear, nsRegion, records,
-  rosters, s2Field, season, tours,
-} from '../lib/data';
-
-const pad2 = (n: number) => String(n).padStart(2, '0');
-const ARROW = '<svg viewBox="0 0 10 10" aria-hidden="true"><path d="M2 8 8 2M3.5 2H8v4.5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>';
-const PLAY = '<svg viewBox="0 0 8 9" aria-hidden="true"><path d="M0 0 8 4.5 0 9z" fill="currentColor"/></svg>';
-const CARET = '<svg class="caret" viewBox="0 0 8 5" aria-hidden="true"><path d="M0 0 4 5 8 0z" fill="currentColor"/></svg>';
-const NEXT = '<svg viewBox="0 0 22 12" aria-hidden="true"><path d="M0 6h20M15 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
-const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTube');
+import { franchisesToDate, matchesPlayed, season, tours } from '../lib/data';
 ---
 <Site current="home" title="RBR World Tour" description={`The Rocket Bot Royale World Tour. Season ${season.season} opens with RBRWT ${season.next.num}.`}>
   <section class="hero" id="top">
@@ -39,7 +29,7 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
   <div class="depth">
     <div class="rays" aria-hidden="true"></div>
 
-    <section class="sec sec-first" id="about" aria-labelledby="about-h">
+    <section class="sec sec-first sec-last" id="about" aria-labelledby="about-h">
       <div class="wrap">
         <header class="sec-head reveal">
           <h2 class="mega" id="about-h">About</h2>
@@ -71,151 +61,6 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
               <li><span class="flow-k"><b>02</b>Apply by DM</span><span class="flow-v slide"><span>Garbelia<i>@garbelia_52399</i></span></span></li>
               <li><span class="flow-k"><b>03</b>Logo + wordmark</span><span class="flow-v slide"><span>Kirin<i>@auroruse</i></span></span></li>
             </ol>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section class="sec" id="franchises" aria-labelledby="fr-h">
-      <div class="wrap">
-        <header class="sec-head reveal">
-          <h2 class="mega" id="fr-h">Franchises</h2>
-          <div class="sec-meta"><span class="sec-count">{pad2(s2Field.length)}</span><span class="label">Season {season.season}</span></div>
-        </header>
-        <div class={s2Field.length === 4 ? 'teams n4' : 'teams'}>
-          {s2Field.map((f, i) => {
-            const roster = rosters.get(f.code) ?? [];
-            return (
-              <article class="team cut reveal" style={`--i:${i}; ${f.style}`}>
-                <div class="team-field">
-                  <span class="team-code">{f.code}</span>
-                  {f.image && <Image src={f.image} alt={`${f.code} ${f.name} logo`} width={520} />}
-                  <span class="team-sweep"></span>
-                </div>
-                <div class="team-body">
-                  <p class="team-home slide">
-                    {f.home?.region
-                      ? <a href={nsRegion(f.home.region)} target="_blank" rel="noopener">{f.home.label}<Fragment set:html={ARROW} /></a>
-                      : <span>{f.home?.label ?? ''}</span>}
-                  </p>
-                  <h3 class="team-name slide"><span>{f.name}</span></h3>
-                  <ol class="team-roster">
-                    {roster.length
-                      ? roster.map((r, k) => (
-                          <li class={r.role.toLowerCase() === 'sub' ? 'is-sub' : undefined}>
-                            <span class="num">{pad2(k + 1)}</span><span class="who slide"><span>{r.player}</span></span>
-                            {r.role.toLowerCase() === 'sub' && <i class="sub-tag">Sub</i>}
-                          </li>
-                        ))
-                      : <li><span class="num">00</span><span class="who"><span class="na">Roster TBA</span></span></li>}
-                  </ol>
-                </div>
-              </article>
-            );
-          })}
-        </div>
-      </div>
-    </section>
-
-    <section class="sec sec-last" id="history" aria-labelledby="hi-h">
-      <div class="wrap">
-        <header class="sec-head reveal">
-          <h2 class="mega" id="hi-h">History</h2>
-          <div class="sec-meta"><span class="sec-count">{pad2(tours.length)}</span><span class="label">Season 1 tours</span></div>
-        </header>
-
-        <p class="sub reveal">Champions</p>
-        <ol class="rafters">
-          {tours.map((t, i) => {
-            const c = franchise(t.champion);
-            return (
-              <li class="flag reveal" style={`--i:${i % 5}; ${c.style}`}>
-                <div class="flag-body">
-                  {c.image && <Image src={c.image} alt={`RBRWT ${t.num} champions: ${c.code} ${c.name}`} width={160} />}
-                  <span class="flag-num">{t.num}</span>
-                  <span class="flag-date">{monthYear(t.date)}</span>
-                </div>
-              </li>
-            );
-          })}
-        </ol>
-
-        <div class="block">
-          <p class="sub reveal">Tours</p>
-          <div class="table-frame reveal">
-            <table class="tours">
-              <colgroup><col style="width:80px"><col style="width:116px"><col style="width:180px"><col style="width:110px"><col style="width:140px"><col style="width:128px"><col style="width:144px"><col style="width:112px"></colgroup>
-              <thead><tr><th>Tour</th><th>Date</th><th>Champion</th>{AWARDS.map((a) => <th>{a}</th>)}<th class="r">Replay</th></tr></thead>
-              <tbody>
-                {tours.map((t, i) => {
-                  const c = franchise(t.champion);
-                  return (
-                    <tr style={c.style}>
-                      <td class="t-num">{t.num}</td>
-                      <td class="t-date">{longDate(t.date)}</td>
-                      <td class="t-champ"><span class="slide"><span>{c.image && <Image src={c.image} alt="" width={64} />}{c.name}</span></span></td>
-                      {AWARDS.map((a) => {
-                        const who = t.awards[a];
-                        const note = t.notes?.[a];
-                        return (
-                          <td class={`t-award a-${a.toLowerCase()}`} data-k={a}>
-                            {who
-                              ? <span class="slide"><span>{who}{note && <i class="note">{note}</i>}</span></span>
-                              : <span class="na">Not awarded</span>}
-                          </td>
-                        );
-                      })}
-                      <td class="watch">
-                        {t.replays.length === 0 && <span class="na">No replay</span>}
-                        {t.replays.length === 1 && <a class="go" href={t.replays[0].url} target="_blank" rel="noopener"><Fragment set:html={PLAY} />Watch</a>}
-                        {t.replays.length > 1 && (
-                          <details class={i >= tours.length - 3 ? 'up' : undefined}>
-                            <summary><Fragment set:html={PLAY} />Watch<Fragment set:html={CARET} /></summary>
-                            <div class="watch-menu">
-                              {t.replays.map((r) => <a href={r.url} target="_blank" rel="noopener">{r.label}<span>{source(r.url)}</span></a>)}
-                            </div>
-                          </details>
-                        )}
-                      </td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <div class="block records">
-          <div class="rec-col">
-            <p class="sub reveal">Records</p>
-            <div class="rec-tiles">
-              {records.map((r, i) => (
-                <div class="rec cut reveal" style={`--i:${i}`}><b>{r.figure}</b><span class="k">{r.label}</span><span class="rec-who slide"><span>{r.holder}</span></span></div>
-              ))}
-            </div>
-            <a class="cta reveal" href={href('/stats/')}>All stats<Fragment set:html={NEXT} /></a>
-          </div>
-          <div>
-            <p class="sub reveal">Kill leaders</p>
-            <table class="leaders reveal">
-              <colgroup><col style="width:56px"><col style="width:74px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
-              <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
-              <tbody>
-                {killLeaders.map((p) => {
-                  const c = p.team ? franchise(p.team) : null;
-                  return (
-                    <tr style={c?.style}>
-                      <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
-                      <td class="tm">{c && <i class="chip">{c.code}</i>}</td>
-                      <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
-                      <td class="n kills">{p.kills}</td>
-                      <td class="n gp">{p.games}</td>
-                      <td class="n">{p.kpg.toFixed(2)}</td>
-                    </tr>
-                  );
-                })}
-              </tbody>
-            </table>
           </div>
         </div>
       </div>

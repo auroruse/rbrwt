@@ -1,0 +1,53 @@
+---
+import { Image } from 'astro:assets';
+import Site from '../layouts/Site.astro';
+import { nsRegion, rosters, s2Field, season } from '../lib/data';
+import { ARROW } from '../lib/icons';
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+---
+<Site current="franchises" inner title="Franchises · RBR World Tour" description={`The ${s2Field.length} franchises of Season ${season.season} of the Rocket Bot Royale World Tour.`}>
+  <div class="depth">
+    <div class="rays" aria-hidden="true"></div>
+    <section class="sec sec-first sec-last" aria-labelledby="fr-h">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h1 class="mega" id="fr-h">Franchises</h1>
+          <div class="sec-meta"><span class="sec-count">{pad2(s2Field.length)}</span><span class="label">Season {season.season}</span></div>
+        </header>
+        <div class={s2Field.length === 4 ? 'teams n4' : 'teams'}>
+          {s2Field.map((f, i) => {
+            const roster = rosters.get(f.code) ?? [];
+            return (
+              <article class="team cut reveal" style={`--i:${i}; ${f.style}`}>
+                <div class="team-field">
+                  <span class="team-code">{f.code}</span>
+                  {f.image && <Image src={f.image} alt={`${f.code} ${f.name} logo`} width={520} />}
+                  <span class="team-sweep"></span>
+                </div>
+                <div class="team-body">
+                  <p class="team-home slide">
+                    {f.home?.region
+                      ? <a href={nsRegion(f.home.region)} target="_blank" rel="noopener">{f.home.label}<Fragment set:html={ARROW} /></a>
+                      : <span>{f.home?.label ?? ''}</span>}
+                  </p>
+                  <h2 class="team-name slide"><span>{f.name}</span></h2>
+                  <ol class="team-roster">
+                    {roster.length
+                      ? roster.map((r, k) => (
+                          <li class={r.role.toLowerCase() === 'sub' ? 'is-sub' : undefined}>
+                            <span class="num">{pad2(k + 1)}</span><span class="who slide"><span>{r.player}</span></span>
+                            {r.role.toLowerCase() === 'sub' && <i class="sub-tag">Sub</i>}
+                          </li>
+                        ))
+                      : <li><span class="num">00</span><span class="who"><span class="na">Roster TBA</span></span></li>}
+                  </ol>
+                </div>
+              </article>
+            );
+          })}
+        </div>
+      </div>
+    </section>
+  </div>
+</Site>

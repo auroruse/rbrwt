@@ -1,19 +1,84 @@
 ---
 import Site from '../layouts/Site.astro';
-import { href, season } from '../lib/data';
-const NEXT = '<svg viewBox="0 0 22 12" aria-hidden="true"><path d="M0 6h20M15 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>';
+import { allTimeBoard, franchiseOrNull, longDate, tourBoards, type BoardRow } from '../lib/data';
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const withSheet = tourBoards.filter((b) => b.rows);
+const span = withSheet.length ? `${withSheet[0].tour.num} to ${withSheet[withSheet.length - 1].tour.num}` : '';
+const boards: { id: string; label: string; title: string; meta: string; rows: BoardRow[] | null }[] = [
+  { id: 'all', label: 'All', title: 'All tours', meta: `${span} · ${allTimeBoard.length} players`, rows: allTimeBoard },
+  ...tourBoards.map(({ tour, rows }) => ({
+    id: tour.num,
+    label: tour.num,
+    title: `RBRWT ${tour.num}`,
+    meta: [longDate(tour.date), rows ? `${rows.length} players` : null, tour.sheet_note ?? null].filter(Boolean).join(' · '),
+    rows,
+  })),
+];
 ---
-<Site current="stats" inner title="Stats · RBR World Tour" description={`Season ${season.season} statistics of the Rocket Bot Royale World Tour.`}>
+<Site current="stats" inner title="Stats · RBR World Tour" description="Season 1 kill leaderboard of the Rocket Bot Royale World Tour, all tours or one at a time.">
   <div class="depth">
-    <section class="sec sec-first sec-last">
+    <div class="rays" aria-hidden="true"></div>
+    <section class="sec sec-first sec-last" aria-labelledby="st-h">
       <div class="wrap">
         <header class="sec-head reveal">
-          <h1 class="mega">Stats</h1>
-          <div class="sec-meta"><span class="sec-count">S{season.season}</span><span class="label">Season {season.season}</span></div>
+          <h1 class="mega" id="st-h">Stats</h1>
+          <div class="sec-meta"><span class="sec-count">{pad2(allTimeBoard.length)}</span><span class="label">Season 1 players</span></div>
         </header>
-        <div class="empty cut reveal"><b>Starts at {season.next.num}</b></div>
-        <a class="cta reveal" href={href('/#history')}>Season 1 records<Fragment set:html={NEXT} /></a>
+
+        <p class="sub reveal">Kill leaderboard</p>
+        <div class="filters reveal" role="group" aria-label="Tour">
+          {boards.map((b, i) => <button type="button" class="filter" data-board={b.id} aria-pressed={i === 0 ? 'true' : 'false'}>{b.label}</button>)}
+        </div>
+
+        {boards.map((b, i) => (
+          <div class="board" id={`board-${b.id}`} hidden={i !== 0}>
+            <div class="board-head"><h2>{b.title}</h2><span>{b.meta}</span></div>
+            {b.rows
+              ? (
+                <table class="leaders">
+                  <colgroup><col style="width:56px"><col style="width:74px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
+                  <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
+                  <tbody>
+                    {b.rows.map((p) => {
+                      const c = franchiseOrNull(p.team);
+                      return (
+                        <tr style={c?.style}>
+                          <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
+                          <td class="tm">{c && <i class="chip">{c.code}</i>}</td>
+                          <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
+                          <td class="n kills">{p.kills}</td>
+                          <td class="n gp">{p.games}</td>
+                          <td class="n">{p.kpg.toFixed(2)}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              )
+              : <div class="empty cut"><b>No kill sheet</b></div>}
+          </div>
+        ))}
       </div>
     </section>
   </div>
+
+  <script is:inline>
+  (function () {
+    var buttons = document.querySelectorAll('.filter');
+    function show(id) {
+      buttons.forEach(function (o) { o.setAttribute('aria-pressed', o.dataset.board === id ? 'true' : 'false'); });
+      document.querySelectorAll('.board').forEach(function (b) { b.hidden = b.id !== 'board-' + id; });
+    }
+    buttons.forEach(function (b) {
+      b.addEventListener('click', function () {
+        show(b.dataset.board);
+        history.replaceState(null, '', b.dataset.board === 'all' ? location.pathname : '#' + b.dataset.board);
+      });
+    });
+    // A link can open one tour's board directly, for example stats/#VI.
+    var want = decodeURIComponent(location.hash.slice(1));
+    if (want && document.getElementById('board-' + want)) { show(want); }
+  })();
+  </script>
 </Site>

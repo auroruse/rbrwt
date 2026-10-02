@@ -36,6 +36,7 @@ export const franchises: Franchise[] = yaml<FranchiseRow[]>('src/data/franchises
   };
 });
 const fByCode = new Map(franchises.map((f) => [f.code, f]));
+export const franchiseOrNull = (code?: string) => (code ? fByCode.get(code) ?? null : null);
 export const franchise = (code: string): Franchise => {
   const f = fByCode.get(code);
   if (!f) throw new Error(`Unknown franchise code "${code}" (add it to src/data/franchises.yaml)`);
@@ -62,7 +63,7 @@ type Award = 'MVP' | 'TF' | 'RotM' | 'MI';
 export const AWARDS: Award[] = ['MVP', 'TF', 'RotM', 'MI'];
 export type Tour = {
   num: string; date: string; venue: string; host: string; champion: string; matches: number; sheet?: string;
-  awards: Record<Award, string | null>; notes?: Partial<Record<Award, string>>;
+  awards: Record<Award, string | null>; notes?: Partial<Record<Award, string>>; sheet_note?: string;
   replays: { label: string; url: string }[];
 };
 export const tours = yaml<Tour[]>('src/data/tours.yaml');
@@ -78,48 +79,53 @@ export const monthYear = (iso: string) => { const p = parts(iso); return `${p.m}
 export const matchesPlayed = tours.reduce((n, t) => n + (t.matches || 0), 0);
 
 // ---------------------------------------------------------------- kill sheets
+// One standard TSV per tour in assets/sheets (the originals are kept in assets/sheets/raw):
+// Player, Team, Conference, GP, Kills, then one column per game, C# conference, W# wild card or play-in, F# finals.
 const aliases = yaml<Record<string, string>>('src/data/aliases.yaml') ?? {};
-const GAME_COL = /^(Game \d+|Conf \d+|Finals \d+|C\d+|WC|F\d+|\d+)$/;
+const GAME_COL = /^[CWF]\d+$/;
 const isNum = (v: string | undefined) => !!v && /^\d+$/.test(v.trim());
 
 type Player = { name: string; kills: number; games: number; team?: string };
+export type BoardRow = Player & { rank: number; kpg: number };
 const players = new Map<string, Player>();
+const perTour = new Map<string, Map<string, Player>>();
 let bestTour = { kills: 0, name: '', tour: '' };
 const gameHighs: { kills: number; name: string; tour: string }[] = [];
 
 for (const t of tours) {
   if (!t.sheet) continue;
-  const rows = read(path.join('assets/sheets', t.sheet)).split(/\r?\n/).map((r) => r.split('\t'));
-  const hi = rows.findIndex((r) => r.some((c) => c.trim().toLowerCase() === 'player'));
-  if (hi < 0) continue;
-  const head = rows[hi].map((c) => c.trim());
-  const low = head.map((c) => c.toLowerCase());
-  const pc = low.indexOf('player');
-  const tc = low.findIndex((c) => c === 'total' || c === 'total kills');
-  const gp = low.findIndex((c) => c === 'gp' || c === 'games played');
-  const team = low.indexOf('team');
-  const gameCols = head.map((c, i) => (GAME_COL.test(c) ? i : -1)).filter((i) => i >= 0);
-  for (const r of rows.slice(hi + 1)) {
+  const [head, ...rows] = read(path.join('assets/sheets', t.sheet)).split(/\r?\n/).map((r) => r.split('\t'));
+  const at = (name: string) => head.findIndex((c) => c.trim().toLowerCase() === name);
+  const [pc, tc, gc, kc] = ['player', 'team', 'gp', 'kills'].map(at);
+  const gameCols = head.map((c, i) => (GAME_COL.test(c.trim()) ? i : -1)).filter((i) => i >= 0);
+  const board = new Map<string, Player>();
+  for (const r of rows) {
     const raw = (r[pc] ?? '').trim();
-    if (!raw || !isNum(r[tc])) continue;
+    if (!raw || !isNum(r[kc])) continue;
     const name = aliases[raw] ?? raw;
-    const kills = Number(r[tc].trim());
-    const games = gp >= 0 && isNum(r[gp]) ? Number(r[gp].trim()) : gameCols.filter((i) => isNum(r[i])).length;
+    const kills = Number(r[kc].trim());
+    const games = isNum(r[gc]) ? Number(r[gc].trim()) : gameCols.filter((i) => isNum(r[i])).length;
+    const team = (r[tc] ?? '').trim() || undefined;
+    const row = board.get(name) ?? { name, kills: 0, games: 0 };
+    row.kills += kills; row.games += games; row.team = team ?? row.team;
+    board.set(name, row);
     const p = players.get(name) ?? { name, kills: 0, games: 0 };
-    p.kills += kills;
-    p.games += games;
-    if (team >= 0 && (r[team] ?? '').trim()) p.team = r[team].trim().split(/\s+/)[0];
+    p.kills += kills; p.games += games; p.team = team ?? p.team;
     players.set(name, p);
     if (kills > bestTour.kills) bestTour = { kills, name, tour: t.num };
     for (const i of gameCols) if (isNum(r[i])) gameHighs.push({ kills: Number(r[i].trim()), name, tour: t.num });
   }
+  perTour.set(t.num, board);
 }
 
-// Ties share a rank: 1, 1, 3.
-export const killLeaders = [...players.values()]
-  .sort((a, b) => b.kills - a.kills || a.games - b.games)
-  .slice(0, 10)
-  .map((p, i, all) => ({ ...p, rank: all.findIndex((q) => q.kills === p.kills) + 1, kpg: p.kills / p.games }));
+// Most kills first, fewer games breaking ties in the order; equal kills share a rank (1, 1, 3).
+const rank = (list: Player[]): BoardRow[] => {
+  const sorted = [...list].sort((a, b) => b.kills - a.kills || a.games - b.games || a.name.localeCompare(b.name));
+  return sorted.map((p) => ({ ...p, rank: sorted.findIndex((q) => q.kills === p.kills) + 1, kpg: p.games ? p.kills / p.games : 0 }));
+};
+export const allTimeBoard = rank([...players.values()]);
+export const killLeaders = allTimeBoard.slice(0, 10);
+export const tourBoards = tours.map((t) => ({ tour: t, rows: perTour.has(t.num) ? rank([...perTour.get(t.num)!.values()]) : null }));
 
 // ---------------------------------------------------------------- records
 const tally = (values: (string | null)[]) => {

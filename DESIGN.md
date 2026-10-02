@@ -16,22 +16,20 @@ Decided with Moukden and Kirin, 2 October 2026. Reworked the same day after the 
 
 ### Menu
 
-Home · Tours · Franchises · Stats · History · About
+Home · Tours · Franchises · Stats · History
 
-Home is the dispatch in site form, so About, Franchises and History scroll to their sections on Home and the menu follows the section in view. Tours and Stats are pages of their own once S2 is running.
+Every item is its own page. There is no About tab; the About section is the body of Home.
 
 ### Pages
 
-**Home**, in the dispatch's order:
+**Home**
 1. The hero: the scene from `assets/header/background.avif` with the header wordmark (`assets/header/header.png`) surfacing over its water. On phones the wordmark stacks: logo, WORLD, TOUR.
 2. The season band, laid across the seam where the header meets the water and spanning the whole screen: SEASON 2, RBRWT XI, the start. No date yet: "Date TBA". Once XI has a date, a countdown takes its place.
-3. About: the dispatch's Overview as the lead, three facts beside it (tours played, matches played, franchises to date), the dispatch's Format as five numbered steps, and Joining the Tour as three steps in order.
-4. Franchises: every S2 franchise with its home region and roster, in alphabetical order of code until S2 has results.
-5. History: the S1 champions hanging from the rafters, the tours table, the records and the kill leaders.
+3. About: the dispatch's Overview as the lead, the stats strip (tours played, matches played, franchises to date), the dispatch's Format as five numbered steps, and Joining the Tour as three steps in order.
 
 **Tours.** S2 tours from XI onward, one row each: numeral, date, host, champion once played. Each tour has its own page: format bracket, standings, kill leaderboard game by game, awards, replay links. Replays always link out, never embed.
 
-**Franchises.** A logo grid of the S2 field. Each tile opens a franchise page:
+**Franchises.** The S2 field as team cards, in alphabetical order of code until S2 has results. Later each card opens a franchise page, not built yet:
 1. The banner, playing the broadcast intro.
 2. Tabs: S2 (default) and S1.
 3. S2: roster cards, tour-by-tour record, franchise records, home region panel (region flag from NationStates, link to the region, founding tour).
@@ -39,9 +37,9 @@ Home is the dispatch in site form, so About, Franchises and History scroll to th
 
 Former franchises have no page; they live in History. A franchise that rejoins gets its page back, S1 tab included.
 
-**Stats.** S2 only: player leaderboard (sortable, filter by franchise), franchise table, records. No charts. Kills per game is ranked only from 10 games up; players under that show their numbers unranked. Before XI is played: "Starts at XI".
+**Stats.** The Season 1 kill leaderboard: every player across all tours by default, or one tour at a time through a row of filter buttons (All, I to X). Tour I has no kill sheet and says so; X's board carries "Conference stage only". A tour's board can be linked directly (`stats/#VI`). No charts. Season 2 joins with its own switch once XI is played.
 
-**History** and **About** are sections of Home (see above). S1 has no tour pages and no game-by-game numbers on the site.
+**History.** The S1 champions hanging from the rafters, the tours table, the records with the kill leaders' top ten, and a "Full leaderboard" button to Stats. S1 has no tour pages.
 
 ### Words
 
@@ -58,8 +56,9 @@ Former franchises have no page; they live in History. A franchise that rejoins g
 
 ### Data
 
-- Kill sheets: `assets/sheets/*.tsv`, Kirin's cleaned copies. They beat the Google sheets and the all-time sheet wherever they disagree, and S1 totals are rebuilt from them.
-- `10 finals.tsv` is a copy of VIII's finals and is never read. X's kills cover its conference stage only.
+- Kill sheets: one standard TSV per tour, `assets/sheets/<numeral>.tsv` (II.tsv to X.tsv): Player, Team (franchise code), Conference, GP, Kills, then one column per game, C# for conference games, W# for wild card or play-ins, F# for finals, numbered within the stage. Every player appears under one site name. S2 sheets use the same layout.
+- Kirin's cleaned originals are kept unchanged in `assets/sheets/raw/`; the standard sheets were converted from them on 2 October 2026 and every player's game kills add up to their total. They beat the Google sheets and the all-time sheet wherever they disagree, and S1 totals are rebuilt from them.
+- II to V's sheets name no teams, so their boards show no team tags. X's kills cover its conference stage only.
 - After each S2 tour Kirin sends that tour's sheet; it is added and the site republished. The browser never fetches a sheet.
 - S2 sheets need each game's winner as well as the kills. Wins, win rates, standings and finals reached cannot come from kill sheets.
 - NationStates nations are used only behind the scenes: the dispatch gives I to VIII's award winners by nation, and they are turned into in-game names before anything is shown.
@@ -165,6 +164,7 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 - **Slants:** chips, plates, buttons and lower-thirds are parallelograms with a 12px slant, text upright.
 - Nothing is rounded. Radius is 0 everywhere; no pills.
 - Lists never show the browser's own markers. Numbering is designed (01, 02) or absent.
+- Slanted controls clip a ring drawn outside them, so their focus ring sits inside the shape.
 - No drop shadows on interface parts. The wordmark carries a soft shadow because it sits on art.
 
 ### Images and icons
@@ -232,6 +232,8 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **Records.** Four tiles on `--deep`, each a gold Mono figure, a Mono label and the holder in Bold: 7 Titles (TO Bushrangers), 4 MVP awards (Miravana), 39 Kills in one tour (Wizard, RBRWT V), 7 Kills in one game (Wizard in V, Kirin in VI). Labels use "in", never a comma. Under the tiles, a full-width slanted gold "All stats" button with an arrow leads to the Stats page; the tiles stretch so the button's bottom lines up with the bottom of the kill leaders table.
 
+**Kill leaderboard** (Stats). Filter buttons in a row, slanted like the chips, `--surface-2` with Mono labels, the chosen one in `--gold` with ink; on phones the row scrolls sideways. Above each board, its name in Bold 28px and its facts in Mono on the right (date, player count, any note). The table is the kill leaders table, every player.
+
 **Kill leaders.** The S1 top ten beside the records. Columns: rank (rank 1 in gold, ties share a rank), Team (their last S1 franchise as a coloured code chip, every chip the same 46px width, in its own column so all player names start on one line), Player, then kills, games and kills per game in Mono, right-aligned. Games drop on phones.
 
 **Tour page head.** The tour numeral in Display with the tour gradient, then a lower-third: date, host venue, host franchise.
@@ -270,6 +272,6 @@ Everything on the page comes from files, read at build time:
 - `src/data/tours.yaml`: each tour's date, venue, host, champion, matches, awards, notes, replays and kill sheet.
 - `src/data/season.yaml`: the season number and the next tour; a date starts the countdown.
 - `src/data/aliases.yaml`: different spellings of one player across the sheets.
-- `assets/sheets/*.tsv`: the kill sheets. Kill leaders and records are computed from them, never typed in.
+- `assets/sheets/<numeral>.tsv`: the kill sheets in the standard layout. Every leaderboard and record is computed from them, never typed in.
 
 Images: logos and the wordmarks are resized to WebP at build. `assets/header/background.avif` is served as it is, because the build's image tool cannot decode it. The phone wordmark pieces live in `src/assets/pieces/`; the link card and favicon in `public/`.

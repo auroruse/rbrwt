@@ -1,0 +1,117 @@
+---
+import { Image } from 'astro:assets';
+import Site from '../layouts/Site.astro';
+import { AWARDS, franchise, franchiseOrNull, href, killLeaders, longDate, monthYear, records, tours } from '../lib/data';
+import { CARET, NEXT, PLAY } from '../lib/icons';
+
+const pad2 = (n: number) => String(n).padStart(2, '0');
+const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTube');
+---
+<Site current="history" inner title="History · RBR World Tour" description="Season 1 of the Rocket Bot Royale World Tour: champions, tours, awards and records.">
+  <div class="depth">
+    <div class="rays" aria-hidden="true"></div>
+    <section class="sec sec-first sec-last" aria-labelledby="hi-h">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h1 class="mega" id="hi-h">History</h1>
+          <div class="sec-meta"><span class="sec-count">{pad2(tours.length)}</span><span class="label">Season 1 tours</span></div>
+        </header>
+
+        <p class="sub reveal">Champions</p>
+        <ol class="rafters">
+          {tours.map((t, i) => {
+            const c = franchise(t.champion);
+            return (
+              <li class="flag reveal" style={`--i:${i % 5}; ${c.style}`}>
+                <div class="flag-body">
+                  {c.image && <Image src={c.image} alt={`RBRWT ${t.num} champions: ${c.code} ${c.name}`} width={160} />}
+                  <span class="flag-num">{t.num}</span>
+                  <span class="flag-date">{monthYear(t.date)}</span>
+                </div>
+              </li>
+            );
+          })}
+        </ol>
+
+        <div class="block">
+          <p class="sub reveal">Tours</p>
+          <div class="table-frame reveal">
+            <table class="tours">
+              <colgroup><col style="width:80px"><col style="width:116px"><col style="width:180px"><col style="width:110px"><col style="width:140px"><col style="width:128px"><col style="width:144px"><col style="width:112px"></colgroup>
+              <thead><tr><th>Tour</th><th>Date</th><th>Champion</th>{AWARDS.map((a) => <th>{a}</th>)}<th class="r">Replay</th></tr></thead>
+              <tbody>
+                {tours.map((t, i) => {
+                  const c = franchise(t.champion);
+                  return (
+                    <tr style={c.style}>
+                      <td class="t-num">{t.num}</td>
+                      <td class="t-date">{longDate(t.date)}</td>
+                      <td class="t-champ"><span class="slide"><span>{c.image && <Image src={c.image} alt="" width={64} />}{c.name}</span></span></td>
+                      {AWARDS.map((a) => {
+                        const who = t.awards[a];
+                        const note = t.notes?.[a];
+                        return (
+                          <td class={`t-award a-${a.toLowerCase()}`} data-k={a}>
+                            {who
+                              ? <span class="slide"><span>{who}{note && <i class="note">{note}</i>}</span></span>
+                              : <span class="na">Not awarded</span>}
+                          </td>
+                        );
+                      })}
+                      <td class="watch">
+                        {t.replays.length === 0 && <span class="na">No replay</span>}
+                        {t.replays.length === 1 && <a class="go" href={t.replays[0].url} target="_blank" rel="noopener"><Fragment set:html={PLAY} />Watch</a>}
+                        {t.replays.length > 1 && (
+                          <details class={i >= tours.length - 3 ? 'up' : undefined}>
+                            <summary><Fragment set:html={PLAY} />Watch<Fragment set:html={CARET} /></summary>
+                            <div class="watch-menu">
+                              {t.replays.map((r) => <a href={r.url} target="_blank" rel="noopener">{r.label}<span>{source(r.url)}</span></a>)}
+                            </div>
+                          </details>
+                        )}
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="block records">
+          <div class="rec-col">
+            <p class="sub reveal">Records</p>
+            <div class="rec-tiles">
+              {records.map((r, i) => (
+                <div class="rec cut reveal" style={`--i:${i}`}><b>{r.figure}</b><span class="k">{r.label}</span><span class="rec-who slide"><span>{r.holder}</span></span></div>
+              ))}
+            </div>
+            <a class="cta reveal" href={href('/stats/')}>Full leaderboard<Fragment set:html={NEXT} /></a>
+          </div>
+          <div>
+            <p class="sub reveal">Kill leaders</p>
+            <table class="leaders reveal">
+              <colgroup><col style="width:56px"><col style="width:74px"><col><col style="width:84px"><col class="gp" style="width:84px"><col style="width:84px"></colgroup>
+              <thead><tr><th>#</th><th>Team</th><th>Player</th><th class="n">Kills</th><th class="n gp">Games</th><th class="n">K/G</th></tr></thead>
+              <tbody>
+                {killLeaders.map((p) => {
+                  const c = franchiseOrNull(p.team);
+                  return (
+                    <tr style={c?.style}>
+                      <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
+                      <td class="tm">{c && <i class="chip">{c.code}</i>}</td>
+                      <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
+                      <td class="n kills">{p.kills}</td>
+                      <td class="n gp">{p.games}</td>
+                      <td class="n">{p.kpg.toFixed(2)}</td>
+                    </tr>
+                  );
+                })}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</Site>

@@ -1,0 +1,16 @@
+---
+import { season } from '../lib/data';
+const when = season.next.date ? String(season.next.date) : null;
+---
+<section class="hud" aria-label={`Season ${season.season}`}>
+  <div class="wrap hud-in">
+    <div class="hud-cell"><span class="hud-k">World Tour</span><span class="hud-v">Season {season.season}</span></div>
+    <div class="hud-cell"><span class="hud-k">Next tour</span><span class="hud-v">RBRWT {season.next.num}</span></div>
+    <div class="hud-cell">
+      <span class="hud-k" id="when-k">{when ? 'Starts in' : 'Starts'}</span>
+      {when
+        ? <span class="hud-v mono" id="when-v" data-date={when}></span>
+        : <span class="hud-v" id="when-v">Date TBA<i class="cursor" aria-hidden="true"></i></span>}
+    </div>
+  </div>
+</section>

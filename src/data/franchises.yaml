@@ -1,0 +1,122 @@
+# Every franchise the tour has had. Whether one is in Season 2 is decided by where its logo
+# sits: assets/franchises/ (in) or assets/former franchises/ (out). Move the logo to change it.
+# primary: the field colour from the dispatch banner. secondary: from the logo.
+# ink: the text colour on the primary, dark or white.
+# home: the region name shown on the site, and its NationStates region (leave region out for none).
+
+- code: CSS
+  name: Cannonballs
+  logo: CSS.png
+  primary: "#FCCB55"
+  secondary: "#212E52"
+  ink: dark
+  home: { label: Commonwealth of Sovereign States, region: commonwealth_of_sovereign_states }
+
+- code: SLD
+  name: Exiles
+  logo: SLD.png
+  primary: "#640229"
+  secondary: "#FDAA14"
+  ink: white
+  home: { label: Solidarity, region: nsleft }
+
+- code: TAL
+  name: Eagles
+  logo: TAL.png
+  primary: "#3D5243"
+  secondary: "#D2EAD2"
+  ink: white
+  home: { label: Talonia, region: talonia }
+
+- code: TPoP
+  name: Lightbringers
+  logo: TPOP.png
+  primary: "#D3A42C"
+  secondary: "#3A4239"
+  ink: dark
+  home: { label: Perdition, region: the_plains_of_perdition }
+
+- code: WC
+  name: Jokers
+  logo: WC.png
+  primary: "#476A9A"
+  secondary: "#ABCDFE"
+  ink: white
+  home: { label: Wild Card }
+
+- code: ARN
+  name: Admirals
+  logo: ARN.png
+  primary: "#BCB768"
+  secondary: "#070B34"
+  ink: dark
+
+- code: BAL
+  name: Ravens
+  logo: BAL.png
+  primary: "#3B5288"
+  secondary: "#F9A41A"
+  ink: white
+
+- code: LILY
+  name: Spartans
+  logo: LILY.png
+  primary: "#FFFFFF"
+  secondary: "#010101"
+  ink: dark
+
+- code: NBB
+  name: Watchdogs
+  logo: NBB.png
+  primary: "#D0010A"
+  secondary: "#0071FB"
+  ink: white
+
+- code: SO
+  name: Mariners
+  logo: SO.png
+  primary: "#002D59"
+  secondary: "#066768"
+  ink: white
+
+- code: STL
+  name: Hyperion Guards
+  logo: STL.png
+  primary: "#294969"
+  secondary: "#F3BA44"
+  ink: white
+
+- code: TL&C
+  name: Minutemen
+  logo: TL&C.png
+  primary: "#35485B"
+  secondary: "#B82E2E"
+  ink: white
+
+- code: TNP
+  name: Rams
+  logo: TNP.png
+  primary: "#01237C"
+  secondary: "#FFFFFF"
+  ink: white
+
+- code: TO
+  name: Bushrangers
+  logo: TO.png
+  primary: "#702D2D"
+  secondary: "#B59292"
+  ink: white
+
+- code: TSP
+  name: Spits
+  logo: TSP.png
+  primary: "#3FB1DE"
+  secondary: "#092458"
+  ink: dark
+
+- code: TWP
+  name: Rumrunners
+  logo: TWP.png
+  primary: "#291548"
+  secondary: "#BD0000"
+  ink: white

@@ -1,0 +1,197 @@
+---
+import { Image } from 'astro:assets';
+import '../styles/site.css';
+import barmark from '../../assets/header/wordmark.png';
+import footLogo from '../assets/pieces/logo.png';
+import { href } from '../lib/data';
+
+interface Props { title: string; description: string; current: 'home' | 'tours' | 'stats'; inner?: boolean }
+const { title, description, current, inner = false } = Astro.props;
+
+// About, Franchises and History are sections of Home; Tours and Stats are pages.
+const links = [
+  { label: 'Home', to: '/', sec: 'top', key: 'home' },
+  { label: 'Tours', to: '/tours/', key: 'tours' },
+  { label: 'Franchises', to: '/#franchises', sec: 'franchises' },
+  { label: 'Stats', to: '/stats/', key: 'stats' },
+  { label: 'History', to: '/#history', sec: 'history' },
+  { label: 'About', to: '/#about', sec: 'about' },
+];
+const og = new URL(href('/og.png'), Astro.site).href;
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+---
+<!doctype html>
+<html lang="en" class="no-js">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{title}</title>
+<meta name="description" content={description}>
+<link rel="canonical" href={canonical}>
+<link rel="icon" type="image/png" href={href('/favicon.png')}>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="RBR World Tour">
+<meta property="og:title" content={title}>
+<meta property="og:description" content={description}>
+<meta property="og:url" content={canonical}>
+<meta property="og:image" content={og}>
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#030A1F">
+<script is:inline>document.documentElement.classList.replace('no-js', 'js');</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap" rel="stylesheet">
+</head>
+<body class={inner ? 'inner' : undefined}>
+<a class="skip label" href="#main">Skip to content</a>
+
+<header class="bar" id="bar">
+  <div class="wrap bar-in">
+    <a class="brand" href={href('/')} aria-label="RBRWT Season 2, home">
+      <Image src={barmark} alt="RBRWT S2" width={600} loading="eager" />
+    </a>
+    <nav class="nav" aria-label="Main">
+      {links.map((l) => (
+        <a href={href(l.to)} data-sec={!inner ? l.sec : undefined} aria-current={l.key === current ? 'page' : undefined}>{l.label}</a>
+      ))}
+    </nav>
+    <button class="menu-btn label" type="button" aria-expanded="false" aria-controls="sheet"><span>Menu</span></button>
+  </div>
+</header>
+
+<div class="sheet" id="sheet" role="dialog" aria-modal="true" aria-label="Menu">
+  <div class="sheet-top">
+    <span class="brand"><Image src={barmark} alt="RBRWT S2" width={600} /></span>
+    <button class="menu-btn label close-btn" type="button"><span>Close</span></button>
+  </div>
+  <nav aria-label="Main">
+    {links.map((l) => (
+      <a href={href(l.to)} data-sec={!inner ? l.sec : undefined} aria-current={l.key === current ? 'page' : undefined}>{l.label}</a>
+    ))}
+  </nav>
+</div>
+
+<main id="main">
+  <slot />
+</main>
+
+<footer>
+  <div class="wrap foot">
+    <Image src={footLogo} alt="" width={240} />
+    <div>
+      <p>Produced by Moukden and Kirin. Do not reproduce without explicit permission.</p>
+      <p>This event adheres to <a href="https://forum.nationstates.net/viewtopic.php?p=43158726#p43158726">MGC Sanctions</a>.</p>
+      <p>Fan tournament, not affiliated with Winterpixel Games.</p>
+    </div>
+  </div>
+</footer>
+
+<div class="wipe" id="wipe" aria-hidden="true"><i class="w1"></i><i class="w2"></i></div>
+
+<script is:inline>
+(function () {
+  var still = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  // The bar sits on the art until the page moves, then turns solid; the art drifts slower than the page.
+  var bar = document.getElementById('bar');
+  var art = document.getElementById('art');
+  var ticking = false;
+  function onScroll() {
+    var y = window.scrollY;
+    bar.classList.toggle('solid', y > 24);
+    if (art && !still && y < 900) { art.style.transform = 'translate3d(0,' + (y * 0.3).toFixed(1) + 'px,0)'; }
+    ticking = false;
+  }
+  window.addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+  onScroll();
+
+  // Blocks rise into place once, as they come into view.
+  var items = document.querySelectorAll('.reveal');
+  if (still || !('IntersectionObserver' in window)) {
+    items.forEach(function (el) { el.classList.add('in'); });
+  } else {
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { en.target.classList.add('in'); io.unobserve(en.target); } });
+    }, { rootMargin: '0px 0px -10% 0px' });
+    items.forEach(function (el) { io.observe(el); });
+  }
+
+  // Names that do not fit slide sideways; measured after the fonts land and whenever a box resizes.
+  var slides = document.querySelectorAll('.slide');
+  function measure() {
+    slides.forEach(function (box) {
+      var inner = box.firstElementChild;
+      if (!inner) { return; }
+      var over = inner.getBoundingClientRect().width - box.clientWidth;
+      var on = over > 1;
+      box.classList.toggle('is-over', on);
+      if (on) {
+        box.style.setProperty('--slide-by', -(over + 26).toFixed(1) + 'px');
+        box.style.setProperty('--slide-dur', Math.max(3, (over + 26) / 30 + 2.4).toFixed(2) + 's');
+      }
+    });
+  }
+  measure();
+  if (document.fonts) { document.fonts.ready.then(measure); }
+  if ('ResizeObserver' in window) {
+    var ro = new ResizeObserver(function () { requestAnimationFrame(measure); });
+    slides.forEach(function (b) { ro.observe(b); });
+  } else { window.addEventListener('resize', measure); }
+
+  // On Home the menu follows the section in view.
+  var navLinks = document.querySelectorAll('nav a[data-sec]');
+  if (navLinks.length && 'IntersectionObserver' in window) {
+    var mark = function (id) {
+      navLinks.forEach(function (a) {
+        if (a.dataset.sec === id) { a.setAttribute('aria-current', 'page'); } else { a.removeAttribute('aria-current'); }
+      });
+    };
+    var spy = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) { mark(en.target.id); } });
+    }, { rootMargin: '-45% 0px -50% 0px' });
+    ['top', 'about', 'franchises', 'history'].forEach(function (id) { var el = document.getElementById(id); if (el) { spy.observe(el); } });
+  }
+
+  // Replay menus: one open at a time; a click elsewhere or Escape closes them.
+  var menus = document.querySelectorAll('.watch details');
+  menus.forEach(function (d) {
+    d.addEventListener('toggle', function () { if (d.open) { menus.forEach(function (o) { if (o !== d) { o.open = false; } }); } });
+  });
+  document.addEventListener('click', function (e) { menus.forEach(function (d) { if (d.open && !d.contains(e.target)) { d.open = false; } }); });
+
+  // Countdown to the next tour, once it has a date (src/data/season.yaml).
+  var plate = document.getElementById('when-v');
+  var target = plate && plate.dataset.date ? new Date(plate.dataset.date) : null;
+  if (target && !isNaN(target)) {
+    var pad = function (n) { return String(n).padStart(2, '0'); };
+    var tick = function () {
+      var t = Math.max(0, Math.floor((target - Date.now()) / 1000));
+      plate.innerHTML = pad(Math.floor(t / 86400)) + '<small>D</small>' + pad(Math.floor(t % 86400 / 3600)) + '<small>H</small>' +
+        pad(Math.floor(t % 3600 / 60)) + '<small>M</small>' + pad(t % 60) + '<small>S</small>';
+    };
+    tick();
+    setInterval(tick, 1000);
+  }
+
+  // Menu sheet for phones and tablets.
+  var sheet = document.getElementById('sheet');
+  var openBtn = document.querySelector('.bar .menu-btn');
+  function closeSheet() { sheet.classList.remove('open'); openBtn.setAttribute('aria-expanded', 'false'); }
+  openBtn.addEventListener('click', function () {
+    sheet.classList.add('open');
+    openBtn.setAttribute('aria-expanded', 'true');
+    sheet.querySelector('.close-btn').focus();
+  });
+  sheet.querySelector('.close-btn').addEventListener('click', function () { closeSheet(); openBtn.focus(); });
+  sheet.querySelectorAll('nav a').forEach(function (a) { a.addEventListener('click', closeSheet); });
+  document.addEventListener('keydown', function (e) {
+    if (e.key !== 'Escape') { return; }
+    menus.forEach(function (d) { d.open = false; });
+    if (sheet.classList.contains('open')) { closeSheet(); openBtn.focus(); }
+  });
+})();
+</script>
+</body>
+</html>

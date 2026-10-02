@@ -1,0 +1,6 @@
+# The season the site is showing, and its next tour.
+# Set date (UTC) to start the countdown, for example: date: 2026-10-31T18:00:00Z
+season: 2
+next:
+  num: XI
+  date: null

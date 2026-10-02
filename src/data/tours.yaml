@@ -1,0 +1,121 @@
+# One entry per tour, oldest first. Award winners by in-game name; null means not awarded.
+# matches: games played across every stage. sheet: the kill sheet in assets/sheets/ (none for I).
+# notes: a short tag shown after an award winner.
+
+- num: I
+  date: 2025-09-21
+  venue: The Steakhouse
+  host: TO
+  champion: TO
+  matches: 9
+  awards: { MVP: Miravana, TF: null, RotM: null, MI: null }
+  replays: []
+
+- num: II
+  date: 2025-10-19
+  venue: The Steakhouse
+  host: TO
+  champion: TO
+  matches: 14
+  sheet: 2.tsv
+  awards: { MVP: Robin, TF: Robin, RotM: Celia, MI: Entropan }
+  replays: []
+
+- num: III
+  date: 2025-11-09
+  venue: The Steakhouse
+  host: TO
+  champion: TPoP
+  matches: 13
+  sheet: 3.tsv
+  awards: { MVP: Wizard, TF: Celia, RotM: New Illyricum, MI: New Opolopia }
+  replays:
+    - { label: Replay, url: "https://youtu.be/QiEfAxIRyGU" }
+
+- num: IV
+  date: 2025-12-20
+  venue: Radiant Field @ Temple Arena
+  host: TPoP
+  champion: TO
+  matches: 21
+  sheet: 4.tsv
+  awards: { MVP: Robin, TF: Robin, RotM: Dyl, MI: Peanu-Butteria }
+  replays:
+    - { label: Replay, url: "https://youtu.be/ghapShSMItI" }
+
+- num: V
+  date: 2026-01-31
+  venue: The Steakhouse
+  host: TO
+  champion: TL&C
+  matches: 30
+  sheet: 5.tsv
+  awards: { MVP: Entropan, TF: Wizard, RotM: Spode, MI: Garbelia }
+  replays:
+    - { label: Replay, url: "https://youtu.be/2GOOa2POe7c" }
+
+- num: VI
+  date: 2026-02-28
+  venue: The Concordome
+  host: TL&C
+  champion: TO
+  matches: 28
+  sheet: 6.tsv
+  awards: { MVP: Miravana, TF: New Opolopia, RotM: Croblade, MI: Magrusa }
+  replays:
+    - { label: Conferences, url: "https://youtu.be/hKau1vIXZqU" }
+    - { label: Finals, url: "https://youtu.be/ewgFl1FUoIk" }
+
+- num: VII
+  date: 2026-03-28
+  venue: The Steakhouse
+  host: TO
+  champion: TO
+  matches: 26
+  sheet: 7.tsv
+  awards: { MVP: Miravana, TF: Kirin, RotM: Fishery, MI: WashFed }
+  replays:
+    - { label: Koala, url: "https://youtu.be/0Fz1PHhy7Iw" }
+    - { label: Kangaroo, url: "https://youtu.be/2Ui8SmVyHGo" }
+    - { label: Finals, url: "https://youtu.be/OBVknJSoG0c" }
+
+- num: VIII
+  date: 2026-04-25
+  venue: The Steakhouse
+  host: TO
+  champion: TO
+  matches: 18
+  sheet: 8.tsv
+  awards: { MVP: Miravana, TF: Miravana, RotM: Muspelgard, MI: Arty }
+  replays:
+    - { label: Koala, url: "https://drive.google.com/file/d/1swTfPEwi3omFOY28Cmoy3CUvHPQqLawJ/view" }
+    - { label: Kangaroo, url: "https://drive.google.com/file/d/1DfNMgG7nYx7JO5iF_pF9dOcLtwhmcTii/view" }
+    - { label: Wild Card, url: "https://drive.google.com/file/d/1yQ9b_nBIOOThw4P1JTcr1-omNWvcvkBM/view" }
+    - { label: Finals, url: "https://www.youtube.com/watch?v=56FahTvFbfM" }
+
+- num: IX
+  date: 2026-05-25
+  venue: The Steakhouse
+  host: TO
+  champion: WC
+  matches: 25
+  sheet: 9.tsv
+  awards: { MVP: Garbelia, TF: New Opolopia, RotM: Hellslayer, MI: Garbelia }
+  replays:
+    - { label: Koala, url: "https://youtu.be/F1N9f_oBgbU" }
+    - { label: Kangaroo, url: "https://youtu.be/d4TSFMOLc8Q" }
+    - { label: Wild Card, url: "https://youtu.be/2HAorpKeVrU" }
+    - { label: Finals, url: "https://youtu.be/Pl3p8FtgngU" }
+
+- num: X
+  date: 2026-06-27
+  venue: Radiant Field @ Temple Arena
+  host: TPoP
+  champion: TO
+  matches: 25
+  sheet: 10 conf.tsv
+  awards: { MVP: Garbelia, TF: Kirin, RotM: New Charles, MI: Sans }
+  notes: { TF: Conf. only }
+  replays:
+    - { label: Conferences, url: "https://youtu.be/w4MtXbsSQSQ" }
+    - { label: Finals, url: "https://youtu.be/8czjiGQXpB8" }

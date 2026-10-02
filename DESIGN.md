@@ -216,7 +216,7 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **About.** The lead is the dispatch's Overview sentence in Medium 31px (22px on phones), with "the playable area is slowly flooding" in gold. Below it, the stats strip, built like the season band: the gold top line with its scan line, gold corner brackets, three readouts in a row divided by slanted hairlines, each a Mono label after a small gold square followed by its figure in white Mono 36px: Tours played 10, Matches played 209, Franchises to date 16. Below 1024px each label sits above its figure; on phones the readouts stack as rows, label left and figure right. Below, "Format" as five numbered steps on `--deep` with a 2px gold top edge (01 Conferences, 02 Qualifying, 03 Wild card, 04 Finals, 05 Seeding), each carrying the dispatch's sentence; five across, two on tablets, one on phones. Then "Joining the Tour" as one panel: the dispatch's opening sentence, then three steps in a row, each pointing at the next with a gold chevron on the divider: 01 Roster (3 starters + up to 3 subs), 02 Apply by DM (Garbelia, @garbelia_52399), 03 Logo + wordmark (Kirin, @auroruse). Each step is a Mono label over its value in Bold 24px, Discord handles in gold Mono. No descriptions under the contacts. Below 760px the steps stack and the chevrons point down.
 
-**Team card** (Home's field). A 16:10 field in the primary with two diagonal stripes in the secondary and the 1px rim; the code in a chip at its top left (ink background, primary text); the logo at 60% of the card's width, bleeding off the right edge. Below, on `--deep`: the home region in Label (linked where it has a region), then the name in Team name type, then the roster numbered 01 to 03 in Mono with in-game names in Title. Every line is one line. Cards fill the row at 300px or wider: three across at full width, one on phones. With exactly four franchises the field is two by two instead, so no card is left alone on a row, and from 1180px each card turns sideways: the field on the left (44%, at least 260px tall, logo at 88% of it), region, name and roster on the right.
+**Team card** (Home's field). A 16:10 field in the primary with two diagonal stripes in the secondary and the 1px rim; the code in a chip at its top left (ink background, primary text); the logo at 60% of the card's width, bleeding off the right edge. Below, on `--deep`: the home region in Label (linked where it has a region), then the name in Team name type, then the roster as a depth chart, numbered in Mono with in-game names in Title: the three starters first, then the subs under a dashed rule, in Medium `--text-2` with a small outlined "Sub" tag. Every line is one line. Cards fill the row at 300px or wider: three across at full width, one on phones. With exactly four franchises the field is two by two instead, so no card is left alone on a row, and from 1180px each card turns sideways: the field on the left (44%, at least 260px tall, logo at 88% of it), region, name and roster on the right.
 
 **Logo tile** (Franchises). Square, primary field with the diagonal stripes and rim, logo at 70% of the tile, code chip and name below. Five across on desktop, three on tablets, two on phones.
 
@@ -262,4 +262,14 @@ No light theme. No cream, beige or off-white. No gradients beyond the tour gradi
 
 ## 6. Build
 
-Static site, built the same way as the Talopedia: Astro, published to GitHub Pages by a GitHub Action from `main`, under `/rbrwt`. All data is read from the TSVs at build time. Fonts are self-hosted from `assets/fonts/`.
+Live at **auroruse.github.io/rbrwt**, from the public repository **github.com/auroruse/rbrwt**. Static Astro site, published to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`, under `/rbrwt`. Fonts: Kode Mono from Google Fonts; Neue Montreal from `assets/fonts/` once the files are there.
+
+Everything on the page comes from files, read at build time:
+- `src/data/franchises.yaml`: every franchise's code, name, colours and home region. Whether one is in Season 2 is decided by its logo's folder, `assets/franchises/` or `assets/former franchises/`.
+- `src/data/rosters.tsv`: S2 rosters as a depth chart, Role "Starter" or "Sub".
+- `src/data/tours.yaml`: each tour's date, venue, host, champion, matches, awards, notes, replays and kill sheet.
+- `src/data/season.yaml`: the season number and the next tour; a date starts the countdown.
+- `src/data/aliases.yaml`: different spellings of one player across the sheets.
+- `assets/sheets/*.tsv`: the kill sheets. Kill leaders and records are computed from them, never typed in.
+
+Images: logos and the wordmarks are resized to WebP at build. `assets/header/background.avif` is served as it is, because the build's image tool cannot decode it. The phone wordmark pieces live in `src/assets/pieces/`; the link card and favicon in `public/`.

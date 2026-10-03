@@ -35,28 +35,53 @@ const mark = (code: string | null, cls = '') => {
 };
 const icon = (a: Award) => `<svg viewBox="0 0 20 20" aria-hidden="true"><use href="#aw-${a}"/></svg>`;
 
+const chips = (tours: string[]) => `<span class="tp-chips">${tours.map((n) => `<i class="tp-chip">${n}</i>`).join('')}</span>`;
+const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
+
 export function detailHTML(p: Player): string {
   const f = p.team ? data.franchises[p.team] : null;
   const head = `<div class="tp-head" style="${styleOf(p.team)}">${mark(p.team, 'tp-logo')}
-    <div class="tp-who"><b class="tp-name">${esc(p.name)}</b><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)}` : ''}</span></div></div>`;
+    <div class="tp-who"><span class="tp-name slide"><b>${esc(p.name)}</b></span><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)}` : ''}</span></div></div>`;
   const figs = p.games
     ? `<div class="tp-figs"><span class="tf"><b>${p.kpg.toFixed(2)}</b><em>K/G</em></span><span class="tf"><b>${p.kills}</b><em>Kills</em></span>
         <span class="tf"><b>${p.games}</b><em>Games</em></span><span class="tf"><b>${p.rank ? pad2(p.rank) : ''}</b><em>Rank</em></span></div>
         ${p.low ? '<p class="tp-note">Under 10 games</p>' : ''}`
     : '<p class="tp-note tp-empty">No S1 games</p>';
-  const rows: [string, string][] = [];
-  if (p.teams.length) rows.push(['S1 teams', `<span class="tp-teams">${p.teams.map((c) => mark(c)).join('')}</span>`]);
+  // The highlights: a figure each, with the tours it happened in as chips.
+  const stat = (label: string, n: number, unit: string, tours: string[]) =>
+    `<div class="tp-stat"><span class="tp-k">${label}</span><span class="tp-v"><b>${n}</b><em>${unit}</em></span>${chips(tours)}</div>`;
+  const stats: string[] = [];
+  if (p.best) stats.push(stat('Best game', p.best.kills, plural(p.best.kills, 'kill', 'kills'), p.best.tours));
+  if (p.finals.length) stats.push(stat('Finals', p.finals.length, plural(p.finals.length, 'tour', 'tours'), p.finals));
+  if (p.titles.length) stats.push(stat('Titles', p.titles.length, plural(p.titles.length, 'title', 'titles'), p.titles));
   const won = AWARD_LIST.filter((a) => p.awards[a]?.length);
-  if (won.length) rows.push(['Awards', won.map((a) => `<span class="tp-aw" title="${AWARD_NAMES[a]}">${icon(a)}${a} <em>${p.awards[a]!.join(', ')}</em></span>`).join('')]);
-  if (p.titles.length) rows.push(['Titles', p.titles.join(', ')]);
-  if (p.best) rows.push(['Best game', `${p.best.kills} kills · ${p.best.tours.join(', ')}`]);
-  if (p.finals.length) rows.push(['Finals', p.finals.join(', ')]);
-  const list = rows.length ? `<dl class="tp-list">${rows.map(([k, v]) => `<div><dt>${k}</dt><dd>${v}</dd></div>`).join('')}</dl>` : '';
+  const awards = won.length
+    ? `<div class="tp-row"><span class="tp-k">Awards</span><span class="tp-boxes">${won.map((a) =>
+        `<span class="tp-box" title="${AWARD_NAMES[a]}">${icon(a)}<b>${a}</b>${chips(p.awards[a]!)}</span>`).join('')}</span></div>`
+    : '';
+  // S1 franchises only when they say more than the banner does.
+  const teams = p.teams.length > 1 || (p.teams.length === 1 && p.teams[0] !== p.team)
+    ? `<div class="tp-row"><span class="tp-k">S1 teams</span><span class="tp-boxes">${p.teams.map((c) =>
+        `<span class="tp-box">${mark(c)}<b>${esc(c)}</b></span>`).join('')}</span></div>`
+    : '';
   const tours = p.tours.length
     ? `<table class="tp-tours"><thead><tr><th>Tour</th><th>Team</th><th>K</th><th>G</th><th>K/G</th></tr></thead><tbody>${p.tours.map((t) =>
         `<tr><td>${t.num}</td><td>${mark(t.team)}</td><td>${t.kills}</td><td>${t.games}</td><td>${t.games ? (t.kills / t.games).toFixed(2) : ''}</td></tr>`).join('')}</tbody></table>`
     : '';
-  return `<div class="tp">${head}${figs}${list}${tours}</div>`;
+  return `<div class="tp">${head}${figs}${stats.length ? `<div class="tp-stats">${stats.join('')}</div>` : ''}${awards}${teams}${tours}</div>`;
+}
+
+// A card's name that is too long for its space slides under a fade, as names do across the site.
+export function fitName(root: HTMLElement) {
+  const box = root.querySelector<HTMLElement>('.tp-name.slide');
+  const inner = box?.firstElementChild as HTMLElement | null;
+  if (!box || !inner) return;
+  const over = inner.getBoundingClientRect().width - box.clientWidth;
+  box.classList.toggle('is-over', over > 1);
+  if (over > 1) {
+    box.style.setProperty('--slide-by', `${-(over + 26).toFixed(1)}px`);
+    box.style.setProperty('--slide-dur', `${Math.max(3, (over + 26) / 30 + 2.4).toFixed(2)}s`);
+  }
 }
 
 // The readout beside a card or a name, for a mouse; keyboard focus opens it too.
@@ -77,6 +102,7 @@ export function hoverPanel(root: HTMLElement, busy: () => boolean, selector = '.
     shown = card;
     pop.innerHTML = detailHTML(p);
     pop.hidden = false;
+    fitName(pop);
     const r = card.getBoundingClientRect();
     const w = pop.offsetWidth, h = pop.offsetHeight, gap = 12;
     let x = r.right + gap;
@@ -128,6 +154,7 @@ export function bottomBar(opts: { tiers: boolean; onPlace?: (to: string) => void
         : '';
       bar.innerHTML = `<button type="button" class="tl-bar-x">Close</button>${tiers}${detailHTML(p)}`;
       bar.hidden = false;
+      fitName(bar);
       bar.scrollTop = 0;
     },
     hide() {

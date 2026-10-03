@@ -635,7 +635,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 
 /* Card detail: a readout beside the card for a mouse, the bar along the bottom for touch */
 .tl-pop { position: fixed; left: 0; top: 0; z-index: 70; width: 360px; max-height: calc(100vh - 88px); overflow: hidden; pointer-events: none;
-  background: rgba(3, 10, 31, 0.97); clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); }
+  background: var(--abyss); clip-path: polygon(14px 0, 100% 0, 100% calc(100% - 14px), calc(100% - 14px) 100%, 0 100%, 0 14px); }
 .tl-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 60; max-height: min(74vh, 640px); overflow-y: auto; overscroll-behavior: contain;
   background: var(--abyss); border-top: 1px solid rgba(253, 232, 10, 0.75); }
 .tl-bar-x { position: absolute; right: 12px; top: 12px; z-index: 2; height: 30px; padding: 0 12px; border: 0; cursor: pointer; font-family: var(--mono);
@@ -650,11 +650,12 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 
 .tp-head { position: relative; display: flex; align-items: center; gap: 14px; padding: 16px 18px 14px; overflow: hidden; background: var(--p, var(--surface-2)); color: var(--ink-on, var(--text)); }
 .tp-head::before { content: ""; position: absolute; inset: 0; opacity: 0.9;
-  background: linear-gradient(118deg, transparent 0 64%, var(--s) 64% 68%, transparent 68% 72%, var(--s) 72% 73.5%, transparent 73.5%); }
+  background: linear-gradient(118deg, transparent 0 81%, var(--s) 81% 85%, transparent 85% 88.5%, var(--s) 88.5% 90%, transparent 90%); }
 .tp-head > * { position: relative; }
 .tp-logo { flex: none; width: 46px; height: 46px; object-fit: contain; }
-.tp-who { min-width: 0; }
-.tp-name { display: block; font-weight: 700; font-size: 20px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; white-space: nowrap; }
+.tp-who { min-width: 0; max-width: 176px; }
+.tp-name { font-weight: 700; font-size: 20px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; }
+.tp-name b { font-weight: inherit; }
 .tp-team { display: block; margin-top: 7px; font-family: var(--mono); font-size: 10px; line-height: 1; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
 .tp-figs { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); padding: 16px 18px 12px; }
 .tp-figs .tf { display: block; min-width: 0; }
@@ -664,15 +665,25 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .tp-figs em { display: block; margin-top: 7px; font-style: normal; font-family: var(--mono); font-size: 9px; line-height: 1; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
 .tp-note { padding: 0 18px 12px; font-family: var(--mono); font-size: 9px; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
 .tp-empty { padding-top: 16px; font-size: 11px; }
-.tp-list { display: grid; gap: 8px; padding: 12px 18px; border-top: 1px solid var(--line); }
-.tp-list > div { display: grid; grid-template-columns: 76px minmax(0, 1fr); gap: 12px; align-items: baseline; }
-.tp-list dt { font-family: var(--mono); font-size: 9px; line-height: 1.5; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
-.tp-list dd { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; font-size: 13px; line-height: 1.35; }
-.tp-aw { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; }
-.tp-aw svg { flex: none; width: 15px; height: 15px; }
-.tp-aw em { font-style: normal; font-family: var(--mono); font-size: 10px; letter-spacing: 0.06em; color: var(--text-3); }
-.tp-teams { display: inline-flex; gap: 6px; }
-.tp-teams img { width: 20px; height: 20px; object-fit: contain; }
+/* The card's middle: highlights as figures with their tours in chips, then awards and S1 teams as boxed chips.
+   Every label is Mono after a small gold square, every figure and tour is Mono, all on one centre line. */
+.tp-k { display: flex; align-items: center; gap: 7px; font-family: var(--mono); font-size: 9px; line-height: 1; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); white-space: nowrap; }
+.tp-k::before { content: ""; flex: none; width: 4px; height: 4px; background: var(--gold); }
+.tp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); border-top: 1px solid var(--line); }
+.tp-stat { display: grid; align-content: start; gap: 9px; min-width: 0; padding: 14px 14px 15px 18px; }
+.tp-stat + .tp-stat { border-left: 1px solid var(--line); }
+.tp-v { display: flex; align-items: baseline; gap: 6px; font-family: var(--mono); line-height: 1; }
+.tp-v b { font-weight: 600; font-size: 22px; color: #fff; font-variant-numeric: tabular-nums; }
+.tp-v em { font-style: normal; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
+.tp-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.tp-chip { display: inline-block; padding: 3px 7px 2px; font-style: normal; font-family: var(--mono); font-size: 10px; line-height: 1; letter-spacing: 0.04em;
+  color: var(--text); background: var(--surface-2); clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%); }
+.tp-row { display: grid; gap: 10px; padding: 14px 18px; border-top: 1px solid var(--line); }
+.tp-boxes { display: flex; flex-wrap: wrap; gap: 6px; }
+.tp-box { display: inline-flex; align-items: center; gap: 7px; height: 30px; padding: 0 8px 0 6px; box-shadow: inset 0 0 0 1px var(--line-strong); }
+.tp-box svg, .tp-box img { flex: none; width: 18px; height: 18px; object-fit: contain; }
+.tp-box .chip { min-width: 0; padding: 2px 4px; font-size: 8px; }
+.tp-box b { font-family: var(--mono); font-weight: 600; font-size: 12px; line-height: 1; letter-spacing: 0.06em; }
 .tp-tours { width: calc(100% - 36px); margin: 0 18px 16px; border-collapse: collapse; font-family: var(--mono); font-size: 11px; line-height: 1; font-variant-numeric: tabular-nums; }
 .tp-tours th { padding: 8px 0 6px; font-weight: 500; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); text-align: right; border-bottom: 1px solid var(--line); }
 .tp-tours td { height: 24px; padding: 0; text-align: right; color: var(--text-2); border-bottom: 1px solid rgba(27, 54, 114, 0.6); }

@@ -7,13 +7,11 @@ import { AWARD_NAMES } from '../lib/tiers';
 interface Props { p: TierPlayer; logo?: string | null; pfp?: string | null }
 const { p, logo, pfp } = Astro.props;
 const f = franchiseOrNull(p.team ?? undefined);
-const tag = p.s2 ? (p.s2.role === 'Sub' ? 'Sub' : 'Starter') : 'S1 only';
 const awards = AWARDS.filter((a) => p.awards[a]?.length).map((a) => ({ a, n: p.awards[a]!.length }));
 const teams = [...new Set([...p.teams, ...(p.s2 ? [p.s2.code] : [])])].join(' ');
 const said = [
   p.name,
   f ? `${f.code} ${f.name}` : null,
-  p.s2 ? `S2 ${tag.toLowerCase()}` : 'S1 only',
   p.games ? `${p.kpg.toFixed(2)} kills per game, ${p.kills} kills in ${p.games} games` : 'no S1 games',
   ...awards.map(({ a, n }) => `${AWARD_NAMES[a]} ×${n}`),
 ].filter(Boolean).join(', ');

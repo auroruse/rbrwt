@@ -5,5 +5,5 @@ interface Props { name: string }
 const { name } = Astro.props;
 ---
 {hasCard(name)
-  ? <button type="button" class="pname" data-player={name} aria-haspopup="dialog" aria-expanded="false">{name}</button>
+  ? <button type="button" class="pname" data-player={name}>{name}</button>
   : <Fragment>{name}</Fragment>}

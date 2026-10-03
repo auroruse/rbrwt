@@ -37,9 +37,8 @@ const icon = (a: Award) => `<svg viewBox="0 0 20 20" aria-hidden="true"><use hre
 
 export function detailHTML(p: Player): string {
   const f = p.team ? data.franchises[p.team] : null;
-  const role = p.s2 ? `S2 ${p.s2.role.toLowerCase()}` : 'S1 only';
   const head = `<div class="tp-head" style="${styleOf(p.team)}">${mark(p.team, 'tp-logo')}
-    <div class="tp-who"><b class="tp-name">${esc(p.name)}</b><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)} · ` : ''}${role}</span></div></div>`;
+    <div class="tp-who"><b class="tp-name">${esc(p.name)}</b><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)}` : ''}</span></div></div>`;
   const figs = p.games
     ? `<div class="tp-figs"><div><b>${p.kpg.toFixed(2)}</b><span>K/G</span></div><div><b>${p.kills}</b><span>Kills</span></div>
         <div><b>${p.games}</b><span>Games</span></div><div><b>${p.rank ? pad2(p.rank) : ''}</b><span>Rank</span></div></div>
@@ -60,8 +59,8 @@ export function detailHTML(p: Player): string {
   return `<div class="tp">${head}${figs}${list}${tours}</div>`;
 }
 
-// The readout beside a card, for a mouse; keyboard focus opens it too.
-export function hoverPanel(root: HTMLElement, busy: () => boolean) {
+// The readout beside a card or a name, for a mouse; keyboard focus opens it too.
+export function hoverPanel(root: HTMLElement, busy: () => boolean, selector = '.tc') {
   const pop = document.getElementById('tl-pop')!;
   let timer = 0;
   let shown: HTMLElement | null = null;
@@ -92,17 +91,17 @@ export function hoverPanel(root: HTMLElement, busy: () => boolean) {
     timer = window.setTimeout(() => show(card), performance.now() < warmUntil || shown ? 0 : 160);
   };
   root.addEventListener('focusin', (e) => {
-    const card = (e.target as Element).closest<HTMLElement>('.tc');
+    const card = (e.target as Element).closest<HTMLElement>(selector);
     if (card && card.matches(':focus-visible')) soon(card);
   });
   root.addEventListener('focusout', hide);
   if (canHover.matches) {
     root.addEventListener('pointerover', (e) => {
-      const card = (e.target as Element).closest<HTMLElement>('.tc');
+      const card = (e.target as Element).closest<HTMLElement>(selector);
       if (card) soon(card);
     });
     root.addEventListener('pointerout', (e) => {
-      const card = (e.target as Element).closest<HTMLElement>('.tc');
+      const card = (e.target as Element).closest<HTMLElement>(selector);
       if (card && !card.contains(e.relatedTarget as Node | null)) hide();
     });
   }

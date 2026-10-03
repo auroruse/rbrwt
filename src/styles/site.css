@@ -486,7 +486,7 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
 /* A player's name opens their card: plain until hovered, then a gold underline */
 .pname { display: inline; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer;
   text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 4px; transition: text-decoration-color var(--fast); }
-.pname:hover, .pname[aria-expanded="true"] { text-decoration-color: var(--gold); }
+.pname:hover, .pname:focus-visible { text-decoration-color: var(--gold); }
 .pname:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 
 /* ---------- Tier List: nine star tiers, each a dark plate with its stars in a mineral ---------- */

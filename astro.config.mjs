@@ -5,4 +5,6 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
   site: process.env.SITE_URL || 'https://auroruse.github.io',
   base: process.env.BASE_PATH || '/rbrwt',
+  // Styles inside every page: a browser holding an older page can never ask for a stylesheet a newer deploy removed.
+  build: { inlineStylesheets: 'always' },
 });

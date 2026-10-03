@@ -14,7 +14,7 @@ export async function tierAssets() {
   const site = new URL(import.meta.env.BASE_URL, import.meta.env.SITE).href.replace(/^https?:\/\//, '').replace(/\/$/, '');
 
   const payload = {
-    players: tierPlayers.map(({ pfp: _, ...p }) => ({ ...p, pfp: pfps[p.name] ?? null })),
+    players: tierPlayers.map(({ pfp: _, rank: _rank, ...p }) => ({ ...p, pfp: pfps[p.name] ?? null })),
     franchises: Object.fromEntries(franchises.map((f) => [f.code, {
       name: f.name, primary: f.primary, secondary: f.secondary, ink: f.inkHex, logo: logos[f.code] ?? null,
     }])),

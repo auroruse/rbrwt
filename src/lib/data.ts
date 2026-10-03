@@ -192,7 +192,7 @@ export type TierPlayer = {
   team: string | null; // the franchise the card wears: S2 if rostered, otherwise their latest S1 tour's
   teams: string[]; // every franchise they played for in S1
   s2: { code: string; role: 'Starter' | 'Sub' } | null;
-  kills: number; games: number; kpg: number; rank: number | null; low: boolean;
+  kills: number; games: number; kpg: number; rank: number | null;
   awards: Partial<Record<Award, string[]>>; // award -> the tours it was won in
   titles: string[]; // tours won as a player, II to X (I has no sheet)
   tours: { num: string; team: string | null; kills: number; games: number }[];
@@ -240,7 +240,6 @@ export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2By
     games: s1?.games ?? 0,
     kpg: row?.kpg ?? 0,
     rank: row?.rank ?? null,
-    low: row?.low ?? false,
     awards: awardsBy.get(name) ?? {},
     titles: tours.filter((t) => perTour.get(t.num)?.get(name)?.team === t.champion).map((t) => t.num),
     tours: tours.filter((t) => perTour.get(t.num)?.has(name)).map((t) => {

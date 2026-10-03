@@ -4,7 +4,7 @@ import { AWARD_LIST, AWARD_NAMES, TIERS, starsSVG, tierLabel, type Award, type T
 
 export type Player = {
   name: string; team: string | null; teams: string[]; s2: { code: string; role: 'Starter' | 'Sub' } | null;
-  kills: number; games: number; kpg: number; rank: number | null; low: boolean;
+  kills: number; games: number; kpg: number;
   awards: Partial<Record<Award, string[]>>; titles: string[];
   tours: { num: string; team: string | null; kills: number; games: number }[];
   best: { kills: number; tours: string[] } | null; pfp: string | null;
@@ -19,9 +19,10 @@ export type Data = {
 export const data: Data = JSON.parse(document.getElementById('tl-data')?.textContent || '{}');
 export const byName = new Map(data.players.map((p) => [p.name, p]));
 export const canHover = window.matchMedia('(hover: hover) and (pointer: fine)');
+// Each player's tier on Kirin's List, the only ranking a card shows.
+const tierOf = new Map(TIERS.flatMap((t) => (data.official?.tiers[t.id] ?? []).map((n) => [n, t] as const)));
 
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]!);
-const pad2 = (n: number) => String(n).padStart(2, '0');
 const styleOf = (code: string | null) => {
   const f = code ? data.franchises[code] : null;
   return f ? `--p:${f.primary};--s:${f.secondary};--ink-on:${f.ink}` : '';
@@ -41,11 +42,14 @@ export function detailHTML(p: Player): string {
   const f = p.team ? data.franchises[p.team] : null;
   const head = `<div class="tp-head" style="${styleOf(p.team)}">${mark(p.team, 'tp-logo')}
     <div class="tp-who"><span class="tp-name slide"><b>${esc(p.name)}</b></span><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)}` : ''}</span></div></div>`;
-  const figs = p.games
-    ? `<div class="tp-figs"><span class="tf"><b>${p.kpg.toFixed(2)}</b><em>K/G</em></span><span class="tf"><b>${p.kills}</b><em>Kills</em></span>
-        <span class="tf"><b>${p.games}</b><em>Games</em></span><span class="tf"><b>${p.rank ? pad2(p.rank) : ''}</b><em>Rank</em></span></div>
-        ${p.low ? '<p class="tp-note">Under 10 games</p>' : ''}`
-    : '<p class="tp-note tp-empty">No S1 games</p>';
+  const placed = tierOf.get(p.name);
+  const tier = `<span class="tf tf-tier">${placed
+    ? `<b role="img" aria-label="${tierLabel(placed)}">${starsSVG(placed, 16, 2)}</b>`
+    : '<b><i>Unranked</i></b>'}<em>Tier</em></span>`;
+  const figs = `<div class="tp-figs">${p.games
+    ? `<span class="tf"><b>${p.kpg.toFixed(2)}</b><em>K/G</em></span><span class="tf"><b>${p.kills}</b><em>Kills</em></span>
+        <span class="tf"><b>${p.games}</b><em>Games</em></span>`
+    : '<span class="tf tf-none"><b><i>No S1 games</i></b></span>'}${tier}</div>`;
   // Under the figures: most kills in a game and titles, each a figure over its tours as chips; then awards,
   // when there are any.
   const stat = (label: string, n: number, unit: string, tours: string[]) =>

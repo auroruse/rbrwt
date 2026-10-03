@@ -106,7 +106,7 @@
   primary: "#702D2D"
   secondary: "#B59292"
   ink: white
-  home: { label: The Outback, region: the_outback }
+  home: { label: Outback, region: the_outback }
 
 - code: TSP
   name: Iced Teas

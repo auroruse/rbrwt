@@ -95,7 +95,6 @@ const careers = yaml<Record<string, string[]>>('src/data/career-teams.yaml') ?? 
 const players = new Map<string, Player>();
 const perTour = new Map<string, Map<string, Player>>();
 const gameHighs: { kills: number; name: string; tour: string }[] = [];
-const finalsBy = new Map<string, Set<string>>(); // tour -> players who played a finals game in it
 
 for (const t of tours) {
   if (!t.sheet) continue;
@@ -103,9 +102,7 @@ for (const t of tours) {
   const at = (name: string) => head.findIndex((c) => c.trim().toLowerCase() === name);
   const [pc, tc, gc, kc] = ['player', 'team', 'gp', 'kills'].map(at);
   const gameCols = head.map((c, i) => (GAME_COL.test(c.trim()) ? i : -1)).filter((i) => i >= 0);
-  const finalCols = gameCols.filter((i) => head[i].trim().toUpperCase().startsWith('F'));
   const board = new Map<string, Player>();
-  const finals = new Set<string>();
   for (const r of rows) {
     const raw = (r[pc] ?? '').trim();
     if (!raw || !isNum(r[kc])) continue;
@@ -120,10 +117,8 @@ for (const t of tours) {
     p.kills += kills; p.games += games; p.team = team ?? p.team;
     players.set(name, p);
     for (const i of gameCols) if (isNum(r[i])) gameHighs.push({ kills: Number(r[i].trim()), name, tour: t.num });
-    if (finalCols.some((i) => isNum(r[i]))) finals.add(name);
   }
   perTour.set(t.num, board);
-  finalsBy.set(t.num, finals);
 }
 
 // Best kills per game first, everyone under MIN_GAMES games below everyone who reached it.
@@ -202,7 +197,6 @@ export type TierPlayer = {
   titles: string[]; // tours won as a player, II to X (I has no sheet)
   tours: { num: string; team: string | null; kills: number; games: number }[];
   best: { kills: number; tours: string[] } | null;
-  finals: string[];
   pfp: ImageMetadata | null;
 };
 
@@ -254,7 +248,6 @@ export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2By
       return { num: t.num, team: r.team ?? null, kills: r.kills, games: r.games };
     }),
     best: top ? { kills: top, tours: [...new Set(highs.filter((g) => g.kills === top).map((g) => g.tour))] } : null,
-    finals: tours.filter((t) => finalsBy.get(t.num)?.has(name)).map((t) => t.num),
     pfp: pfpByName.get(name.toLowerCase()) ?? null,
   };
 });

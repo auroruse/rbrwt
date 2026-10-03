@@ -7,7 +7,7 @@ export type Player = {
   kills: number; games: number; kpg: number; rank: number | null; low: boolean;
   awards: Partial<Record<Award, string[]>>; titles: string[];
   tours: { num: string; team: string | null; kills: number; games: number }[];
-  best: { kills: number; tours: string[] } | null; finals: string[]; pfp: string | null;
+  best: { kills: number; tours: string[] } | null; pfp: string | null;
 };
 export type Franchise = { name: string; primary: string; secondary: string; ink: string; logo: string | null };
 export type Data = {
@@ -36,7 +36,6 @@ const mark = (code: string | null, cls = '') => {
 const icon = (a: Award) => `<svg viewBox="0 0 20 20" aria-hidden="true"><use href="#aw-${a}"/></svg>`;
 
 const chips = (tours: string[]) => `<span class="tp-chips">${tours.map((n) => `<i class="tp-chip">${n}</i>`).join('')}</span>`;
-const plural = (n: number, one: string, many: string) => (n === 1 ? one : many);
 
 export function detailHTML(p: Player): string {
   const f = p.team ? data.franchises[p.team] : null;
@@ -47,28 +46,24 @@ export function detailHTML(p: Player): string {
         <span class="tf"><b>${p.games}</b><em>Games</em></span><span class="tf"><b>${p.rank ? pad2(p.rank) : ''}</b><em>Rank</em></span></div>
         ${p.low ? '<p class="tp-note">Under 10 games</p>' : ''}`
     : '<p class="tp-note tp-empty">No S1 games</p>';
-  // The highlights: a figure each, with the tours it happened in as chips.
+  // Under the figures: tours played, most kills in a game and titles, each a figure over its tours as chips;
+  // then awards, when there are any.
   const stat = (label: string, n: number, unit: string, tours: string[]) =>
-    `<div class="tp-stat"><span class="tp-k">${label}</span><span class="tp-v"><b>${n}</b><em>${unit}</em></span>${chips(tours)}</div>`;
+    `<div class="tp-stat"><span class="tp-k">${label}</span><span class="tp-v"><b>${n}</b>${unit ? `<em>${unit}</em>` : ''}</span>${chips(tours)}</div>`;
   const stats: string[] = [];
-  if (p.best) stats.push(stat('Best game', p.best.kills, plural(p.best.kills, 'kill', 'kills'), p.best.tours));
-  if (p.finals.length) stats.push(stat('Finals', p.finals.length, plural(p.finals.length, 'tour', 'tours'), p.finals));
-  if (p.titles.length) stats.push(stat('Titles', p.titles.length, plural(p.titles.length, 'title', 'titles'), p.titles));
+  if (p.tours.length) stats.push(stat('Tours played', p.tours.length, '', p.tours.map((x) => x.num)));
+  if (p.best) stats.push(stat('Most kills', p.best.kills, 'in a game', p.best.tours));
+  if (p.titles.length) stats.push(stat('Titles', p.titles.length, '', p.titles));
   const won = AWARD_LIST.filter((a) => p.awards[a]?.length);
   const awards = won.length
     ? `<div class="tp-row"><span class="tp-k">Awards</span><span class="tp-boxes">${won.map((a) =>
         `<span class="tp-box" title="${AWARD_NAMES[a]}">${icon(a)}<b>${a}</b>${chips(p.awards[a]!)}</span>`).join('')}</span></div>`
     : '';
-  // S1 franchises only when they say more than the banner does.
-  const teams = p.teams.length > 1 || (p.teams.length === 1 && p.teams[0] !== p.team)
-    ? `<div class="tp-row"><span class="tp-k">S1 teams</span><span class="tp-boxes">${p.teams.map((c) =>
-        `<span class="tp-box">${mark(c)}<b>${esc(c)}</b></span>`).join('')}</span></div>`
-    : '';
   const tours = p.tours.length
     ? `<table class="tp-tours"><thead><tr><th>Tour</th><th>Team</th><th>K</th><th>G</th><th>K/G</th></tr></thead><tbody>${p.tours.map((t) =>
         `<tr><td>${t.num}</td><td>${mark(t.team)}</td><td>${t.kills}</td><td>${t.games}</td><td>${t.games ? (t.kills / t.games).toFixed(2) : ''}</td></tr>`).join('')}</tbody></table>`
     : '';
-  return `<div class="tp">${head}${figs}${stats.length ? `<div class="tp-stats">${stats.join('')}</div>` : ''}${awards}${teams}${tours}</div>`;
+  return `<div class="tp">${head}${figs}${stats.length ? `<div class="tp-stats">${stats.join('')}</div>` : ''}${awards}${tours}</div>`;
 }
 
 // A card's name that is too long for its space slides under a fade, as names do across the site.

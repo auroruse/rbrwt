@@ -7,7 +7,24 @@ const { fx } = Astro.props;
 <span class="fx" aria-hidden="true">
   {fx === 'css' && <Fragment><i class="fx-smoke s1"></i><i class="fx-smoke s2"></i><i class="fx-smoke s3"></i><i class="fx-shell"></i><i class="fx-flash"></i></Fragment>}
   {fx === 'sld' && <Fragment><svg class="fx-flame" viewBox="0 0 100 40"><path class="o" d="M104 5C84 3 64 1 40 9L46 13C30 13 14 16 0 20C14 24 30 27 46 27L40 31C64 39 84 37 104 35Z" /><path class="m" d="M104 11C86 10 68 9 50 15C40 18 30 20 24 20C30 20 40 22 50 25C68 31 86 30 104 29Z" /><path class="c" d="M104 15C92 15 80 16 70 20C80 24 92 25 104 25Z" /></svg><i class="fx-spark k1"></i><i class="fx-spark k2"></i><i class="fx-spark k3"></i><i class="fx-spark k4"></i></Fragment>}
-  {fx === 'tal' && <Fragment><i class="fx-wind w1"></i><i class="fx-wind w2"></i><i class="fx-wind w3"></i></Fragment>}
+  {fx === 'tal' && (
+    <Fragment>
+      <i class="fx-aura"></i>
+      <svg class="fx-tri t1" viewBox="-50 -50 100 100"><polygon points="0,-40 34.6,20 -34.6,20" /></svg>
+      <svg class="fx-tri t2" viewBox="-50 -50 100 100"><polygon points="0,-40 34.6,20 -34.6,20" /></svg>
+      <svg class="fx-tri t3" viewBox="-50 -50 100 100"><polygon points="0,-40 34.6,20 -34.6,20" /></svg>
+      <svg class="fx-gusts" viewBox="0 0 200 100">
+        <path class="g1" pathLength="100" d="M200 18C160 8 128 30 96 20S34 8 0 22" />
+        <path class="g2" pathLength="100" d="M200 50C162 40 138 62 100 52S38 40 0 56" />
+        <path class="g3" pathLength="100" d="M200 82C156 72 124 94 84 82S32 70 0 84" />
+        <path class="g4" pathLength="100" d="M200 34C176 30 160 42 150 36C140 30 150 22 158 30" />
+        <path class="g5" pathLength="100" d="M76 58C72 66 66 72 56 76" />
+        <path class="g6" pathLength="100" d="M124 58C128 66 134 72 144 76" />
+      </svg>
+      <i class="fx-feather f1"></i><i class="fx-feather f2"></i><i class="fx-feather f3"></i>
+      <i class="fx-eye"></i>
+    </Fragment>
+  )}
   {fx === 'to' && (
     <Fragment>
       <svg class="fx-star" viewBox="-50 -50 100 100"><polygon points="0.0,-46.0 11.2,-15.4 43.7,-14.2 18.1,5.9 27.0,37.2 0.0,19.0 -27.0,37.2 -18.1,5.9 -43.7,-14.2 -11.2,-15.4" /></svg>

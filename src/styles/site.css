@@ -756,19 +756,54 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .fp.fx-full .fx-sld .k3 { animation: fx-fly 650ms ease-out 300ms; }
 .fp.fx-full .fx-sld .k4 { animation: fx-fly 750ms ease-out 360ms; }
 
-/* TAL Eagles: the eagle drops in and beats its wings while wind streaks past */
-.fx-tal .fp-logo { transform-origin: 50% 55%; }
-.fx-tal .fx-wind { left: 100%; width: 45cqw; height: 0.9cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.6); }
-.fx-tal .w1 { top: 26%; } .fx-tal .w2 { top: 52%; } .fx-tal .w3 { top: 74%; }
-@keyframes tal-swoop { 0% { opacity: 0.2; transform: translateY(-22%) scale(0.9); } 22% { opacity: 1; transform: translateY(3%) scaleX(1.06) scaleY(0.96); }
-  34% { transform: scaleX(0.8) scaleY(1.04); } 46% { transform: scaleX(1.05); } 58% { transform: scaleX(0.86) scaleY(1.03); } 72% { transform: scaleX(1.03); } 100% { transform: none; } }
-@keyframes tal-flap { 0%, 100% { transform: none; } 35% { transform: scaleX(0.82) scaleY(1.04); } 65% { transform: scaleX(1.05); } }
-@keyframes fx-wind { 0% { opacity: 0; transform: translateX(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateX(-160cqw); } }
-.fp.fx-full .fx-tal .fp-logo { animation: tal-swoop 1300ms var(--ease-out); }
-.fp.fx-preview .fx-tal .fp-logo { animation: tal-flap 600ms ease-in-out; }
-.fp.fx-full .fx-tal .w1 { animation: fx-wind 700ms ease-in 250ms; }
-.fp.fx-full .fx-tal .w2, .fp.fx-preview .fx-tal .w2 { animation: fx-wind 650ms ease-in 120ms; }
-.fp.fx-full .fx-tal .w3 { animation: fx-wind 700ms ease-in 520ms; }
+/* TAL Eagles: the eagle rises and spreads its wings, gusts of wind curl round it and shed feathers, and the
+   Eye of Providence on its chest (50% 54% of the logo) opens: a glint, its pyramid glowing, triangles pulsing out */
+.fx-tal .fp-logo { transform-origin: 50% 45%; }
+/* The pyramid of the Eye, glowing behind the bird: a triangle of light whose centroid sits on the eye */
+.fx-tal .fx-aura { left: 50%; top: 54%; z-index: -1; width: 130cqw; height: 130cqw; margin: -75cqw 0 0 -65cqw; transform-origin: 50% 57.73%;
+  clip-path: polygon(50% 0, 100% 86.6%, 0 86.6%);
+  background: radial-gradient(circle at 50% 57.73%, rgba(255, 248, 214, 0.85) 0, rgba(236, 255, 236, 0.42) 22%, rgba(236, 255, 236, 0) 52%); }
+.fx-tal .fx-tri { left: 50%; top: 54%; z-index: -1; width: 23cqw; height: 23cqw; margin: -11.5cqw 0 0 -11.5cqw; overflow: visible;
+  fill: none; stroke: #F4FFF4; stroke-width: 1.6; }
+.fx-tal .fx-tri polygon { vector-effect: non-scaling-stroke; }
+.fx-tal .fx-gusts { left: -50cqw; top: 0; width: 200cqw; height: 100cqw; overflow: visible; opacity: 1; }
+/* Each gust is one long dash travelling its path: hidden before the start and after the end at rest */
+.fx-tal .fx-gusts path { fill: none; stroke: rgba(255, 255, 255, 0.8); stroke-width: 0.9; stroke-linecap: round; stroke-dasharray: 34 100; stroke-dashoffset: 34; }
+.fx-tal .fx-gusts .g5, .fx-tal .fx-gusts .g6 { stroke-dasharray: 45 100; stroke-dashoffset: 45; }
+.fx-tal .fx-feather { width: 6.5cqw; height: 15cqw; margin: -7.5cqw 0 0 -3.25cqw; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+  background: linear-gradient(90deg, #F2FBF2 0 44%, #3D5243 44% 56%, #F2FBF2 56%); }
+.fx-tal .f1 { left: 18%; top: 22%; --dx: -14cqw; --dy: 44cqw; --r: 160deg; }
+.fx-tal .f2 { left: 82%; top: 24%; --dx: 12cqw; --dy: 46cqw; --r: -150deg; }
+.fx-tal .f3 { left: 66%; top: 42%; --dx: 6cqw; --dy: 36cqw; --r: 210deg; }
+.fx-tal .fx-eye { left: 50%; top: 54.4%; width: 16cqw; height: 16cqw; margin: -8cqw 0 0 -8cqw;
+  background: radial-gradient(circle, #FFFBE6 0 16%, rgba(255, 240, 180, 0.85) 26%, rgba(255, 240, 180, 0) 62%); }
+.fx-tal .fx-eye::before { content: ""; position: absolute; inset: -40%; background: #FFFBE6;
+  clip-path: polygon(50% 0, 54% 46%, 100% 50%, 54% 54%, 50% 100%, 46% 54%, 0 50%, 46% 46%); }
+@keyframes tal-rise { 0% { opacity: 0; transform: translateY(14%) scale(0.53, 0.86); } 28% { opacity: 1; transform: translateY(-3%) scale(1.08, 1.02); }
+  42% { transform: translateY(1%) scale(0.92, 1.01); } 56% { transform: translateY(-2%) scale(1.04, 1); } 72% { transform: scale(0.98, 1); } 100% { transform: none; } }
+@keyframes tal-beat { 0%, 100% { transform: none; } 35% { transform: translateY(-2%) scale(1.05, 1.01); } 65% { transform: translateY(1%) scale(0.93, 1); } }
+@keyframes tal-aura { 0% { opacity: 0; transform: scale(0.35); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.05); } }
+@keyframes tal-tri { 0% { opacity: 0; transform: scale(1); } 15% { opacity: 0.9; } 100% { opacity: 0; transform: scale(6); } }
+@keyframes tal-gust { from { stroke-dashoffset: 34; } to { stroke-dashoffset: -100; } }
+@keyframes tal-draft { from { stroke-dashoffset: 45; } to { stroke-dashoffset: -100; } }
+@keyframes tal-eye { 0% { opacity: 0; transform: scale(0.2); } 40% { opacity: 1; transform: scale(1.25); } 65% { opacity: 0.85; transform: scale(0.9); } 100% { opacity: 0; transform: scale(1.1); } }
+@keyframes fx-drift { 0% { opacity: 0; transform: translate(0, 0) rotate(0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) rotate(var(--r)); } }
+.fp.fx-full .fx-tal .fp-logo { animation: tal-rise 1900ms cubic-bezier(0.22, 0.9, 0.3, 1); }
+.fp.fx-preview .fx-tal .fp-logo { animation: tal-beat 800ms ease-in-out; }
+.fp.fx-full .fx-tal .fx-aura { animation: tal-aura 1600ms ease-out 450ms; }
+.fp.fx-full .fx-tal .t1 { animation: tal-tri 1200ms cubic-bezier(0.2, 0.7, 0.3, 1) 600ms; }
+.fp.fx-full .fx-tal .t2 { animation: tal-tri 1200ms cubic-bezier(0.2, 0.7, 0.3, 1) 780ms; }
+.fp.fx-full .fx-tal .t3 { animation: tal-tri 1200ms cubic-bezier(0.2, 0.7, 0.3, 1) 960ms; }
+.fp.fx-full .fx-tal .fx-eye { animation: tal-eye 1100ms ease-out 520ms; }
+.fp.fx-preview .fx-tal .fx-eye { animation: tal-eye 700ms ease-out 150ms; }
+.fp.fx-full .fx-tal .g1 { animation: tal-gust 1200ms cubic-bezier(0.45, 0, 0.25, 1) 150ms; }
+.fp.fx-full .fx-tal .g2, .fp.fx-preview .fx-tal .g2 { animation: tal-gust 1100ms cubic-bezier(0.45, 0, 0.25, 1) 300ms; }
+.fp.fx-full .fx-tal .g3 { animation: tal-gust 1200ms cubic-bezier(0.45, 0, 0.25, 1) 520ms; }
+.fp.fx-full .fx-tal .g4 { animation: tal-gust 900ms cubic-bezier(0.45, 0, 0.25, 1) 700ms; }
+.fp.fx-full .fx-tal .g5, .fp.fx-full .fx-tal .g6 { animation: tal-draft 600ms ease-out 780ms; }
+.fp.fx-full .fx-tal .f1 { animation: fx-drift 1300ms ease-in 820ms; }
+.fp.fx-full .fx-tal .f2 { animation: fx-drift 1300ms ease-in 900ms; }
+.fp.fx-full .fx-tal .f3 { animation: fx-drift 1200ms ease-in 1000ms; }
 
 /* TO Bushrangers: the rider gallops, dust kicks up from the hooves, speed lines trail and the star bursts out */
 .fx-to .fx-star { left: 49%; top: 52%; z-index: -1; width: 100cqw; height: 100cqw; margin: -50cqw 0 0 -50cqw; overflow: visible; fill: none; stroke: var(--ink-on); stroke-width: 2.4; }

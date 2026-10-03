@@ -26,7 +26,7 @@ const caption = [official.title, official.date && longDate(official.date)].filte
 
         {hasOfficial
           ? (
-            <div class="tl-work tl-view size-m reveal">
+            <div class="tl-view size-m reveal">
               {caption && <p class="sub">{caption}</p>}
               <TierBoard rows={rows} logos={logos} pfps={pfps} />
             </div>

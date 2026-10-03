@@ -50,13 +50,13 @@ export function detailHTML(p: Player): string {
     ? `<span class="tf"><b>${p.kpg.toFixed(2)}</b><em>K/G</em></span><span class="tf"><b>${p.kills}</b><em>Kills</em></span>
         <span class="tf"><b>${p.games}</b><em>Games</em></span>`
     : '<span class="tf tf-none"><b><i>No S1 games</i></b></span>'}${tier}</div>`;
-  // Under the figures: most kills in a game and titles, each a figure over its tours as chips; then awards,
-  // when there are any.
-  const stat = (label: string, n: number, unit: string, tours: string[]) =>
-    `<div class="tp-stat"><span class="tp-k">${label}</span><span class="tp-v"><b>${n}</b>${unit ? `<em>${unit}</em>` : ''}</span>${chips(tours)}</div>`;
+  // Under the figures: most kills in a game (when there is one) and titles (always, 0 included), each a figure
+  // over its tours as chips; then the tours; then awards, when there are any.
+  const stat = (label: string, n: number, tours: string[]) =>
+    `<div class="tp-stat"><span class="tp-k">${label}</span><span class="tp-v"><b>${n}</b></span>${tours.length ? chips(tours) : ''}</div>`;
   const stats: string[] = [];
-  if (p.best) stats.push(stat('Most kills in a game', p.best.kills, '', p.best.tours));
-  if (p.titles.length) stats.push(stat('Titles', p.titles.length, '', p.titles));
+  if (p.best) stats.push(stat('Most kills in a game', p.best.kills, p.best.tours));
+  stats.push(stat('Titles', p.titles.length, p.titles));
   const won = AWARD_LIST.filter((a) => p.awards[a]?.length);
   const awards = won.length
     ? `<div class="tp-row"><span class="tp-k">Awards</span><span class="tp-boxes">${won.map((a) =>
@@ -66,7 +66,7 @@ export function detailHTML(p: Player): string {
     ? `<table class="tp-tours"><thead><tr><th>Tour</th><th>Team</th><th>K</th><th>G</th><th>K/G</th></tr></thead><tbody>${p.tours.map((t) =>
         `<tr><td>${t.num}</td><td>${mark(t.team)}</td><td>${t.kills}</td><td>${t.games}</td><td>${t.games ? (t.kills / t.games).toFixed(2) : ''}</td></tr>`).join('')}</tbody></table>`
     : '';
-  return `<div class="tp">${head}${figs}${stats.length ? `<div class="tp-stats">${stats.join('')}</div>` : ''}${awards}${tours}</div>`;
+  return `<div class="tp">${head}${figs}<div class="tp-stats">${stats.join('')}</div>${tours}${awards}</div>`;
 }
 
 // A card's name that is too long for its space slides under a fade, as names do across the site.

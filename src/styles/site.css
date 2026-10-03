@@ -677,7 +677,6 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .tp-stat + .tp-stat { border-left: 1px solid var(--line); }
 .tp-v { display: flex; align-items: baseline; gap: 6px; font-family: var(--mono); line-height: 1; }
 .tp-v b { font-weight: 600; font-size: 22px; color: #fff; font-variant-numeric: tabular-nums; }
-.tp-v em { font-style: normal; font-size: 9px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-3); }
 .tp-chips { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
 .tp-chip { display: inline-block; padding: 3px 7px 2px; font-style: normal; font-family: var(--mono); font-size: 10px; line-height: 1; letter-spacing: 0.04em;
   color: var(--text); background: var(--surface-2); clip-path: polygon(3px 0, 100% 0, calc(100% - 3px) 100%, 0 100%); }

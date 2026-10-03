@@ -1,0 +1,11 @@
+---
+// The player card on pages outside the Tier List: any PlayerName opens the same readout a tier card shows.
+import AwardSprite from './AwardSprite.astro';
+import { tierAssets } from '../lib/tier-assets';
+const { json } = await tierAssets();
+---
+<AwardSprite />
+<div class="tl-pop" id="tl-pop" role="dialog" aria-label="Player card" aria-hidden="true" hidden></div>
+<div class="tl-bar" id="tl-bar" role="dialog" aria-label="Player card" hidden></div>
+<script type="application/json" id="tl-data" set:html={json}></script>
+<script>import '../scripts/player-cards';</script>

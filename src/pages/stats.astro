@@ -2,6 +2,8 @@
 import Site from '../layouts/Site.astro';
 import TeamMarks from '../components/TeamMarks.astro';
 import S2Placeholder from '../components/S2Placeholder.astro';
+import PlayerName from '../components/PlayerName.astro';
+import PlayerCards from '../components/PlayerCards.astro';
 import { allTimeBoard, longDate, MIN_GAMES, season, sheetSpan, tourBoards, type BoardRow } from '../lib/data';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -56,7 +58,7 @@ const boards: { id: string; label: string; title: string; meta: string; rows: Bo
                         <tr class={lastAbove ? 'above-split' : undefined}>
                           <td class={p.rank === 1 ? 'rk top' : 'rk'}>{pad2(p.rank)}</td>
                           <td class="tm"><TeamMarks codes={p.teams} /></td>
-                          <td class="pl"><span class="slide"><span>{p.name}</span></span></td>
+                          <td class="pl"><span class="slide"><span><PlayerName name={p.name} /></span></span></td>
                           <td class="n">{p.kills}</td>
                           <td class="n gp">{p.games}</td>
                           <td class="n key">{p.kpg.toFixed(2)}</td>
@@ -72,6 +74,7 @@ const boards: { id: string; label: string; title: string; meta: string; rows: Bo
       </div>
     </section>
   </div>
+  <PlayerCards />
 
   <script is:inline>
   (function () {

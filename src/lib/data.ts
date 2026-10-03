@@ -259,6 +259,9 @@ export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2By
   };
 });
 
+const cardNames = new Set(tierPlayers.map((p) => p.name));
+export const hasCard = (name: string) => cardNames.has(name);
+
 // The pool's own order: the S2 field franchise by franchise in depth-chart order, then everyone else
 // by the franchise their card wears, best kills per game first.
 const atOf = (n: string) => boardRow.get(n)?.at ?? Number.MAX_SAFE_INTEGER;

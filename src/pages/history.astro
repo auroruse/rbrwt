@@ -3,6 +3,8 @@ import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
 import TeamMarks from '../components/TeamMarks.astro';
 import { AWARDS, franchise, longDate, monthYear, records, tours } from '../lib/data';
+import PlayerName from '../components/PlayerName.astro';
+import PlayerCards from '../components/PlayerCards.astro';
 import { CARET, PLAY } from '../lib/icons';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
@@ -54,7 +56,7 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
                         return (
                           <td class={`t-award a-${a.toLowerCase()}`} data-k={a}>
                             {who
-                              ? <span class="slide"><span>{who}{note && <i class="note">{note}</i>}</span></span>
+                              ? <span class="slide"><span><PlayerName name={who} />{note && <i class="note">{note}</i>}</span></span>
                               : <span class="na">Not awarded</span>}
                           </td>
                         );
@@ -88,7 +90,7 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
                 <b class="rec2-fig">{r.figure}</b>
                 <ul class="rec2-who">
                   {r.holders.map((h) => (
-                    <li><TeamMarks codes={h.teams} /><span class="slide"><span>{h.name}{h.note && <i>{h.note}</i>}</span></span></li>
+                    <li><TeamMarks codes={h.teams} /><span class="slide"><span><PlayerName name={h.name} />{h.note && <i>{h.note}</i>}</span></span></li>
                   ))}
                 </ul>
               </div>
@@ -98,4 +100,5 @@ const source = (url: string) => (url.includes('drive.google') ? 'Drive' : 'YouTu
       </div>
     </section>
   </div>
+  <PlayerCards />
 </Site>

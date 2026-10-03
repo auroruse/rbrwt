@@ -1,0 +1,9 @@
+---
+// A player's name that opens their player card. A name with no card (a franchise, say) stays plain text.
+import { hasCard } from '../lib/data';
+interface Props { name: string }
+const { name } = Astro.props;
+---
+{hasCard(name)
+  ? <button type="button" class="pname" data-player={name} aria-haspopup="dialog" aria-expanded="false">{name}</button>
+  : <Fragment>{name}</Fragment>}

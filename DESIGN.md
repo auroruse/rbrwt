@@ -136,7 +136,7 @@ Primary is the field colour from Kirin's own dispatch banners; secondary comes f
 
 | Code | Shown as | Links to |
 |---|---|---|
-| CSS | Commonwealth of Sovereign States | nationstates.net/region=commonwealth_of_sovereign_states |
+| CSS | Commonwealth | nationstates.net/region=commonwealth_of_sovereign_states |
 | SLD | Solidarity | nationstates.net/region=nsleft |
 | TAL | Talonia | nationstates.net/region=talonia |
 | TO | The Outback | nationstates.net/region=the_outback |
@@ -259,6 +259,8 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 **Tier card.** A stat tile with the broadcast cut at 8px: 112×148 (M), 84×116 (S) or 148×196 (L). The top is a field in the card's franchise colours with the stripes, the 1px rim (its diagonal drawn along the cut) and the logo bleeding off the right edge; the code chip at its top left. No starter or sub tag (removed at Kirin's request, 3 October 2026). Under the field on `--deep`: the name in Bold, kills per game in Mono with a small "K/G", kills and games ("169 K · 111 G"), and the award icons with counts ("×2"). A card wears the player's S2 franchise, otherwise the last real franchise they played for: the Wild Card side is free agents and never counts as a player's team on the tier list (its tours still read WC in the detail panel's tour rows), so the team filter has no WC either. A player with no S1 games reads "No S1 games". Logo-led: a pfp, once added, sits small at the field's bottom left. Selected or focused, a card gets a 2px gold ring that follows the cut.
 
 **Card detail.** On desktop, hovering a card opens a readout panel beside it: name and franchise with the player's S2 role, then kills per game, kills, games and all-time rank as Mono figures, then the S1 franchises, awards with their tours, titles (tours won as a player, II to X), best game and finals reached, then the tours one by one with team, kills and games. On touch screens, tapping a card shows the same in a bar along the bottom; in the editor the bar also carries the nine tiers and Unranked as buttons that place the card.
+
+**Player card.** Every player's name on the site opens that same readout: the Franchises rosters, the Stats leaderboard, and History's records and award winners. A name is a plain button in its own type that takes a gold underline on hover; a click pins the card beside the name for a mouse (it follows the name as the page scrolls), a tap opens it in the bottom bar. A click elsewhere, Escape or the name again closes it. Franchise names and "Not awarded" stay plain text.
 
 **Tier poster** (Export PNG). Drawn in the browser, 1920px wide, whatever the screen: the water background darkening downwards, the RBRWT S2 wordmark top left, "Tier list" in gold Mono over the title in Bold on the right, a gold rule, then the nine tiers with their plates, cards at the chosen size and counts (an empty tier stays as a slim row so the scale reads in full), and along the bottom "By <name>" with the date and auroruse.github.io/rbrwt. Unranked is left out.
 

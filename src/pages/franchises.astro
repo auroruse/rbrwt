@@ -3,6 +3,8 @@ import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
 import { nsRegion, rosters, s2Field, season } from '../lib/data';
 import { ARROW } from '../lib/icons';
+import PlayerName from '../components/PlayerName.astro';
+import PlayerCards from '../components/PlayerCards.astro';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 ---
@@ -36,7 +38,7 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
                     {roster.length
                       ? roster.map((r, k) => (
                           <li class={r.role.toLowerCase() === 'sub' ? 'is-sub' : undefined}>
-                            <span class="num">{pad2(k + 1)}</span><span class="who slide"><span>{r.player}</span></span>
+                            <span class="num">{pad2(k + 1)}</span><span class="who slide"><span><PlayerName name={r.player} /></span></span>
                             {r.role.toLowerCase() === 'sub' && <i class="sub-tag">Sub</i>}
                           </li>
                         ))
@@ -50,4 +52,5 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
       </div>
     </section>
   </div>
+  <PlayerCards />
 </Site>

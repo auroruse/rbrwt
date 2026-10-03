@@ -483,6 +483,12 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
 @media (max-width: 1023px) { .records-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 639px) { .records-grid { grid-template-columns: 1fr; } .rec2 { min-height: 0; } .rec2-fig { font-size: 56px; } }
 
+/* A player's name opens their card: plain until hovered, then a gold underline */
+.pname { display: inline; padding: 0; border: 0; background: none; color: inherit; font: inherit; letter-spacing: inherit; text-align: left; cursor: pointer;
+  text-decoration: underline; text-decoration-color: transparent; text-decoration-thickness: 2px; text-underline-offset: 4px; transition: text-decoration-color var(--fast); }
+.pname:hover, .pname[aria-expanded="true"] { text-decoration-color: var(--gold); }
+.pname:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+
 /* ---------- Tier List: nine star tiers, each a dark plate with its stars in a mineral ---------- */
 /* Card sizes. src/lib/tiers.ts (CARD) carries the same numbers for the poster. */
 .size-s { --tc-w: 84px; --tc-h: 116px; --tc-f: 44px; --tc-name: 11px; --tc-kpg: 15px; --tc-small: 8px; --tc-tiny: 7px; --tc-pad: 6px; --tc-icon: 11px; }

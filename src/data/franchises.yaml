@@ -10,7 +10,7 @@
   primary: "#FCCB55"
   secondary: "#212E52"
   ink: dark
-  home: { label: Commonwealth of Sovereign States, region: commonwealth_of_sovereign_states }
+  home: { label: Commonwealth, region: commonwealth_of_sovereign_states }
 
 - code: SLD
   name: Exiles

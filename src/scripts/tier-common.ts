@@ -40,8 +40,8 @@ export function detailHTML(p: Player): string {
   const head = `<div class="tp-head" style="${styleOf(p.team)}">${mark(p.team, 'tp-logo')}
     <div class="tp-who"><b class="tp-name">${esc(p.name)}</b><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)}` : ''}</span></div></div>`;
   const figs = p.games
-    ? `<div class="tp-figs"><div><b>${p.kpg.toFixed(2)}</b><span>K/G</span></div><div><b>${p.kills}</b><span>Kills</span></div>
-        <div><b>${p.games}</b><span>Games</span></div><div><b>${p.rank ? pad2(p.rank) : ''}</b><span>Rank</span></div></div>
+    ? `<div class="tp-figs"><span class="tf"><b>${p.kpg.toFixed(2)}</b><em>K/G</em></span><span class="tf"><b>${p.kills}</b><em>Kills</em></span>
+        <span class="tf"><b>${p.games}</b><em>Games</em></span><span class="tf"><b>${p.rank ? pad2(p.rank) : ''}</b><em>Rank</em></span></div>
         ${p.low ? '<p class="tp-note">Under 10 games</p>' : ''}`
     : '<p class="tp-note tp-empty">No S1 games</p>';
   const rows: [string, string][] = [];

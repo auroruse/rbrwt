@@ -1,12 +1,14 @@
 ---
 import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
-import { nsRegion, rosters, s2Field, season } from '../lib/data';
+import { nsRegion, rosters, s2Field, season, tierPlayers } from '../lib/data';
 import { ARROW } from '../lib/icons';
-import PlayerName from '../components/PlayerName.astro';
-import PlayerCards from '../components/PlayerCards.astro';
+import PlayerBanner from '../components/PlayerBanner.astro';
+import AwardSprite from '../components/AwardSprite.astro';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
+const byName = new Map(tierPlayers.map((p) => [p.name, p]));
+const isSub = (role: string) => role.toLowerCase() === 'sub';
 ---
 <Site current="franchises" inner title="Franchises · RBR World Tour" description={`The ${s2Field.length} franchises of Season ${season.season} of the Rocket Bot Royale World Tour.`}>
   <div class="depth">
@@ -34,15 +36,16 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
                       : <span>{f.home?.label ?? ''}</span>}
                   </p>
                   <h2 class="team-name slide"><span>{f.name}</span></h2>
-                  <ol class="team-roster">
+                  <ol class="pl-list">
                     {roster.length
-                      ? roster.map((r, k) => (
-                          <li class={r.role.toLowerCase() === 'sub' ? 'is-sub' : undefined}>
-                            <span class="num">{pad2(k + 1)}</span><span class="who slide"><span><PlayerName name={r.player} /></span></span>
-                            {r.role.toLowerCase() === 'sub' && <i class="sub-tag">Sub</i>}
-                          </li>
-                        ))
-                      : <li><span class="num">00</span><span class="who"><span class="na">Roster TBA</span></span></li>}
+                      ? roster.map((r, k) => {
+                          const p = byName.get(r.player);
+                          const firstSub = isSub(r.role) && k > 0 && !isSub(roster[k - 1].role);
+                          return p
+                            ? <PlayerBanner p={p} n={k + 1} code={f.code} firstSub={firstSub} />
+                            : <li class={firstSub ? 'pl pl-first-sub pl-plain' : 'pl pl-plain'}>{r.player}</li>;
+                        })
+                      : <li class="pl pl-plain"><span class="na">Roster TBA</span></li>}
                   </ol>
                 </div>
               </article>
@@ -52,5 +55,16 @@ const pad2 = (n: number) => String(n).padStart(2, '0');
       </div>
     </section>
   </div>
-  <PlayerCards />
+  <AwardSprite />
+  <script is:inline>
+  // A banner slides its trivia and tours open below it, and shut again.
+  document.querySelectorAll('.pl-head').forEach(function (b) {
+    b.addEventListener('click', function () {
+      var open = b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', open ? 'true' : 'false');
+      var more = document.getElementById(b.getAttribute('aria-controls'));
+      if (more) { more.inert = !open; }
+    });
+  });
+  </script>
 </Site>

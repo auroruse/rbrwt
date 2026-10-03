@@ -671,6 +671,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .tp-k::before { content: ""; flex: none; width: 4px; height: 4px; background: var(--gold); }
 .tp-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); border-top: 1px solid var(--line); }
 .tp-stat { display: grid; align-content: start; gap: 9px; min-width: 0; padding: 14px 14px 15px 18px; }
+.tp-stat .tp-k { letter-spacing: 0.12em; }
 .tp-stat + .tp-stat { border-left: 1px solid var(--line); }
 .tp-v { display: flex; align-items: baseline; gap: 6px; font-family: var(--mono); line-height: 1; }
 .tp-v b { font-weight: 600; font-size: 22px; color: #fff; font-variant-numeric: tabular-nums; }

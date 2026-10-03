@@ -46,13 +46,12 @@ export function detailHTML(p: Player): string {
         <span class="tf"><b>${p.games}</b><em>Games</em></span><span class="tf"><b>${p.rank ? pad2(p.rank) : ''}</b><em>Rank</em></span></div>
         ${p.low ? '<p class="tp-note">Under 10 games</p>' : ''}`
     : '<p class="tp-note tp-empty">No S1 games</p>';
-  // Under the figures: tours played, most kills in a game and titles, each a figure over its tours as chips;
-  // then awards, when there are any.
+  // Under the figures: most kills in a game and titles, each a figure over its tours as chips; then awards,
+  // when there are any.
   const stat = (label: string, n: number, unit: string, tours: string[]) =>
     `<div class="tp-stat"><span class="tp-k">${label}</span><span class="tp-v"><b>${n}</b>${unit ? `<em>${unit}</em>` : ''}</span>${chips(tours)}</div>`;
   const stats: string[] = [];
-  if (p.tours.length) stats.push(stat('Tours played', p.tours.length, '', p.tours.map((x) => x.num)));
-  if (p.best) stats.push(stat('Most kills', p.best.kills, 'in a game', p.best.tours));
+  if (p.best) stats.push(stat('Most kills in a game', p.best.kills, '', p.best.tours));
   if (p.titles.length) stats.push(stat('Titles', p.titles.length, '', p.titles));
   const won = AWARD_LIST.filter((a) => p.awards[a]?.length);
   const awards = won.length

@@ -706,7 +706,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 
 /* ---------- Franchise animations: each team acts out its logo ----------
    .fx-preview is the short taste a resting mouse gets; .fx-full plays as the team opens. Positions are
-   shares of the logo's box: the CSS barrel tip at 84% 18%, the SLD rocket's tail at 13% 53%, the TO
+   shares of the logo's box: the CSS barrel tip at 84% 18%, the SLD rocket's tail at 16.5% 57.5% (its axis climbs 21deg), the TO
    hooves at 78% 76% and 36% 67%. */
 .fx { position: absolute; inset: 0; }
 .fx > * { position: absolute; display: block; opacity: 0; }
@@ -736,10 +736,14 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .fp.fx-full .fx-css .s3, .fp.fx-preview .fx-css .s3 { animation: fx-puff 800ms ease-out 120ms; }
 
 /* SLD Exiles: the fist punches up and the rocket fires, flame and sparks streaming from its tail */
-.fx-sld .fx-flame { left: 13%; top: 53%; width: 28cqw; height: 10cqw; margin: -5cqw 0 0 -28cqw; transform-origin: 100% 50%; rotate: -17.5deg;
-  background: linear-gradient(270deg, #FFF6C2, #FFB020 30%, #FF5A1F 70%, rgba(255, 90, 31, 0)); clip-path: polygon(100% 12%, 100% 88%, 0 50%); }
-.fx-sld .fx-spark { left: 13%; top: 53%; width: 3.4cqw; height: 3.4cqw; margin: -1.7cqw 0 0 -1.7cqw; border-radius: 50%; background: #FFD35C; }
-.fx-sld .k1 { --dx: -32cqw; --dy: 12cqw; } .fx-sld .k2 { --dx: -26cqw; --dy: 22cqw; } .fx-sld .k3 { --dx: -36cqw; --dy: 2cqw; } .fx-sld .k4 { --dx: -18cqw; --dy: 26cqw; }
+.fx-sld .fx-flame { left: calc(19% - 30cqw); top: calc(57.5% - 6cqw); z-index: -1; width: 30cqw; height: 12cqw; overflow: visible;
+  transform-origin: 100% 50%; rotate: -21deg; }
+.fx-sld .fx-flame path { stroke-linejoin: round; }
+.fx-sld .fx-flame .o { fill: #F26A1B; stroke: #5E0328; stroke-width: 3; paint-order: stroke; }
+.fx-sld .fx-flame .m { fill: #FDAA14; }
+.fx-sld .fx-flame .c { fill: #FFF2B0; }
+.fx-sld .fx-spark { left: 14%; top: 59%; width: 3.4cqw; height: 3.4cqw; margin: -1.7cqw 0 0 -1.7cqw; border-radius: 50%; background: #FFD35C; }
+.fx-sld .k1 { --dx: -32cqw; --dy: 13cqw; } .fx-sld .k2 { --dx: -25cqw; --dy: 20cqw; } .fx-sld .k3 { --dx: -36cqw; --dy: 7cqw; } .fx-sld .k4 { --dx: -20cqw; --dy: 23cqw; }
 @keyframes sld-punch { 0%, 100% { transform: none; } 30% { transform: translateY(-9%) scale(1.05) rotate(-2deg); } }
 @keyframes sld-punch-s { 0%, 100% { transform: none; } 35% { transform: translateY(-4%) scale(1.02); } }
 @keyframes sld-flame { 0% { opacity: 0; transform: scaleX(0); } 20% { opacity: 1; transform: scaleX(1.1); } 40% { transform: scaleX(0.85); } 60% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(0.3); } }

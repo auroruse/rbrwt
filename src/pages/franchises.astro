@@ -53,7 +53,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                   <div class="fp-roster" id={`roster-${f.code.toLowerCase()}`}>
                     <table class="fp-table">
                       <colgroup><col style="width:40px"><col><col style="width:104px"><col style="width:64px"><col class="kl" style="width:58px"><col class="gp" style="width:64px"><col class="rkc" style="width:54px"></colgroup>
-                      <thead><tr><th>#</th><th>Player</th><th>Kirin's List</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n rkc">Rank</th></tr></thead>
+                      <thead><tr><th>#</th><th>Player</th><th>Tier</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n rkc">Rank</th></tr></thead>
                       <tbody>
                         {roster.length
                           ? roster.map((r, k) => {
@@ -64,7 +64,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                                   <td class="rk">{pad2(k + 1)}</td>
                                   <td class="pl"><span class="slide"><span><PlayerName name={r.player} /></span></span></td>
                                   <td class="kls">{tierOf.get(r.player)
-                                    ? <span class="kls-stars" title={`${tierOf.get(r.player)!.stars} stars on Kirin's List`}><Fragment set:html={starsSVG(tierOf.get(r.player)!, 14, 2)} /></span>
+                                    ? <span class="kls-stars" title={`${tierOf.get(r.player)!.stars} stars`}><Fragment set:html={starsSVG(tierOf.get(r.player)!, 14, 2)} /></span>
                                     : <span class="na">Unranked</span>}</td>
                                   <td class="n key">{p?.games ? p.kpg.toFixed(2) : ''}</td>
                                   <td class="n kl">{p?.games ? p.kills : ''}</td>

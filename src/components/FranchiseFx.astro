@@ -6,7 +6,7 @@ const { fx } = Astro.props;
 ---
 <span class="fx" aria-hidden="true">
   {fx === 'css' && <Fragment><i class="fx-smoke s1"></i><i class="fx-smoke s2"></i><i class="fx-smoke s3"></i><i class="fx-shell"></i><i class="fx-flash"></i></Fragment>}
-  {fx === 'sld' && <Fragment><i class="fx-flame"></i><i class="fx-spark k1"></i><i class="fx-spark k2"></i><i class="fx-spark k3"></i><i class="fx-spark k4"></i></Fragment>}
+  {fx === 'sld' && <Fragment><svg class="fx-flame" viewBox="0 0 100 40"><path class="o" d="M104 5C84 3 64 1 40 9L46 13C30 13 14 16 0 20C14 24 30 27 46 27L40 31C64 39 84 37 104 35Z" /><path class="m" d="M104 11C86 10 68 9 50 15C40 18 30 20 24 20C30 20 40 22 50 25C68 31 86 30 104 29Z" /><path class="c" d="M104 15C92 15 80 16 70 20C80 24 92 25 104 25Z" /></svg><i class="fx-spark k1"></i><i class="fx-spark k2"></i><i class="fx-spark k3"></i><i class="fx-spark k4"></i></Fragment>}
   {fx === 'tal' && <Fragment><i class="fx-wind w1"></i><i class="fx-wind w2"></i><i class="fx-wind w3"></i></Fragment>}
   {fx === 'to' && (
     <Fragment>

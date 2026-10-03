@@ -1,0 +1,53 @@
+---
+import Site from '../../layouts/Site.astro';
+import TierBoard from '../../components/TierBoard.astro';
+import AwardSprite from '../../components/AwardSprite.astro';
+import { hasOfficial, href, longDate, official, tierPlayers } from '../../lib/data';
+import { tierAssets } from '../../lib/tier-assets';
+import { NEXT } from '../../lib/icons';
+
+const { logos, pfps, json } = await tierAssets();
+const byName = new Map(tierPlayers.map((p) => [p.name, p]));
+const rows = Object.fromEntries(official.tiers.map((t) => [t.id, t.players.map((n) => byName.get(n)!)]));
+const placed = official.tiers.reduce((n, t) => n + t.players.length, 0);
+const credit = [official.by && `By ${official.by}`, official.date && longDate(official.date)].filter(Boolean).join(' · ');
+---
+<Site current="tier-list" inner title="Tier List · RBR World Tour" description="The official tier list of the Rocket Bot Royale World Tour's players, and a maker for your own.">
+  <AwardSprite />
+  <div class="depth">
+    <div class="rays" aria-hidden="true"></div>
+    <section class="sec sec-first sec-last" aria-labelledby="tl-h">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h1 class="mega" id="tl-h">Tier List</h1>
+          {hasOfficial && <div class="sec-meta"><span class="sec-count">{String(placed).padStart(2, '0')}</span><span class="label">{credit || 'Official'}</span></div>}
+        </header>
+
+        {hasOfficial
+          ? (
+            <div class="tl-work tl-view size-m reveal">
+              {official.title && <p class="sub">{official.title}</p>}
+              <TierBoard rows={rows} logos={logos} pfps={pfps} />
+            </div>
+          )
+          : (
+            <div class="s2-wait cut reveal">
+              <p class="sub">Official list</p>
+              <p class="s2-wait-h">Coming soon</p>
+              <div class="s2-wait-read">
+                <div class="hud-cell"><span class="hud-k">Players</span><span class="hud-v">{tierPlayers.length}</span></div>
+                <div class="hud-cell"><span class="hud-k">Tiers</span><span class="hud-v">5 to 1 stars</span></div>
+              </div>
+            </div>
+          )}
+
+        <a class="cta tl-cta reveal" href={href('/tier-list/editor/')}><span>Make your own</span><Fragment set:html={NEXT} /></a>
+      </div>
+    </section>
+  </div>
+
+  <div class="tl-pop" id="tl-pop" aria-hidden="true" hidden></div>
+  <div class="tl-bar" id="tl-bar" role="dialog" aria-label="Player details" hidden></div>
+  <script type="application/json" id="tl-data" set:html={json}></script>
+  <script>import '../../scripts/tier-view';</script>
+</Site>

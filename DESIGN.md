@@ -16,7 +16,7 @@ Decided with Moukden and Kirin, 2 October 2026. Reworked the same day after the 
 
 ### Menu
 
-Home · Tours · Franchises · Stats · History
+Home · Tours · Franchises · Stats · History · Tier List
 
 Every item is its own page. There is no About tab; the About section is the body of Home.
 
@@ -41,6 +41,10 @@ Former franchises have no page; they live in History. A franchise that rejoins g
 
 **History.** The S1 champions hanging from the rafters, the tours table and the records. No leaderboard; that lives on Stats. S1 has no tour pages.
 
+**Tier List.** Kirin's official tier list of every player, read-only, then a gold "Make your own" button that opens the editor (`tier-list/editor/`). Until the official list is in, a placeholder panel stands where it goes. Kirin sends the official list as a screenshot and it is typed into `src/data/tier-list.yaml`.
+
+**Editor.** The tiers on the left; the Unranked pool docked on the right, scrolling on its own so every card is in reach of every tier (under the tiers on phones and tablets). A card moves by dragging, with a mouse at once or with a finger after a short hold, or by tapping it and then tapping a tier. Cards reorder inside a tier. The pool has a search box and a row of franchise logos that narrows it to one franchise's players, S1 or S2. It keeps its own order: the S2 field franchise by franchise in depth-chart order, then everyone else by franchise, best kills per game first. Above the tiers: Title and Name fields, both optional (a blank title reads "RBRWT S2 Tier List"), the card size switch (S, M, L), "Start from the official list" once there is one, Reset, and Export PNG. One list per browser, saved with every move. A first visit starts with everyone in Unranked. Reset and replacing a list with the official one ask once more on the button itself.
+
 ### Words
 
 - Broadcast voice, short. No intro paragraphs, no "welcome", nothing that explains what a page is. A heading and the content are the page.
@@ -64,6 +68,8 @@ Former franchises have no page; they live in History. A franchise that rejoins g
 - X's kills cover its conference stage only.
 - After each S2 tour Kirin sends that tour's sheet; it is added and the site republished. The browser never fetches a sheet.
 - S2 sheets need each game's winner as well as the kills. Wins, win rates, standings and finals reached cannot come from kill sheets.
+- `src/data/tier-list.yaml` holds the official tier list: title, maker, date and the players in each tier by site name. A name the site doesn't know stops the build, so a typo never publishes a list with a player missing.
+- A saved list lives in the browser under `rbrwt.tierlist`. A merged or renamed player carries over through `aliases.yaml`; one who no longer exists drops out.
 - NationStates nations are used only behind the scenes: the dispatch gives I to VIII's award winners by nation, and they are turned into in-game names before anything is shown.
 
 ---
@@ -180,7 +186,7 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 - **Bar wordmark:** `assets/header/wordmark.png`, 3000×450, "RBRWT S2" in the same blocky outlined letters: RBRWT in the tour gradient, S2 running purple #9356F3 to coral #E58275.
 - **Logos:** 500×500 transparent PNGs named by code. Shown at 24px in table rows, 48px in lists, about 74% of a team card's width, up to 320px in banners. Alt text: "TO Bushrangers logo".
 - **Pfps:** square, `assets/pfps/<in-game name>.png`. 32px in tables, 72px on roster cards, with the broadcast cut scaled to 6px. A missing pfp shows a Rocket Bot tank silhouette (inline SVG) in the franchise primary on its secondary.
-- **Award icons:** the dispatch's in-game icons redrawn crisp as SVG, same drawings: rocket (MVP), three circles (TF), beach ball (RotM), gears (MI), plus the white controller (games played) and gold controller (games won). 16px in tables, 28px on cards, the award's full name on hover and in a legend.
+- **Award icons:** the dispatch's 20px in-game icons redrawn crisp as SVG, same drawings and colours: MVP a blue rocket with an orange flame beside a white ring, TF three grey skulls stacked in a pyramid, RotM a beach ball in white, orange, green, pink and violet, MI three gold gears. Still to draw: the white controller (games played) and gold controller (games won). 16px in tables, 28px on cards, the award's full name on hover and in a legend.
 - **Other icons:** inline SVG, 1.5px stroke, square caps. No emoji, no icon font.
 - **Discord card:** one 1200×630 image built from the art and the wordmark, used by every page.
 
@@ -248,6 +254,14 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **Tabs** (S2 and S1 on a franchise page). Labels on a hairline; the current tab gets the 2px `--gold` bar.
 
+**Tier plate.** Nine star tiers, then Unranked: 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5 and 1 stars. Each tier opens with a dark slanted plate on `--abyss` carrying its stars in a mineral, top to bottom Amethyst, Ruby, Emerald, Diamond, Platinum, Gold, Silver, Copper and Wood. The stars are cut facets with hard edges, lit from the top left in a light, a mid and a dark face; Diamond carries a small white glint and Wood two grain lines. Half a star is the star's left half beside an empty outline of the right. The stars count up from the left, so the plates step down like a staircase. No mineral names. A row's player count sits at its right end in Mono.
+
+**Tier card.** A stat tile with the broadcast cut at 8px: 112×148 (M), 84×116 (S) or 148×196 (L). The top is a field in the card's franchise colours with the stripes, the 1px rim (its diagonal drawn along the cut) and the logo bleeding off the right edge; the code chip at its top left. No starter or sub tag (removed at Kirin's request, 3 October 2026). Under the field on `--deep`: the name in Bold, kills per game in Mono with a small "K/G", kills and games ("169 K · 111 G"), and the award icons with counts ("×2"). A card wears the player's S2 franchise, otherwise the franchise of their latest S1 tour. A player with no S1 games reads "No S1 games". Logo-led: a pfp, once added, sits small at the field's bottom left. Selected or focused, a card gets a 2px gold ring that follows the cut.
+
+**Card detail.** On desktop, hovering a card opens a readout panel beside it: name and franchise with the player's S2 role, then kills per game, kills, games and all-time rank as Mono figures, then the S1 franchises, awards with their tours, titles (tours won as a player, II to X), best game and finals reached, then the tours one by one with team, kills and games. On touch screens, tapping a card shows the same in a bar along the bottom; in the editor the bar also carries the nine tiers and Unranked as buttons that place the card.
+
+**Tier poster** (Export PNG). Drawn in the browser, 1920px wide, whatever the screen: the water background darkening downwards, the RBRWT S2 wordmark top left, "Tier list" in gold Mono over the title in Bold on the right, a gold rule, then the nine tiers with their plates, cards at the chosen size and counts (an empty tier stays as a slim row so the scale reads in full), and along the bottom "By <name>" with the date and auroruse.github.io/rbrwt. Unranked is left out.
+
 **Empty state.** Two or three words in Label, `--text-3`, centred in the space the content would fill.
 
 **Season 2 placeholder** (Stats and Tours until XI is played). The season band grown into a panel: `--abyss` at 72%, the gold top line with its scan line, gold corner brackets. A "Season 2" Mono label, "Starts with RBRWT XI" in Bold up to 64px, the sentence "Season 2 stats will be added here once the season starts." ("tours" on Tours) in `--text-2`, then a readout row under a hairline: Next tour RBRWT XI, and Starts DATE TBA with the cursor, which becomes the countdown once XI has a date.
@@ -278,6 +292,7 @@ Everything on the page comes from files, read at build time:
 - `src/data/tours.yaml`: each tour's date, venue, host, champion, matches, awards, notes, replays and kill sheet.
 - `src/data/season.yaml`: the season number and the next tour; a date starts the countdown.
 - `src/data/aliases.yaml`: different spellings of one player across the sheets.
+- `src/data/tier-list.yaml`: the official tier list.
 - `assets/sheets/<numeral>.tsv`: the kill sheets in the standard layout. Every leaderboard and record is computed from them, never typed in.
 
 Images: logos and the wordmarks are resized to WebP at build. `assets/header/background.avif` is served as it is, because the build's image tool cannot decode it. The phone wordmark pieces live in `src/assets/pieces/`; the link card and favicon in `public/`.

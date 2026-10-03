@@ -5,7 +5,7 @@ import barmark from '../../assets/header/wordmark.png';
 import footLogo from '../assets/pieces/logo.png';
 import { href } from '../lib/data';
 
-interface Props { title: string; description: string; current: 'home' | 'tours' | 'franchises' | 'stats' | 'history'; inner?: boolean }
+interface Props { title: string; description: string; current: 'home' | 'tours' | 'franchises' | 'stats' | 'history' | 'tier-list'; inner?: boolean }
 const { title, description, current, inner = false } = Astro.props;
 
 const links = [
@@ -14,6 +14,7 @@ const links = [
   { label: 'Franchises', to: '/franchises/', key: 'franchises' },
   { label: 'Stats', to: '/stats/', key: 'stats' },
   { label: 'History', to: '/history/', key: 'history' },
+  { label: 'Tier List', to: '/tier-list/', key: 'tier-list' },
 ];
 const og = new URL(href('/og.png'), Astro.site).href;
 const canonical = new URL(Astro.url.pathname, Astro.site).href;

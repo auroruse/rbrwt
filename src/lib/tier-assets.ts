@@ -1,0 +1,30 @@
+// What the Tier List pages hand to the browser: every card's numbers for the detail panel and the poster,
+// the franchises with their logos, the pool's order and the official list. Logos are resized once here
+// and the same files serve the cards, the panels and the poster.
+import { getImage } from 'astro:assets';
+import barmark from '../../assets/header/wordmark.png';
+import { aliases, franchises, hasOfficial, official, poolOrder, tierPlayers } from './data';
+
+export async function tierAssets() {
+  const logos: Record<string, string> = {};
+  for (const f of franchises) if (f.image) logos[f.code] = (await getImage({ src: f.image, width: 192 })).src;
+  const pfps: Record<string, string> = {};
+  for (const p of tierPlayers) if (p.pfp) pfps[p.name] = (await getImage({ src: p.pfp, width: 96 })).src;
+  const wordmark = (await getImage({ src: barmark, width: 900 })).src;
+  const site = new URL(import.meta.env.BASE_URL, import.meta.env.SITE).href.replace(/^https?:\/\//, '').replace(/\/$/, '');
+
+  const payload = {
+    players: tierPlayers.map(({ pfp: _, ...p }) => ({ ...p, pfp: pfps[p.name] ?? null })),
+    franchises: Object.fromEntries(franchises.map((f) => [f.code, {
+      name: f.name, primary: f.primary, secondary: f.secondary, ink: f.inkHex, logo: logos[f.code] ?? null,
+    }])),
+    order: poolOrder,
+    aliases,
+    official: hasOfficial ? { title: official.title, by: official.by, tiers: Object.fromEntries(official.tiers.map((t) => [t.id, t.players])) } : null,
+    wordmark,
+    site,
+  };
+  // Safe inside a <script> element: no "</script>" can close it early.
+  const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+  return { logos, pfps, json };
+}

@@ -1,0 +1,25 @@
+---
+// The nine star tiers as rows: a dark slanted plate with the stars in the tier's mineral, the cards,
+// and the count. In the editor the plates are buttons that place the selected card.
+import { TIERS, starsSVG, tierLabel } from '../lib/tiers';
+import type { TierPlayer } from '../lib/data';
+import TierCard from './TierCard.astro';
+interface Props { rows?: Partial<Record<string, TierPlayer[]>>; editable?: boolean; logos: Record<string, string>; pfps: Record<string, string> }
+const { rows = {}, editable = false, logos, pfps } = Astro.props;
+---
+<div class="tl-board">
+  {TIERS.map((t) => {
+    const list = rows[t.id] ?? [];
+    return (
+      <section class="tl-row" data-tier={t.id} aria-label={tierLabel(t)}>
+        {editable
+          ? <button class="tl-plate" type="button" data-place={t.id} aria-label={`Place in ${tierLabel(t)}`}><Fragment set:html={starsSVG(t)} /></button>
+          : <div class="tl-plate" role="img" aria-label={tierLabel(t)}><Fragment set:html={starsSVG(t)} /></div>}
+        <div class="tl-zone" data-zone={t.id}>
+          {list.map((p) => <TierCard p={p} logo={p.team ? logos[p.team] : null} pfp={pfps[p.name]} />)}
+        </div>
+        <span class="tl-count" data-count={t.id}>{list.length}</span>
+      </section>
+    );
+  })}
+</div>

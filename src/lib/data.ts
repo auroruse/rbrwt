@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import type { ImageMetadata } from 'astro';
 import YAML from 'yaml';
+import { TIER_IDS } from './tiers';
 
 const ROOT = process.cwd();
 const read = (p: string) => fs.readFileSync(path.join(ROOT, p), 'utf8');
@@ -81,7 +82,7 @@ export const matchesPlayed = tours.reduce((n, t) => n + (t.matches || 0), 0);
 // ---------------------------------------------------------------- kill sheets
 // One standard TSV per tour in assets/sheets (the originals are kept in assets/sheets/raw):
 // Player, Team, Conference, GP, Kills, then one column per game, C# conference, W# wild card or play-in, F# finals.
-const aliases = yaml<Record<string, string>>('src/data/aliases.yaml') ?? {};
+export const aliases = yaml<Record<string, string>>('src/data/aliases.yaml') ?? {};
 const GAME_COL = /^[CWF]\d+$/;
 const isNum = (v: string | undefined) => !!v && /^\d+$/.test(v.trim());
 
@@ -94,6 +95,7 @@ const careers = yaml<Record<string, string[]>>('src/data/career-teams.yaml') ?? 
 const players = new Map<string, Player>();
 const perTour = new Map<string, Map<string, Player>>();
 const gameHighs: { kills: number; name: string; tour: string }[] = [];
+const finalsBy = new Map<string, Set<string>>(); // tour -> players who played a finals game in it
 
 for (const t of tours) {
   if (!t.sheet) continue;
@@ -101,7 +103,9 @@ for (const t of tours) {
   const at = (name: string) => head.findIndex((c) => c.trim().toLowerCase() === name);
   const [pc, tc, gc, kc] = ['player', 'team', 'gp', 'kills'].map(at);
   const gameCols = head.map((c, i) => (GAME_COL.test(c.trim()) ? i : -1)).filter((i) => i >= 0);
+  const finalCols = gameCols.filter((i) => head[i].trim().toUpperCase().startsWith('F'));
   const board = new Map<string, Player>();
+  const finals = new Set<string>();
   for (const r of rows) {
     const raw = (r[pc] ?? '').trim();
     if (!raw || !isNum(r[kc])) continue;
@@ -116,8 +120,10 @@ for (const t of tours) {
     p.kills += kills; p.games += games; p.team = team ?? p.team;
     players.set(name, p);
     for (const i of gameCols) if (isNum(r[i])) gameHighs.push({ kills: Number(r[i].trim()), name, tour: t.num });
+    if (finalCols.some((i) => isNum(r[i]))) finals.add(name);
   }
   perTour.set(t.num, board);
+  finalsBy.set(t.num, finals);
 }
 
 // Best kills per game first, everyone under MIN_GAMES games below everyone who reached it.
@@ -182,6 +188,101 @@ export const records: RecordTile[] = [
   { figure: topGame, label: 'Kills in one game', context: 'One game',
     holders: unique(gameHighs.filter((g) => g.kills === topGame), (g) => g.name + g.tour).map((g) => ({ name: g.name, teams: teamIn(g.name, g.tour), note: `RBRWT ${g.tour}` })) },
 ];
+
+// ---------------------------------------------------------------- tier list
+// A card for everyone in the S1 sheets and everyone on an S2 roster, with what its face and its
+// detail panel show. src/lib/tiers.ts holds the tiers themselves.
+export type TierPlayer = {
+  name: string;
+  team: string | null; // the franchise the card wears: S2 if rostered, otherwise their latest S1 tour's
+  teams: string[]; // every franchise they played for in S1
+  s2: { code: string; role: 'Starter' | 'Sub' } | null;
+  kills: number; games: number; kpg: number; rank: number | null; low: boolean;
+  awards: Partial<Record<Award, string[]>>; // award -> the tours it was won in
+  titles: string[]; // tours won as a player, II to X (I has no sheet)
+  tours: { num: string; team: string | null; kills: number; games: number }[];
+  best: { kills: number; tours: string[] } | null;
+  finals: string[];
+  pfp: ImageMetadata | null;
+};
+
+const pfpFiles = import.meta.glob<{ default: ImageMetadata }>('/assets/pfps/*.{png,jpg,jpeg,webp}', { eager: true });
+const pfpByName = new Map(Object.entries(pfpFiles).map(([k, v]) => [path.basename(k).replace(/\.[^.]+$/, '').toLowerCase(), v.default]));
+
+const s2ByName = new Map<string, { code: string; role: 'Starter' | 'Sub' }>();
+for (const f of s2Field) {
+  for (const r of rosters.get(f.code) ?? []) s2ByName.set(r.player, { code: f.code, role: r.role.toLowerCase() === 'sub' ? 'Sub' : 'Starter' });
+}
+const awardsBy = new Map<string, Partial<Record<Award, string[]>>>();
+for (const t of tours) {
+  for (const a of AWARDS) {
+    const w = t.awards[a];
+    if (!w) continue;
+    const name = aliases[w] ?? w;
+    const won = awardsBy.get(name) ?? {};
+    (won[a] ??= []).push(t.num);
+    awardsBy.set(name, won);
+  }
+}
+const boardRow = new Map(allTimeBoard.map((p, i) => [p.name, { ...p, at: i }]));
+
+export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2ByName.keys()])].map((name) => {
+  const s1 = players.get(name);
+  const row = boardRow.get(name);
+  const highs = gameHighs.filter((g) => g.name === name);
+  const top = highs.length ? Math.max(...highs.map((g) => g.kills)) : 0;
+  return {
+    name,
+    team: s2ByName.get(name)?.code ?? s1?.team ?? null,
+    teams: careers[name] ?? (s1?.team ? [s1.team] : []),
+    s2: s2ByName.get(name) ?? null,
+    kills: s1?.kills ?? 0,
+    games: s1?.games ?? 0,
+    kpg: row?.kpg ?? 0,
+    rank: row?.rank ?? null,
+    low: row?.low ?? false,
+    awards: awardsBy.get(name) ?? {},
+    titles: tours.filter((t) => perTour.get(t.num)?.get(name)?.team === t.champion).map((t) => t.num),
+    tours: tours.filter((t) => perTour.get(t.num)?.has(name)).map((t) => {
+      const r = perTour.get(t.num)!.get(name)!;
+      return { num: t.num, team: r.team ?? null, kills: r.kills, games: r.games };
+    }),
+    best: top ? { kills: top, tours: [...new Set(highs.filter((g) => g.kills === top).map((g) => g.tour))] } : null,
+    finals: tours.filter((t) => finalsBy.get(t.num)?.has(name)).map((t) => t.num),
+    pfp: pfpByName.get(name.toLowerCase()) ?? null,
+  };
+});
+
+// The pool's own order: the S2 field franchise by franchise in depth-chart order, then everyone else
+// by the franchise their card wears, best kills per game first.
+const atOf = (n: string) => boardRow.get(n)?.at ?? Number.MAX_SAFE_INTEGER;
+export const poolOrder: string[] = [
+  ...s2Field.flatMap((f) => (rosters.get(f.code) ?? []).map((r) => r.player)),
+  ...tierPlayers.filter((p) => !p.s2).sort((a, b) => (a.team ?? '~').localeCompare(b.team ?? '~') || atOf(a.name) - atOf(b.name)).map((p) => p.name),
+];
+
+// The official list, typed in from Kirin's screenshot. An unknown name stops the build rather than
+// publishing a list with a player missing.
+type OfficialFile = { title?: string | null; by?: string | null; date?: string | null; tiers?: Record<string, string[] | null> | null };
+const officialFile = yaml<OfficialFile | null>('src/data/tier-list.yaml') ?? {};
+const known = new Set(tierPlayers.map((p) => p.name));
+const placedOfficial = new Set<string>();
+export const official = {
+  title: officialFile.title ?? null,
+  by: officialFile.by ?? null,
+  date: officialFile.date ? String(officialFile.date).slice(0, 10) : null,
+  tiers: TIER_IDS.map((id) => {
+    const listed = Object.entries(officialFile.tiers ?? {}).find(([k]) => String(Number(k)) === String(Number(id)))?.[1] ?? [];
+    const names = listed.map((n) => aliases[String(n).trim()] ?? String(n).trim());
+    for (const n of names) {
+      if (!known.has(n)) throw new Error(`tier-list.yaml: no player called "${n}" (tier ${id})`);
+      if (placedOfficial.has(n)) throw new Error(`tier-list.yaml: "${n}" is in more than one tier`);
+      placedOfficial.add(n);
+    }
+    return { id, players: names };
+  }),
+};
+export const hasOfficial = placedOfficial.size > 0;
 
 // ---------------------------------------------------------------- links
 const BASE = import.meta.env.BASE_URL.replace(/\/$/, '');

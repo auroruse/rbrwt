@@ -1,0 +1,36 @@
+---
+// One player's card on the Tier List: a field in the franchise they wear (S2 if rostered, otherwise their
+// latest S1 tour's) with its code chip, then name, kills per game, kills and games, and award icons. The
+// editor moves these between tiers; the detail panel is built in the browser from the page's data.
+import { AWARDS, franchiseOrNull, type TierPlayer } from '../lib/data';
+import { AWARD_NAMES } from '../lib/tiers';
+interface Props { p: TierPlayer; logo?: string | null; pfp?: string | null }
+const { p, logo, pfp } = Astro.props;
+const f = franchiseOrNull(p.team ?? undefined);
+const tag = p.s2 ? (p.s2.role === 'Sub' ? 'Sub' : 'Starter') : 'S1 only';
+const awards = AWARDS.filter((a) => p.awards[a]?.length).map((a) => ({ a, n: p.awards[a]!.length }));
+const teams = [...new Set([...p.teams, ...(p.s2 ? [p.s2.code] : [])])].join(' ');
+const said = [
+  p.name,
+  f ? `${f.code} ${f.name}` : null,
+  p.s2 ? `S2 ${tag.toLowerCase()}` : 'S1 only',
+  p.games ? `${p.kpg.toFixed(2)} kills per game, ${p.kills} kills in ${p.games} games` : 'no S1 games',
+  ...awards.map(({ a, n }) => `${AWARD_NAMES[a]} ×${n}`),
+].filter(Boolean).join(', ');
+---
+<div class="tc" role="button" tabindex="0" data-player={p.name} data-teams={teams} style={f?.style} aria-label={said}>
+  <div class="tc-field" aria-hidden="true">
+    <span class="tc-code">{f?.code ?? ''}</span>
+    {logo && <img class="tc-logo" src={logo} alt="" draggable="false" decoding="async" />}
+    {pfp && <img class="tc-pfp" src={pfp} alt="" draggable="false" decoding="async" />}
+  </div>
+  <div class="tc-body" aria-hidden="true">
+    <span class="tc-name slide"><span>{p.name}</span></span>
+    {p.games
+      ? <Fragment><span class="tc-kpg"><b>{p.kpg.toFixed(2)}</b><i>K/G</i></span><span class="tc-kg">{p.kills} K · {p.games} G</span></Fragment>
+      : <span class="tc-none">No S1 games</span>}
+    <span class="tc-aw">
+      {awards.map(({ a, n }) => <i><svg viewBox="0 0 20 20"><use href={`#aw-${a}`} /></svg>×{n}</i>)}
+    </span>
+  </div>
+</div>

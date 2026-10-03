@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "astro": "^5.14.0",
+    "sortablejs": "^1.15.7",
     "yaml": "^2.6.1"
   }
 }

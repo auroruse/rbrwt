@@ -1,0 +1,72 @@
+---
+import Site from '../../layouts/Site.astro';
+import TierBoard from '../../components/TierBoard.astro';
+import TierCard from '../../components/TierCard.astro';
+import AwardSprite from '../../components/AwardSprite.astro';
+import { franchises, hasOfficial, href, poolOrder, tierPlayers } from '../../lib/data';
+import { tierAssets } from '../../lib/tier-assets';
+
+const { logos, pfps, json } = await tierAssets();
+const byName = new Map(tierPlayers.map((p) => [p.name, p]));
+const pool = poolOrder.map((n) => byName.get(n)!);
+// The team filter: every franchise with a player, the S2 field first.
+const filterTeams = franchises
+  .filter((f) => tierPlayers.some((p) => p.teams.includes(f.code) || p.s2?.code === f.code))
+  .sort((a, b) => Number(b.active) - Number(a.active) || a.code.localeCompare(b.code));
+---
+<Site current="tier-list" inner title="Tier List Editor · RBR World Tour" description="Rank the Rocket Bot Royale World Tour's players from 5 stars to 1 and export your tier list as a PNG.">
+  <AwardSprite />
+  <div class="depth">
+    <section class="sec sec-first sec-last" aria-labelledby="te-h">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h1 class="mega" id="te-h">Your List</h1>
+          <a class="tl-back" href={href('/tier-list/')}>Official list</a>
+        </header>
+
+        <div class="tl-tools">
+          <label class="tl-field"><span>Title</span><input id="tl-title" type="text" maxlength="48" placeholder="RBRWT S2 Tier List" autocomplete="off" spellcheck="false" /></label>
+          <label class="tl-field"><span>Name</span><input id="tl-name" type="text" maxlength="32" placeholder="Your name" autocomplete="off" spellcheck="false" /></label>
+          <div class="tl-field">
+            <span id="tl-size-k">Card size</span>
+            <div class="filters tl-sizes" role="group" aria-labelledby="tl-size-k">
+              <button type="button" class="filter" data-size="s" aria-pressed="false">S</button>
+              <button type="button" class="filter" data-size="m" aria-pressed="true">M</button>
+              <button type="button" class="filter" data-size="l" aria-pressed="false">L</button>
+            </div>
+          </div>
+          <div class="tl-acts">
+            {hasOfficial && <button type="button" class="tl-btn" id="tl-official">Start from official</button>}
+            <button type="button" class="tl-btn" id="tl-reset">Reset</button>
+            <button type="button" class="tl-btn tl-go" id="tl-export">Export PNG</button>
+          </div>
+        </div>
+
+        <div class="tl-work size-m" id="tl-work">
+          <TierBoard editable logos={logos} pfps={pfps} />
+          <aside class="tl-pool" aria-labelledby="tl-pool-h">
+            <div class="tl-pool-head"><h2 id="tl-pool-h">Unranked</h2><span class="tl-count" id="tl-pool-n">{pool.length}</span></div>
+            <input class="tl-search" id="tl-search" type="search" placeholder="Search players" autocomplete="off" spellcheck="false" aria-label="Search players" />
+            <div class="tl-teams" role="group" aria-label="Show one franchise">
+              <button type="button" class="tl-team tl-all" data-team="" aria-pressed="true">All</button>
+              {filterTeams.map((f) => (
+                <button type="button" class="tl-team" data-team={f.code} aria-pressed="false" title={`${f.code} ${f.name}`} aria-label={`${f.code} ${f.name}`}>
+                  {logos[f.code] ? <img src={logos[f.code]} alt="" draggable="false" /> : <i class="chip" style={f.style}>{f.code}</i>}
+                </button>
+              ))}
+            </div>
+            <p class="tl-none" id="tl-none" hidden>No match</p>
+            <div class="tl-zone tl-pool-zone" data-zone="pool">
+              {pool.map((p) => <TierCard p={p} logo={p.team ? logos[p.team] : null} pfp={pfps[p.name]} />)}
+            </div>
+          </aside>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <div class="tl-pop" id="tl-pop" aria-hidden="true" hidden></div>
+  <div class="tl-bar" id="tl-bar" role="dialog" aria-label="Place a player" hidden></div>
+  <script type="application/json" id="tl-data" set:html={json}></script>
+  <script>import '../../scripts/tier-editor';</script>
+</Site>

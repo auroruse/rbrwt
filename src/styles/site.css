@@ -166,9 +166,11 @@ a { color: inherit; text-decoration: none; }
   background: linear-gradient(118deg, transparent 0 50%, var(--s) 50% 55%, transparent 55% 60%, var(--s) 60% 61.5%, transparent 61.5%); }
 .fp-code { position: absolute; left: 18px; top: 16px; z-index: 1; padding: 5px 9px 4px; font-weight: 700; font-size: 12px; letter-spacing: 0.16em;
   background: var(--ink-on); color: var(--p); }
-.fp-logo { position: absolute; left: 50%; top: calc((100% - var(--plate)) / 2); width: min(80%, 230px); height: auto; transform: translate(-50%, -50%); pointer-events: none; }
+.fp-art { position: absolute; left: 50%; top: calc((100% - var(--plate)) / 2); width: min(80%, 230px); aspect-ratio: 1; transform: translate(-50%, -50%);
+  container-type: size; isolation: isolate; pointer-events: none; }
+.fp-logo { display: block; width: 100%; height: 100%; }
 .fp-title { position: absolute; left: 0; right: 0; bottom: 0; height: var(--plate); padding: 26px 20px 0; border-top: 1px solid var(--s); }
-.fp-home { margin-bottom: 8px; font-weight: 500; font-size: 11px; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; }
+.fp-home { position: relative; z-index: 3; margin-bottom: 8px; font-weight: 500; font-size: 11px; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; }
 .fp-home a { display: inline-flex; align-items: center; gap: 6px; }
 .fp-home a svg { width: 9px; height: 9px; flex: none; }
 .fp-home a:hover { text-decoration: underline; text-underline-offset: 3px; }
@@ -181,6 +183,10 @@ a { color: inherit; text-decoration: none; }
 .fp-strip b { writing-mode: vertical-rl; transform: rotate(180deg); font-weight: 700; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
 .fband.has-open .fp:not(.is-open) .fp-id { opacity: 0; }
 .fband.has-open .fp:not(.is-open) .fp-strip { opacity: 1; }
+/* The whole closed team is one button; once open, only its identity column is */
+.fp-toggle { position: absolute; inset: 0; z-index: 2; padding: 0; border: 0; background: transparent; cursor: pointer; }
+.fp.is-open .fp-toggle { right: auto; width: 300px; }
+.fp-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: -5px; }
 /* The roster, on the team's right once it opens */
 .fp-roster { position: absolute; inset: 0 0 0 300px; min-width: 560px; padding: 28px 30px; background: var(--deep); color: var(--text);
   opacity: 0; visibility: hidden; transition: opacity var(--base) var(--ease-out), visibility 0s linear var(--base); }
@@ -196,20 +202,23 @@ a { color: inherit; text-decoration: none; }
 .fp-table th.n, .fp-table td.n { text-align: right; }
 .fp-table td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-2); }
 .fp-table td.key { font-weight: 600; color: var(--gold); }
+.fp-table .kls .stars { display: block; width: auto; height: 14px; }
+.fp-table .kls .na { font-size: 10px; }
 @media (max-width: 1099px) {
   .fband { flex-direction: column; height: auto; }
   .fp { flex: none; }
   .fp-id, .fp.is-open .fp-id { position: relative; width: 100%; height: 132px; }
   .fp-id::before { inset: 0; }
-  .fp-logo { left: auto; right: -10px; top: 50%; width: 150px; transform: translateY(-50%); }
+  .fp-art { left: auto; right: -10px; top: 50%; width: 150px; transform: translateY(-50%); }
   .fp-title { left: 20px; right: 150px; bottom: 20px; height: auto; padding: 0; border-top: 0; }
+  .fp-toggle, .fp.is-open .fp-toggle { width: 100%; height: 132px; bottom: auto; }
   .fp-name, .fp.is-open .fp-name { font-size: 26px; }
   .fp-strip { display: none; }
   .fband.has-open .fp:not(.is-open) .fp-id { opacity: 1; }
   .fp-roster, .fp.is-open .fp-roster { position: static; display: none; min-width: 0; padding: 14px 16px 16px; opacity: 1; visibility: visible; }
   .fp.is-open .fp-roster { display: block; }
 }
-@media (max-width: 639px) { .fp-table .kl, .fp-table .gp { display: none; } .fp-table td { font-size: 15px; } }
+@media (max-width: 639px) { .fp-table .kl, .fp-table .gp, .fp-table .rkc { display: none; } .fp-table td { font-size: 15px; } }
 
 /* Names never wrap and never shrink: one that does not fit slides sideways under an edge fade. */
 .slide { display: block; overflow: hidden; white-space: nowrap; }
@@ -693,4 +702,107 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 @media (prefers-reduced-motion: reduce) {
   .tc-logo, .tl-row { transition: none; }
   .tc.is-new { animation: none; }
+}
+
+/* ---------- Franchise animations: each team acts out its logo ----------
+   .fx-preview is the short taste a resting mouse gets; .fx-full plays as the team opens. Positions are
+   shares of the logo's box: the CSS barrel tip at 84% 18%, the SLD rocket's tail at 13% 53%, the TO
+   hooves at 78% 76% and 36% 67%. */
+.fx { position: absolute; inset: 0; }
+.fx > * { position: absolute; display: block; opacity: 0; }
+.fx-sweep { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transform: translateX(-120%);
+  background: linear-gradient(118deg, transparent 30%, rgba(255, 255, 255, 0.32) 45%, transparent 60%); }
+@keyframes fx-flash { 0% { opacity: 0; transform: scale(0.2); } 25% { opacity: 1; transform: scale(1.15) rotate(10deg); } 100% { opacity: 0; transform: scale(1.4) rotate(18deg); } }
+@keyframes fx-puff { 0% { opacity: 0; transform: scale(0.3); } 20% { opacity: 0.85; } 100% { opacity: 0; transform: translate(var(--dx, 6cqw), var(--dy, -8cqw)) scale(1.8); } }
+@keyframes fx-fly { 0% { opacity: 0; transform: translate(0, 0); } 15% { opacity: 1; } 100% { opacity: 0; transform: translate(var(--dx), var(--dy)) scale(0.4); } }
+@keyframes fx-sweep { from { opacity: 1; transform: translateX(-120%); } to { opacity: 1; transform: translateX(120%); } }
+@keyframes fx-pop { 0%, 100% { transform: none; } 30% { transform: scale(1.08) rotate(-2deg); } }
+
+/* CSS Cannonballs: the tank recoils, the muzzle flashes, a shell flies off along the barrel, smoke rolls out */
+.fx-css .fx-flash { left: 84%; top: 18%; width: 24cqw; height: 24cqw; margin: -12cqw 0 0 -12cqw; background: #FFE27A;
+  clip-path: polygon(50% 0, 61% 35%, 98% 35%, 68% 57%, 79% 91%, 50% 70%, 21% 91%, 32% 57%, 2% 35%, 39% 35%); }
+.fx-css .fx-shell { left: 84%; top: 18%; width: 8cqw; height: 8cqw; margin: -4cqw 0 0 -4cqw; border-radius: 50%; background: #1B2233; box-shadow: inset 2px 2px 0 rgba(255, 255, 255, 0.35); }
+.fx-css .fx-smoke { left: 84%; top: 18%; width: 13cqw; height: 13cqw; margin: -6.5cqw 0 0 -6.5cqw; border-radius: 50%; background: rgba(232, 234, 240, 0.75); }
+.fx-css .s2 { --dx: 2cqw; --dy: -12cqw; } .fx-css .s3 { --dx: 10cqw; --dy: -3cqw; }
+@keyframes css-recoil { 0%, 60%, 100% { transform: none; } 10% { transform: translate(-6%, 3%) rotate(-3deg); } 35% { transform: translate(1%, -0.5%) rotate(0.5deg); } }
+@keyframes css-recoil-s { 0%, 100% { transform: none; } 15% { transform: translate(-3%, 1.5%) rotate(-1.5deg); } }
+@keyframes css-shell { 0% { opacity: 0; transform: scale(0.6); } 8% { opacity: 1; } 55% { opacity: 1; transform: translate(46cqw, -22cqw); } 100% { opacity: 0; transform: translate(92cqw, -18cqw) scale(0.9); } }
+.fp.fx-full .fx-css .fp-logo { animation: css-recoil 700ms var(--ease-out); }
+.fp.fx-preview .fx-css .fp-logo { animation: css-recoil-s 500ms var(--ease-out); }
+.fp.fx-full .fx-css .fx-flash, .fp.fx-preview .fx-css .fx-flash { animation: fx-flash 320ms ease-out; }
+.fp.fx-full .fx-css .fx-shell { animation: css-shell 900ms cubic-bezier(0.25, 0.6, 0.4, 1) 60ms; }
+.fp.fx-full .fx-css .s1 { animation: fx-puff 900ms ease-out 80ms; }
+.fp.fx-full .fx-css .s2 { animation: fx-puff 1000ms ease-out 160ms; }
+.fp.fx-full .fx-css .s3, .fp.fx-preview .fx-css .s3 { animation: fx-puff 800ms ease-out 120ms; }
+
+/* SLD Exiles: the fist punches up and the rocket fires, flame and sparks streaming from its tail */
+.fx-sld .fx-flame { left: 13%; top: 53%; width: 28cqw; height: 10cqw; margin: -5cqw 0 0 -28cqw; transform-origin: 100% 50%; rotate: -17.5deg;
+  background: linear-gradient(270deg, #FFF6C2, #FFB020 30%, #FF5A1F 70%, rgba(255, 90, 31, 0)); clip-path: polygon(100% 12%, 100% 88%, 0 50%); }
+.fx-sld .fx-spark { left: 13%; top: 53%; width: 3.4cqw; height: 3.4cqw; margin: -1.7cqw 0 0 -1.7cqw; border-radius: 50%; background: #FFD35C; }
+.fx-sld .k1 { --dx: -32cqw; --dy: 12cqw; } .fx-sld .k2 { --dx: -26cqw; --dy: 22cqw; } .fx-sld .k3 { --dx: -36cqw; --dy: 2cqw; } .fx-sld .k4 { --dx: -18cqw; --dy: 26cqw; }
+@keyframes sld-punch { 0%, 100% { transform: none; } 30% { transform: translateY(-9%) scale(1.05) rotate(-2deg); } }
+@keyframes sld-punch-s { 0%, 100% { transform: none; } 35% { transform: translateY(-4%) scale(1.02); } }
+@keyframes sld-flame { 0% { opacity: 0; transform: scaleX(0); } 20% { opacity: 1; transform: scaleX(1.1); } 40% { transform: scaleX(0.85); } 60% { opacity: 1; transform: scaleX(1); } 100% { opacity: 0; transform: scaleX(0.3); } }
+.fp.fx-full .fx-sld .fp-logo { animation: sld-punch 800ms var(--ease-slam); }
+.fp.fx-preview .fx-sld .fp-logo { animation: sld-punch-s 550ms var(--ease-slam); }
+.fp.fx-full .fx-sld .fx-flame { animation: sld-flame 900ms ease-out 120ms; }
+.fp.fx-preview .fx-sld .fx-flame { animation: sld-flame 500ms ease-out 80ms; }
+.fp.fx-full .fx-sld .k1 { animation: fx-fly 700ms ease-out 180ms; }
+.fp.fx-full .fx-sld .k2 { animation: fx-fly 800ms ease-out 240ms; }
+.fp.fx-full .fx-sld .k3 { animation: fx-fly 650ms ease-out 300ms; }
+.fp.fx-full .fx-sld .k4 { animation: fx-fly 750ms ease-out 360ms; }
+
+/* TAL Eagles: the eagle drops in and beats its wings while wind streaks past */
+.fx-tal .fp-logo { transform-origin: 50% 55%; }
+.fx-tal .fx-wind { left: 100%; width: 45cqw; height: 0.9cqw; border-radius: 1cqw; background: rgba(255, 255, 255, 0.6); }
+.fx-tal .w1 { top: 26%; } .fx-tal .w2 { top: 52%; } .fx-tal .w3 { top: 74%; }
+@keyframes tal-swoop { 0% { opacity: 0.2; transform: translateY(-22%) scale(0.9); } 22% { opacity: 1; transform: translateY(3%) scaleX(1.06) scaleY(0.96); }
+  34% { transform: scaleX(0.8) scaleY(1.04); } 46% { transform: scaleX(1.05); } 58% { transform: scaleX(0.86) scaleY(1.03); } 72% { transform: scaleX(1.03); } 100% { transform: none; } }
+@keyframes tal-flap { 0%, 100% { transform: none; } 35% { transform: scaleX(0.82) scaleY(1.04); } 65% { transform: scaleX(1.05); } }
+@keyframes fx-wind { 0% { opacity: 0; transform: translateX(0); } 20% { opacity: 1; } 100% { opacity: 0; transform: translateX(-160cqw); } }
+.fp.fx-full .fx-tal .fp-logo { animation: tal-swoop 1300ms var(--ease-out); }
+.fp.fx-preview .fx-tal .fp-logo { animation: tal-flap 600ms ease-in-out; }
+.fp.fx-full .fx-tal .w1 { animation: fx-wind 700ms ease-in 250ms; }
+.fp.fx-full .fx-tal .w2, .fp.fx-preview .fx-tal .w2 { animation: fx-wind 650ms ease-in 120ms; }
+.fp.fx-full .fx-tal .w3 { animation: fx-wind 700ms ease-in 520ms; }
+
+/* TO Bushrangers: the rider gallops, dust kicks up from the hooves, speed lines trail and the star bursts out */
+.fx-to .fx-star { left: 49%; top: 52%; z-index: -1; width: 100cqw; height: 100cqw; margin: -50cqw 0 0 -50cqw; overflow: visible; fill: none; stroke: var(--ink-on); stroke-width: 2.4; }
+.fx-to .fx-speed { left: 74%; width: 30cqw; height: 0.8cqw; background: var(--ink-on); }
+.fx-to .v1 { top: 36%; } .fx-to .v2 { top: 46%; } .fx-to .v3 { top: 58%; }
+.fx-to .fx-dust { width: 13cqw; height: 13cqw; margin: -6.5cqw 0 0 -6.5cqw; border-radius: 50%; background: rgba(214, 190, 160, 0.78); }
+.fx-to .d1 { left: 78%; top: 76%; --dx: 14cqw; --dy: -4cqw; } .fx-to .d2 { left: 72%; top: 80%; --dx: 20cqw; --dy: 2cqw; } .fx-to .d3 { left: 36%; top: 67%; --dx: 10cqw; --dy: -6cqw; }
+@keyframes to-gallop { 0%, 75%, 100% { transform: none; } 12% { transform: translate(-2%, -5%) rotate(-3deg); } 25% { transform: translate(-1%, 0) rotate(1deg); }
+  37% { transform: translate(-3%, -5%) rotate(-3deg); } 50% { transform: translate(-1%, 0) rotate(1deg); } 62% { transform: translate(-2%, -4%) rotate(-2deg); } }
+@keyframes to-gallop-s { 0%, 100% { transform: none; } 25% { transform: translate(-2%, -4%) rotate(-2deg); } 50% { transform: translate(-1%, 0) rotate(1deg); } 75% { transform: translate(-2%, -3%) rotate(-2deg); } }
+@keyframes to-star { 0% { opacity: 0; transform: scale(0.7); } 25% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.45) rotate(72deg); } }
+@keyframes to-speed { 0% { opacity: 0; transform: translateX(0) scaleX(0.3); } 30% { opacity: 0.7; transform: translateX(6cqw); } 100% { opacity: 0; transform: translateX(26cqw) scaleX(0.6); } }
+.fp.fx-full .fx-to .fp-logo { animation: to-gallop 1100ms ease-in-out; }
+.fp.fx-preview .fx-to .fp-logo { animation: to-gallop-s 560ms ease-in-out; }
+.fp.fx-full .fx-to .fx-star { animation: to-star 1000ms var(--ease-out) 150ms; }
+.fp.fx-full .fx-to .d1, .fp.fx-preview .fx-to .d1 { animation: fx-puff 800ms ease-out 200ms; }
+.fp.fx-full .fx-to .d2 { animation: fx-puff 800ms ease-out 480ms; }
+.fp.fx-full .fx-to .d3 { animation: fx-puff 800ms ease-out 350ms; }
+.fp.fx-full .fx-to .v1 { animation: to-speed 600ms ease-out 100ms; }
+.fp.fx-full .fx-to .v2 { animation: to-speed 600ms ease-out 220ms; }
+.fp.fx-full .fx-to .v3 { animation: to-speed 600ms ease-out 340ms; }
+
+/* TPoP Lightbringers: light rays burst from behind the figure, it flares, and a flash crosses the panel */
+.fx-tpop .fx-rays { left: 50%; top: 50%; z-index: -1; width: 150cqw; height: 150cqw; margin: -75cqw 0 0 -75cqw; border-radius: 50%;
+  background: repeating-conic-gradient(from 0deg, rgba(255, 244, 196, 0.6) 0 5deg, transparent 5deg 15deg);
+  -webkit-mask-image: radial-gradient(circle, #000 18%, transparent 68%); mask-image: radial-gradient(circle, #000 18%, transparent 68%); }
+@keyframes tpop-rays { 0% { opacity: 0; transform: scale(0.5); } 30% { opacity: 1; } 100% { opacity: 0; transform: scale(1.15) rotate(40deg); } }
+@keyframes tpop-flare { 0%, 100% { filter: none; transform: none; } 25% { filter: brightness(1.45); transform: scale(1.05); } }
+.fp.fx-full .fx-tpop .fx-rays { animation: tpop-rays 1400ms ease-out; }
+.fp.fx-preview .fx-tpop .fx-rays { animation: tpop-rays 700ms ease-out; }
+.fp.fx-full .fx-tpop .fp-logo { animation: tpop-flare 1200ms ease-out; }
+.fp[data-fx="tpop"].fx-full .fx-sweep, .fp[data-fx="tpop"].fx-preview .fx-sweep { animation: fx-sweep 800ms ease-out 150ms; }
+
+/* Any franchise without its own: the logo pops and a light sweep crosses */
+.fp.fx-full .fx-generic .fp-logo, .fp.fx-preview .fx-generic .fp-logo { animation: fx-pop 600ms var(--ease-slam); }
+.fp[data-fx="generic"].fx-full .fx-sweep, .fp[data-fx="generic"].fx-preview .fx-sweep { animation: fx-sweep 800ms ease-out; }
+
+@media (prefers-reduced-motion: reduce) {
+  .fx, .fx-sweep { display: none; }
+  .fp .fp-logo { animation: none !important; }
 }

@@ -1,0 +1,19 @@
+---
+// The pieces each franchise's animation moves, laid over its logo. The motion itself is in site.css under
+// "Franchise animations". A franchise with no animation of its own gets the generic one.
+interface Props { fx: string }
+const { fx } = Astro.props;
+---
+<span class="fx" aria-hidden="true">
+  {fx === 'css' && <Fragment><i class="fx-smoke s1"></i><i class="fx-smoke s2"></i><i class="fx-smoke s3"></i><i class="fx-shell"></i><i class="fx-flash"></i></Fragment>}
+  {fx === 'sld' && <Fragment><i class="fx-flame"></i><i class="fx-spark k1"></i><i class="fx-spark k2"></i><i class="fx-spark k3"></i><i class="fx-spark k4"></i></Fragment>}
+  {fx === 'tal' && <Fragment><i class="fx-wind w1"></i><i class="fx-wind w2"></i><i class="fx-wind w3"></i></Fragment>}
+  {fx === 'to' && (
+    <Fragment>
+      <svg class="fx-star" viewBox="-50 -50 100 100"><polygon points="0.0,-46.0 11.2,-15.4 43.7,-14.2 18.1,5.9 27.0,37.2 0.0,19.0 -27.0,37.2 -18.1,5.9 -43.7,-14.2 -11.2,-15.4" /></svg>
+      <i class="fx-speed v1"></i><i class="fx-speed v2"></i><i class="fx-speed v3"></i>
+      <i class="fx-dust d1"></i><i class="fx-dust d2"></i><i class="fx-dust d3"></i>
+    </Fragment>
+  )}
+  {fx === 'tpop' && <i class="fx-rays"></i>}
+</span>

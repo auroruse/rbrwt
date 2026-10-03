@@ -3,12 +3,19 @@ import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
 import PlayerName from '../components/PlayerName.astro';
 import PlayerCards from '../components/PlayerCards.astro';
-import { nsRegion, rosters, s2Field, season, tierPlayers } from '../lib/data';
+import FranchiseFx from '../components/FranchiseFx.astro';
+import { nsRegion, official, rosters, s2Field, season, tierPlayers } from '../lib/data';
 import { ARROW } from '../lib/icons';
+import { TIERS, starsSVG } from '../lib/tiers';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
 const isSub = (role: string) => role.toLowerCase() === 'sub';
+// Each player's tier on Kirin's List, shown in its mineral stars.
+const tierOf = new Map(official.tiers.flatMap((t) => t.players.map((n) => [n, TIERS.find((x) => x.id === t.id)!] as const)));
+// The franchises with an animation of their own; any other gets the generic one.
+const FX = new Set(['css', 'sld', 'tal', 'to', 'tpop']);
+const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() : 'generic');
 ---
 <Site current="franchises" inner title="Franchises · RBR World Tour" description={`The ${s2Field.length} franchises of Season ${season.season} of the Rocket Bot Royale World Tour.`}>
   <div class="depth">
@@ -24,10 +31,15 @@ const isSub = (role: string) => role.toLowerCase() === 'sub';
             {s2Field.map((f) => {
               const roster = rosters.get(f.code) ?? [];
               return (
-                <article class="fp cut" style={f.style} tabindex="0" aria-label={`${f.code} ${f.name}`}>
+                <article class="fp cut" style={f.style} data-fx={fxOf(f.code)}>
+                  <button type="button" class="fp-toggle" aria-expanded="false" aria-controls={`roster-${f.code.toLowerCase()}`} aria-label={`${f.code} ${f.name} roster`}></button>
                   <div class="fp-id">
                     <span class="fp-code">{f.code}</span>
-                    {f.image && <Image class="fp-logo" src={f.image} alt={`${f.code} ${f.name} logo`} width={480} />}
+                    <span class={`fp-art fx-${fxOf(f.code)}`}>
+                      {f.image && <Image class="fp-logo" src={f.image} alt={`${f.code} ${f.name} logo`} width={480} />}
+                      <FranchiseFx fx={fxOf(f.code)} />
+                    </span>
+                    <i class="fx-sweep" aria-hidden="true"></i>
                     <div class="fp-title">
                       <p class="fp-home slide">
                         {f.home?.region
@@ -38,10 +50,10 @@ const isSub = (role: string) => role.toLowerCase() === 'sub';
                     </div>
                   </div>
                   <span class="fp-strip" aria-hidden="true">{f.image && <Image src={f.image} alt="" width={96} />}<b>{f.name}</b></span>
-                  <div class="fp-roster">
+                  <div class="fp-roster" id={`roster-${f.code.toLowerCase()}`}>
                     <table class="fp-table">
-                      <colgroup><col style="width:46px"><col><col style="width:76px"><col class="kl" style="width:70px"><col class="gp" style="width:76px"><col style="width:64px"></colgroup>
-                      <thead><tr><th>#</th><th>Player</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n">Rank</th></tr></thead>
+                      <colgroup><col style="width:40px"><col><col style="width:104px"><col style="width:64px"><col class="kl" style="width:58px"><col class="gp" style="width:64px"><col class="rkc" style="width:54px"></colgroup>
+                      <thead><tr><th>#</th><th>Player</th><th>Kirin's List</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n rkc">Rank</th></tr></thead>
                       <tbody>
                         {roster.length
                           ? roster.map((r, k) => {
@@ -51,14 +63,17 @@ const isSub = (role: string) => role.toLowerCase() === 'sub';
                                 <tr class={lastStarter ? 'last-starter' : undefined}>
                                   <td class="rk">{pad2(k + 1)}</td>
                                   <td class="pl"><span class="slide"><span><PlayerName name={r.player} /></span></span></td>
+                                  <td class="kls">{tierOf.get(r.player)
+                                    ? <span class="kls-stars" title={`${tierOf.get(r.player)!.stars} stars on Kirin's List`}><Fragment set:html={starsSVG(tierOf.get(r.player)!, 14, 2)} /></span>
+                                    : <span class="na">Unranked</span>}</td>
                                   <td class="n key">{p?.games ? p.kpg.toFixed(2) : ''}</td>
                                   <td class="n kl">{p?.games ? p.kills : ''}</td>
                                   <td class="n gp">{p?.games ? p.games : ''}</td>
-                                  <td class="n">{p?.rank ? pad2(p.rank) : ''}</td>
+                                  <td class="n rkc">{p?.rank ? pad2(p.rank) : ''}</td>
                                 </tr>
                               );
                             })
-                          : <tr><td class="rk">00</td><td class="pl"><span class="na">Roster TBA</span></td><td></td><td class="kl"></td><td class="gp"></td><td></td></tr>}
+                          : <tr><td class="rk">00</td><td class="pl"><span class="na">Roster TBA</span></td><td></td><td></td><td class="kl"></td><td class="gp"></td><td class="rkc"></td></tr>}
                       </tbody>
                     </table>
                   </div>
@@ -72,32 +87,39 @@ const isSub = (role: string) => role.toLowerCase() === 'sub';
   </div>
   <PlayerCards />
   <script is:inline>
-  // A mouse opens a team by resting on it and closes it by leaving the band; a tap opens and shuts it;
-  // keyboard focus opens it too. One team is open at a time.
+  // A click opens a team across the band and plays its animation; a click on it again, a click outside the
+  // band or Escape shuts it. A mouse resting on a closed team plays a short preview of its animation.
   (function () {
     var band = document.getElementById('fband');
     if (!band) { return; }
     var panels = band.querySelectorAll('.fp');
-    var mouse = window.matchMedia('(hover: hover) and (pointer: fine)');
-    var timer = 0;
+    function play(p, kind, ms) {
+      p.classList.remove('fx-preview', 'fx-full');
+      void p.offsetWidth;
+      p.classList.add(kind);
+      clearTimeout(p.fxTimer);
+      p.fxTimer = setTimeout(function () { p.classList.remove(kind); }, ms);
+    }
     function open(p) {
-      panels.forEach(function (o) { o.classList.toggle('is-open', o === p); });
+      panels.forEach(function (o) {
+        var on = o === p;
+        o.classList.toggle('is-open', on);
+        o.querySelector('.fp-toggle').setAttribute('aria-expanded', on ? 'true' : 'false');
+      });
       band.classList.toggle('has-open', !!p);
+      if (p) { play(p, 'fx-full', 1800); }
     }
     panels.forEach(function (p) {
-      p.addEventListener('pointerenter', function () {
-        if (!mouse.matches) { return; }
-        clearTimeout(timer);
-        timer = setTimeout(function () { open(p); }, band.classList.contains('has-open') ? 0 : 70);
-      });
-      p.addEventListener('focusin', function (e) { if (e.target.matches(':focus-visible')) { open(p); } });
-      p.addEventListener('click', function (e) {
-        if (mouse.matches || e.target.closest('a, button')) { return; }
-        open(p.classList.contains('is-open') ? null : p);
+      p.querySelector('.fp-toggle').addEventListener('click', function () { open(p.classList.contains('is-open') ? null : p); });
+      p.addEventListener('pointerenter', function (e) {
+        if (e.pointerType !== 'mouse' || band.classList.contains('has-open')) { return; }
+        if (Date.now() - (p.fxLast || 0) < 1400) { return; }
+        p.fxLast = Date.now();
+        play(p, 'fx-preview', 1000);
       });
     });
-    band.addEventListener('pointerleave', function () { if (mouse.matches) { clearTimeout(timer); open(null); } });
-    band.addEventListener('focusout', function (e) { if (!band.contains(e.relatedTarget)) { open(null); } });
+    document.addEventListener('click', function (e) { if (band.classList.contains('has-open') && !band.contains(e.target)) { open(null); } });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape' && band.classList.contains('has-open')) { open(null); } });
   })();
   </script>
 </Site>

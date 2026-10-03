@@ -143,37 +143,73 @@ a { color: inherit; text-decoration: none; }
 .sec-meta .label { color: var(--text-2); white-space: nowrap; }
 .block { margin-top: 88px; }
 
-.teams { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 24px; }
-/* Four franchises: two by two, never three and an orphan. From 1180px each card turns sideways. */
-.teams.n4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-@media (min-width: 1180px) {
-  .teams.n4 .team { display: grid; grid-template-columns: minmax(0, 44%) minmax(0, 1fr); }
-  .teams.n4 .team-field { aspect-ratio: auto; min-height: 260px; }
-  .teams.n4 .team-field img { width: 88%; right: -18%; top: 50%; }
-  .teams.n4 .team-body { display: flex; flex-direction: column; justify-content: center; padding: 24px 26px 14px; }
+/* ---------- Franchises: the S2 field as one band; hovering a team opens it across the band with its roster ---------- */
+.fband { --plate: 112px; display: flex; gap: 8px; height: 440px; }
+.fp { position: relative; flex: 1 1 0; min-width: 0; overflow: hidden; outline: none; background: var(--p); color: var(--ink-on);
+  transition: flex-grow var(--slow) var(--ease-out); }
+.fband.has-open .fp { flex-grow: 0.32; }
+.fband .fp.is-open { flex-grow: 5; }
+/* The 1px rim, drawn along both cut corners so it never breaks; gold when the team has keyboard focus */
+.fp::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 0 1px var(--s);
+  background:
+    linear-gradient(to bottom right, transparent 50%, var(--s) 50% calc(50% + 1px), transparent calc(50% + 1px)) 0 0 / var(--cut) var(--cut) no-repeat,
+    linear-gradient(to top left, transparent 50%, var(--s) 50% calc(50% + 1px), transparent calc(50% + 1px)) 100% 100% / var(--cut) var(--cut) no-repeat; }
+.fp:focus-visible::after { box-shadow: inset 0 0 0 2px var(--gold);
+  background:
+    linear-gradient(to bottom right, transparent 50%, var(--gold) 50% calc(50% + 2px), transparent calc(50% + 2px)) 0 0 / var(--cut) var(--cut) no-repeat,
+    linear-gradient(to top left, transparent 50%, var(--gold) 50% calc(50% + 2px), transparent calc(50% + 2px)) 100% 100% / var(--cut) var(--cut) no-repeat; }
+/* The team itself: code, logo, home region and name on its colour */
+.fp-id { position: absolute; inset: 0 auto 0 0; width: 100%; overflow: hidden; transition: width var(--slow) var(--ease-out), opacity var(--base); }
+.fp.is-open .fp-id { width: 300px; }
+/* The stripes stop at the name plate, so they never cross the name */
+.fp-id::before { content: ""; position: absolute; inset: 0 0 var(--plate) 0; opacity: 0.95;
+  background: linear-gradient(118deg, transparent 0 50%, var(--s) 50% 55%, transparent 55% 60%, var(--s) 60% 61.5%, transparent 61.5%); }
+.fp-code { position: absolute; left: 18px; top: 16px; z-index: 1; padding: 5px 9px 4px; font-weight: 700; font-size: 12px; letter-spacing: 0.16em;
+  background: var(--ink-on); color: var(--p); }
+.fp-logo { position: absolute; left: 50%; top: calc((100% - var(--plate)) / 2); width: min(80%, 230px); height: auto; transform: translate(-50%, -50%); pointer-events: none; }
+.fp-title { position: absolute; left: 0; right: 0; bottom: 0; height: var(--plate); padding: 26px 20px 0; border-top: 1px solid var(--s); }
+.fp-home { margin-bottom: 8px; font-weight: 500; font-size: 11px; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; }
+.fp-home a { display: inline-flex; align-items: center; gap: 6px; }
+.fp-home a svg { width: 9px; height: 9px; flex: none; }
+.fp-home a:hover { text-decoration: underline; text-underline-offset: 3px; }
+.fp-name { font-weight: 700; font-size: 21px; line-height: 1; letter-spacing: -0.03em; text-transform: uppercase; }
+.fp.is-open .fp-name { font-size: 26px; }
+/* A narrowed team: its logo and its name running up the strip */
+.fp-strip { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 18px;
+  opacity: 0; pointer-events: none; transition: opacity var(--base); }
+.fp-strip img { width: 36px; height: 36px; object-fit: contain; }
+.fp-strip b { writing-mode: vertical-rl; transform: rotate(180deg); font-weight: 700; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
+.fband.has-open .fp:not(.is-open) .fp-id { opacity: 0; }
+.fband.has-open .fp:not(.is-open) .fp-strip { opacity: 1; }
+/* The roster, on the team's right once it opens */
+.fp-roster { position: absolute; inset: 0 0 0 300px; min-width: 560px; padding: 28px 30px; background: var(--deep); color: var(--text);
+  opacity: 0; visibility: hidden; transition: opacity var(--base) var(--ease-out), visibility 0s linear var(--base); }
+.fp.is-open .fp-roster { opacity: 1; visibility: visible; transition: opacity var(--base) var(--ease-out) 140ms, visibility 0s; }
+.fp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
+.fp-table th { padding: 0 10px 12px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
+  color: var(--text-3); border-bottom: 1px solid rgba(169, 186, 224, 0.28); white-space: nowrap; }
+.fp-table td { height: 46px; padding: 0 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-size: 16px; }
+.fp-table tbody tr:last-child td { border-bottom: 0; }
+.fp-table tr.last-starter td { border-bottom: 1px dashed var(--line-strong); }
+.fp-table .rk { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
+.fp-table .pl { font-weight: 700; }
+.fp-table th.n, .fp-table td.n { text-align: right; }
+.fp-table td.n { font-family: var(--mono); font-variant-numeric: tabular-nums; color: var(--text-2); }
+.fp-table td.key { font-weight: 600; color: var(--gold); }
+@media (max-width: 1099px) {
+  .fband { flex-direction: column; height: auto; }
+  .fp { flex: none; }
+  .fp-id, .fp.is-open .fp-id { position: relative; width: 100%; height: 132px; }
+  .fp-id::before { inset: 0; }
+  .fp-logo { left: auto; right: -10px; top: 50%; width: 150px; transform: translateY(-50%); }
+  .fp-title { left: 20px; right: 150px; bottom: 20px; height: auto; padding: 0; border-top: 0; }
+  .fp-name, .fp.is-open .fp-name { font-size: 26px; }
+  .fp-strip { display: none; }
+  .fband.has-open .fp:not(.is-open) .fp-id { opacity: 1; }
+  .fp-roster, .fp.is-open .fp-roster { position: static; display: none; min-width: 0; padding: 14px 16px 16px; opacity: 1; visibility: visible; }
+  .fp.is-open .fp-roster { display: block; }
 }
-.team { background: var(--deep); transition: transform var(--base) var(--ease-out); }
-.team:hover { transform: translateY(-4px); }
-.team-field { position: relative; aspect-ratio: 16 / 10; background: var(--p); overflow: hidden; }
-.team-field::before { content: ""; position: absolute; inset: 0;
-  background: linear-gradient(118deg, transparent 0 50%, var(--s) 50% 55%, transparent 55% 60%, var(--s) 60% 61.5%, transparent 61.5%); opacity: 0.95; }
-/* The 1px rim, with a diagonal laid along the card's cut so it runs unbroken round the top left */
-.team-field::after { content: ""; position: absolute; inset: 0; box-shadow: inset 0 0 0 1px var(--s);
-  background: linear-gradient(to bottom right, transparent 50%, var(--s) 50% calc(50% + 1px), transparent calc(50% + 1px)) 0 0 / var(--cut) var(--cut) no-repeat; }
-.team-field img { position: absolute; right: -7%; top: 54%; width: 60%; height: auto; transform: translateY(-50%);
-  transition: transform var(--slow) var(--ease-out); }
-.team:hover .team-field img { transform: translateY(-50%) scale(1.05) rotate(-2deg); }
-.team-sweep { position: absolute; inset: 0; background: linear-gradient(118deg, transparent 30%, rgba(255, 255, 255, 0.28) 45%, transparent 60%);
-  transform: translateX(-120%); }
-.team:hover .team-sweep { transition: transform 700ms var(--ease-out); transform: translateX(120%); }
-.team-code { position: absolute; left: 18px; top: 16px; z-index: 1; font-weight: 700; font-size: 12px; letter-spacing: 0.16em;
-  padding: 5px 9px 4px; background: var(--ink-on); color: var(--p); }
-.team-body { padding: 18px 20px 10px; }
-.team-name { font-weight: 700; font-size: 34px; line-height: 1; letter-spacing: -0.03em; text-transform: uppercase; }
-.team-home { margin-bottom: 7px; font-weight: 500; font-size: 12px; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-2); }
-.team-home a { display: inline-flex; align-items: center; gap: 6px; transition: color var(--fast); }
-.team-home a svg { width: 9px; height: 9px; flex: none; }
-.team-home a:hover { color: #fff; text-decoration: underline; text-underline-offset: 3px; }
+@media (max-width: 639px) { .fp-table .kl, .fp-table .gp { display: none; } .fp-table td { font-size: 15px; } }
 
 /* Names never wrap and never shrink: one that does not fit slides sideways under an edge fade. */
 .slide { display: block; overflow: hidden; white-space: nowrap; }
@@ -184,10 +220,8 @@ a { color: inherit; text-decoration: none; }
 @keyframes slide { 0%, 18% { transform: translateX(0); } 82%, 100% { transform: translateX(var(--slide-by, 0)); } }
 
 @media (max-width: 639px) {
-  .team-name { font-size: 30px; }
   .sec { padding-top: 96px; } .sec-first { padding-top: 68px; } .sec-last { padding-bottom: 96px; } .block { margin-top: 60px; }
   .sec-count { font-size: 32px; }
-  .teams, .teams.n4 { grid-template-columns: 1fr; }
 }
 
 /* ---------- About ---------- */
@@ -392,10 +426,9 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
   .js .surface, .js .hud-cell, .js .reveal { opacity: 1; transform: none; animation: none; transition: none; }
   .js .hud::before, .cursor { animation: none; }
   .hud::after, .stats::after { display: none; }
-  .team, .team-field img { transition: none; }
-  .team-sweep { display: none; }
   .slide.is-over > * { animation: none; }
   .flag-body, .tours tbody tr { transition: none; }
+  .fp, .fp-id, .fp-strip, .fp-roster { transition: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 
@@ -408,39 +441,6 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
 .empty b { font-weight: 700; font-size: 64px; line-height: 1; letter-spacing: -0.03em; }
 .empty span { font-family: var(--mono); font-size: 12px; letter-spacing: 0.16em; text-transform: uppercase; color: var(--text-3); }
 
-/* Franchises: each player a banner in the franchise colours over their S1 figures; a click slides out the rest.
-   Starters come first, then a dashed rule, then the subs. */
-.teams { align-items: start; }
-.pl-list { display: grid; gap: 8px; margin-top: 18px; }
-.pl-first-sub { margin-top: 6px; padding-top: 14px; border-top: 1px dashed var(--line-strong); }
-.pl-plain { padding: 12px 14px; font-weight: 700; background: rgba(3, 10, 31, 0.85); }
-.pl-head { display: block; width: 100%; padding: 0; border: 0; cursor: pointer; text-align: left; color: var(--text); font: inherit;
-  background: rgba(3, 10, 31, 0.85); transition: background var(--fast); }
-.pl-head:hover { background: var(--abyss); }
-.pl-head:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-.pl-band { position: relative; display: flex; align-items: center; gap: 12px; padding: 13px 14px 12px; overflow: hidden; background: var(--p); color: var(--ink-on); }
-.pl-band::before { content: ""; position: absolute; inset: 0; opacity: 0.9;
-  background: linear-gradient(118deg, transparent 0 64%, var(--s) 64% 68%, transparent 68% 72%, var(--s) 72% 73.5%, transparent 73.5%); }
-.pl-band > * { position: relative; }
-.pl-num { flex: none; font-family: var(--mono); font-size: 11px; line-height: 1; opacity: 0.75; font-variant-numeric: tabular-nums; }
-.pl-who { flex: 1; min-width: 0; }
-.pl-name { font-weight: 700; font-size: 19px; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; }
-.pl-team { display: block; margin-top: 6px; font-family: var(--mono); font-size: 9.5px; line-height: 1; letter-spacing: 0.14em; text-transform: uppercase; white-space: nowrap; }
-.pl-band .caret { flex: none; width: 10px; height: 6px; transition: transform var(--base) var(--ease-out); }
-.pl-head[aria-expanded="true"] .caret { transform: rotate(180deg); }
-.pl-head .tp-figs { padding: 14px 14px 12px; }
-.pl-head .tp-figs b { font-size: 22px; }
-.pl-head .tp-figs .tf + .tf { padding-left: 12px; }
-.pl-head .tp-note { display: block; padding: 0 14px 12px; }
-.pl-more { display: grid; grid-template-rows: 0fr; background: rgba(3, 10, 31, 0.85); transition: grid-template-rows var(--slow) var(--ease-out); }
-.pl-head[aria-expanded="true"] + .pl-more { grid-template-rows: 1fr; }
-.pl-more-in { min-height: 0; overflow: hidden; }
-.pl-more .tp-list { padding: 12px 14px; }
-.pl-more .tp-tours { width: calc(100% - 28px); margin: 0 14px 14px; }
-.tp-list .marks img { width: 22px; height: 22px; }
-.tp-tours .marks img { width: 16px; height: 16px; }
-@media (max-width: 639px) { .pl-head .tp-figs b { font-size: 19px; } .pl-head .tp-figs .tf + .tf { padding-left: 10px; } }
-@media (prefers-reduced-motion: reduce) { .pl-more, .pl-band .caret { transition: none; } }
 
 /* ---------- Stats: one kill leaderboard, switched between all tours and a single tour ---------- */
 .filters { display: flex; gap: 8px; margin-bottom: 32px; overflow-x: auto; scrollbar-width: none; padding: 2px 0; }

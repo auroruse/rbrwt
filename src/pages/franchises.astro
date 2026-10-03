@@ -1,10 +1,10 @@
 ---
 import { Image } from 'astro:assets';
 import Site from '../layouts/Site.astro';
+import PlayerName from '../components/PlayerName.astro';
+import PlayerCards from '../components/PlayerCards.astro';
 import { nsRegion, rosters, s2Field, season, tierPlayers } from '../lib/data';
 import { ARROW } from '../lib/icons';
-import PlayerBanner from '../components/PlayerBanner.astro';
-import AwardSprite from '../components/AwardSprite.astro';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
@@ -19,52 +19,85 @@ const isSub = (role: string) => role.toLowerCase() === 'sub';
           <h1 class="mega" id="fr-h">Franchises</h1>
           <div class="sec-meta"><span class="sec-count">{pad2(s2Field.length)}</span><span class="label">Season {season.season}</span></div>
         </header>
-        <div class={s2Field.length === 4 ? 'teams n4' : 'teams'}>
-          {s2Field.map((f, i) => {
-            const roster = rosters.get(f.code) ?? [];
-            return (
-              <article class="team cut reveal" style={`--i:${i}; ${f.style}`}>
-                <div class="team-field">
-                  <span class="team-code">{f.code}</span>
-                  {f.image && <Image src={f.image} alt={`${f.code} ${f.name} logo`} width={520} />}
-                  <span class="team-sweep"></span>
-                </div>
-                <div class="team-body">
-                  <p class="team-home slide">
-                    {f.home?.region
-                      ? <a href={nsRegion(f.home.region)} target="_blank" rel="noopener">{f.home.label}<Fragment set:html={ARROW} /></a>
-                      : <span>{f.home?.label ?? ''}</span>}
-                  </p>
-                  <h2 class="team-name slide"><span>{f.name}</span></h2>
-                  <ol class="pl-list">
-                    {roster.length
-                      ? roster.map((r, k) => {
-                          const p = byName.get(r.player);
-                          const firstSub = isSub(r.role) && k > 0 && !isSub(roster[k - 1].role);
-                          return p
-                            ? <PlayerBanner p={p} n={k + 1} code={f.code} firstSub={firstSub} />
-                            : <li class={firstSub ? 'pl pl-first-sub pl-plain' : 'pl pl-plain'}>{r.player}</li>;
-                        })
-                      : <li class="pl pl-plain"><span class="na">Roster TBA</span></li>}
-                  </ol>
-                </div>
-              </article>
-            );
-          })}
+        <div class="reveal">
+          <div class="fband" id="fband">
+            {s2Field.map((f) => {
+              const roster = rosters.get(f.code) ?? [];
+              return (
+                <article class="fp cut" style={f.style} tabindex="0" aria-label={`${f.code} ${f.name}`}>
+                  <div class="fp-id">
+                    <span class="fp-code">{f.code}</span>
+                    {f.image && <Image class="fp-logo" src={f.image} alt={`${f.code} ${f.name} logo`} width={480} />}
+                    <div class="fp-title">
+                      <p class="fp-home slide">
+                        {f.home?.region
+                          ? <a href={nsRegion(f.home.region)} target="_blank" rel="noopener">{f.home.label}<Fragment set:html={ARROW} /></a>
+                          : <span>{f.home?.label ?? ''}</span>}
+                      </p>
+                      <h2 class="fp-name slide"><span>{f.name}</span></h2>
+                    </div>
+                  </div>
+                  <span class="fp-strip" aria-hidden="true">{f.image && <Image src={f.image} alt="" width={96} />}<b>{f.name}</b></span>
+                  <div class="fp-roster">
+                    <table class="fp-table">
+                      <colgroup><col style="width:46px"><col><col style="width:76px"><col class="kl" style="width:70px"><col class="gp" style="width:76px"><col style="width:64px"></colgroup>
+                      <thead><tr><th>#</th><th>Player</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n">Rank</th></tr></thead>
+                      <tbody>
+                        {roster.length
+                          ? roster.map((r, k) => {
+                              const p = byName.get(r.player);
+                              const lastStarter = !isSub(r.role) && k + 1 < roster.length && isSub(roster[k + 1].role);
+                              return (
+                                <tr class={lastStarter ? 'last-starter' : undefined}>
+                                  <td class="rk">{pad2(k + 1)}</td>
+                                  <td class="pl"><span class="slide"><span><PlayerName name={r.player} /></span></span></td>
+                                  <td class="n key">{p?.games ? p.kpg.toFixed(2) : ''}</td>
+                                  <td class="n kl">{p?.games ? p.kills : ''}</td>
+                                  <td class="n gp">{p?.games ? p.games : ''}</td>
+                                  <td class="n">{p?.rank ? pad2(p.rank) : ''}</td>
+                                </tr>
+                              );
+                            })
+                          : <tr><td class="rk">00</td><td class="pl"><span class="na">Roster TBA</span></td><td></td><td class="kl"></td><td class="gp"></td><td></td></tr>}
+                      </tbody>
+                    </table>
+                  </div>
+                </article>
+              );
+            })}
+          </div>
         </div>
       </div>
     </section>
   </div>
-  <AwardSprite />
+  <PlayerCards />
   <script is:inline>
-  // A banner slides its trivia and tours open below it, and shut again.
-  document.querySelectorAll('.pl-head').forEach(function (b) {
-    b.addEventListener('click', function () {
-      var open = b.getAttribute('aria-expanded') !== 'true';
-      b.setAttribute('aria-expanded', open ? 'true' : 'false');
-      var more = document.getElementById(b.getAttribute('aria-controls'));
-      if (more) { more.inert = !open; }
+  // A mouse opens a team by resting on it and closes it by leaving the band; a tap opens and shuts it;
+  // keyboard focus opens it too. One team is open at a time.
+  (function () {
+    var band = document.getElementById('fband');
+    if (!band) { return; }
+    var panels = band.querySelectorAll('.fp');
+    var mouse = window.matchMedia('(hover: hover) and (pointer: fine)');
+    var timer = 0;
+    function open(p) {
+      panels.forEach(function (o) { o.classList.toggle('is-open', o === p); });
+      band.classList.toggle('has-open', !!p);
+    }
+    panels.forEach(function (p) {
+      p.addEventListener('pointerenter', function () {
+        if (!mouse.matches) { return; }
+        clearTimeout(timer);
+        timer = setTimeout(function () { open(p); }, band.classList.contains('has-open') ? 0 : 70);
+      });
+      p.addEventListener('focusin', function (e) { if (e.target.matches(':focus-visible')) { open(p); } });
+      p.addEventListener('click', function (e) {
+        if (mouse.matches || e.target.closest('a, button')) { return; }
+        open(p.classList.contains('is-open') ? null : p);
+      });
     });
-  });
+    band.addEventListener('pointerleave', function () { if (mouse.matches) { clearTimeout(timer); open(null); } });
+    band.addEventListener('focusout', function (e) { if (!band.contains(e.relatedTarget)) { open(null); } });
+  })();
   </script>
 </Site>

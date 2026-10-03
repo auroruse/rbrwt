@@ -292,12 +292,12 @@ export async function exportPoster(input: Input, data: Data) {
   for (const r of rows) {
     ctx.fillStyle = 'rgba(6,20,51,0.72)';
     ctx.fillRect(M, y, W - 2 * M, r.h);
-    const py = y + 8, ph = r.h - 16, sl = 14;
+    const sl = 14;
     ctx.beginPath();
-    ctx.moveTo(M + sl, py);
-    ctx.lineTo(M + PLATE, py);
-    ctx.lineTo(M + PLATE - sl, py + ph);
-    ctx.lineTo(M, py + ph);
+    ctx.moveTo(M, y);
+    ctx.lineTo(M + PLATE, y);
+    ctx.lineTo(M + PLATE - sl, y + r.h);
+    ctx.lineTo(M, y + r.h);
     ctx.closePath();
     ctx.fillStyle = C.abyss;
     ctx.fill();

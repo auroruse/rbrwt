@@ -10,9 +10,10 @@ const { logos, pfps, json } = await tierAssets();
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
 const rows = Object.fromEntries(official.tiers.map((t) => [t.id, t.players.map((n) => byName.get(n)!)]));
 const placed = official.tiers.reduce((n, t) => n + t.players.length, 0);
-const credit = [official.by && `By ${official.by}`, official.date && longDate(official.date)].filter(Boolean).join(' · ');
+const owner = `${official.by ?? 'Kirin'}'s List`;
+const caption = [official.title, official.date && longDate(official.date)].filter(Boolean).join(' · ');
 ---
-<Site current="tier-list" inner title="Tier List · RBR World Tour" description="The official tier list of the Rocket Bot Royale World Tour's players, and a maker for your own.">
+<Site current="tier-list" inner title="Tier List · RBR World Tour" description="Kirin's tier list of the Rocket Bot Royale World Tour's players, and a maker for your own.">
   <AwardSprite />
   <div class="depth">
     <div class="rays" aria-hidden="true"></div>
@@ -20,19 +21,19 @@ const credit = [official.by && `By ${official.by}`, official.date && longDate(of
       <div class="wrap">
         <header class="sec-head reveal">
           <h1 class="mega" id="tl-h">Tier List</h1>
-          {hasOfficial && <div class="sec-meta"><span class="sec-count">{String(placed).padStart(2, '0')}</span><span class="label">{credit || 'Official'}</span></div>}
+          {hasOfficial && <div class="sec-meta"><span class="sec-count">{String(placed).padStart(2, '0')}</span><span class="label">{owner}</span></div>}
         </header>
 
         {hasOfficial
           ? (
             <div class="tl-work tl-view size-m reveal">
-              {official.title && <p class="sub">{official.title}</p>}
+              {caption && <p class="sub">{caption}</p>}
               <TierBoard rows={rows} logos={logos} pfps={pfps} />
             </div>
           )
           : (
             <div class="s2-wait cut reveal">
-              <p class="sub">Official list</p>
+              <p class="sub">{owner}</p>
               <p class="s2-wait-h">Coming soon</p>
               <div class="s2-wait-read">
                 <div class="hud-cell"><span class="hud-k">Players</span><span class="hud-v">{tierPlayers.length}</span></div>

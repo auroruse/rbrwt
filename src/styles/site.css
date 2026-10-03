@@ -491,8 +491,8 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
 
 .tl-board { display: grid; gap: 4px; }
 .tl-row { display: grid; grid-template-columns: 172px minmax(0, 1fr) 52px; background: rgba(6, 20, 51, 0.72); transition: background var(--fast); }
-.tl-plate { display: flex; align-items: center; margin: 6px 0; padding: 0 26px 0 20px; border: 0; background: var(--abyss); color: inherit; font: inherit;
-  clip-path: polygon(12px 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.tl-plate { display: flex; align-items: center; margin: 0; padding: 0 30px 0 22px; border: 0; background: var(--abyss); color: inherit; font: inherit;
+  clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
 .tl-plate .stars { display: block; width: auto; height: 22px; }
 .tl-zone { display: flex; flex-wrap: wrap; align-content: flex-start; gap: 8px; min-width: 0; min-height: 96px; padding: 10px 12px; }
 .tl-count { align-self: center; justify-self: end; padding-right: 18px; font-family: var(--mono); font-size: 15px; line-height: 1; color: var(--text-3); font-variant-numeric: tabular-nums; }
@@ -651,7 +651,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 }
 @media (max-width: 639px) {
   .tl-row { grid-template-columns: 78px minmax(0, 1fr); }
-  .tl-plate { padding: 0 14px 0 10px; clip-path: polygon(8px 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
+  .tl-plate { padding: 0 16px 0 10px; clip-path: polygon(0 0, 100% 0, calc(100% - 8px) 100%, 0 100%); }
   .tl-plate .stars { height: 10px; }
   .tl-count { position: relative; z-index: 1; grid-column: 1; grid-row: 1; align-self: end; justify-self: start; padding: 0 0 12px 12px; font-size: 11px; pointer-events: none; }
   .tl-zone { gap: 6px; padding: 8px 6px; }

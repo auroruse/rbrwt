@@ -1,7 +1,16 @@
-# The official tier list, typed in from Kirin's screenshot. Players go in by the name the site shows;
+# Kirin's List, typed in from Kirin's screenshot. Players go in by the name the site shows;
 # a name the site doesn't know stops the build. Tiers: 5, 4.5, 4, 3.5, 3, 2.5, 2, 1.5, 1.
 # While no tier has anyone in it, the Tier List page shows a placeholder.
-title: null
+title: Preseason
 by: Kirin
-date: null
-tiers: {}
+date: 2026-10-03
+tiers:
+  "5": [Wizard, Garbelia]
+  "4.5": [Kirin, New Opolopia]
+  "4": [Priola]
+  "3.5": [Missouria, Magrusa]
+  "3": [Alfonzo]
+  "2.5": [Arty]
+  "2": [Hermitland]
+  "1.5": [John Laurens]
+  "1": []

@@ -1,4 +1,4 @@
-// The official list: details beside a card for a mouse, in the bottom bar for a tap.
+// Kirin's List: details beside a card for a mouse, in the bottom bar for a tap.
 import { bottomBar, byName, canHover, hoverPanel } from './tier-common';
 
 const view = document.querySelector<HTMLElement>('.tl-view');

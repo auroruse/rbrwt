@@ -225,16 +225,22 @@ for (const t of tours) {
   }
 }
 const boardRow = new Map(allTimeBoard.map((p, i) => [p.name, { ...p, at: i }]));
+// The Wild Card side is free agents, not a franchise: a card wears the last real franchise its player
+// played for, and WC never appears among their teams (a tour played as a Joker still reads WC in its row).
+const FREE_AGENTS = 'WC';
+const real = (code?: string | null): code is string => !!code && code !== FREE_AGENTS;
 
 export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2ByName.keys()])].map((name) => {
   const s1 = players.get(name);
   const row = boardRow.get(name);
   const highs = gameHighs.filter((g) => g.name === name);
   const top = highs.length ? Math.max(...highs.map((g) => g.kills)) : 0;
+  const byTour = tours.map((t) => perTour.get(t.num)?.get(name)?.team).filter(real);
+  const teams = careers[name]?.filter(real) ?? [...new Set(byTour)];
   return {
     name,
-    team: s2ByName.get(name)?.code ?? s1?.team ?? null,
-    teams: careers[name] ?? (s1?.team ? [s1.team] : []),
+    team: s2ByName.get(name)?.code ?? byTour.at(-1) ?? teams.at(-1) ?? null,
+    teams,
     s2: s2ByName.get(name) ?? null,
     kills: s1?.kills ?? 0,
     games: s1?.games ?? 0,

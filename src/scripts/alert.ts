@@ -23,10 +23,9 @@ type Face = { family: string; weight: number; cap: number; squeeze: number; lead
 const BOLD: Face = { family: 'Anton', weight: 400, cap: 63, squeeze: 0.838, lead: 9 };
 const LIGHT: Face = { family: 'Antonio', weight: 300, cap: 63, squeeze: 0.85, lead: 10 };
 const STARS = { gap: 16, size: 34, step: 5 };
-// Where every logo starts: its drawing fitted into this box, centred across the panel and wider than it, so it
-// runs off both sides as the NFL's do; a tall one goes down behind the plate rather than off the top. Dragging
-// and Logo size move it from there.
-const LOGO = { cx: (PANEL + W) / 2, cy: 350, w: 600, h: 640 };
+// Where every logo starts: its drawing fitted into this box and centred in the space above the plate, wider
+// than the panel so it runs off both sides as the NFL's do. Dragging and Logo size move it from there.
+const LOGO = { cx: (PANEL + W) / 2, cy: PLATE.top / 2, w: 600, h: 640 };
 
 const state = {
   team: data.teams[0]?.code ?? '',

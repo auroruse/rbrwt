@@ -4,9 +4,10 @@ import Site from '../layouts/Site.astro';
 import PlayerName from '../components/PlayerName.astro';
 import PlayerCards from '../components/PlayerCards.astro';
 import FranchiseFx from '../components/FranchiseFx.astro';
-import { nsRegion, official, rosters, s2Field, season, tierPlayers } from '../lib/data';
+import type { ImageMetadata } from 'astro';
+import { FREE_AGENT, freeAgents, nsRegion, official, rosters, s2Field, season, tierPlayers } from '../lib/data';
 import { ARROW } from '../lib/icons';
-import { TIERS, starsSVG } from '../lib/tiers';
+import { TIERS, crestSVG, starsSVG } from '../lib/tiers';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
@@ -18,6 +19,14 @@ const tierOf = new Map(official.tiers.flatMap((t) => t.players.map((n) => [n, TI
 // The franchises with an animation of their own; any other gets the generic one.
 const FX = new Set(['css', 'sld', 'so', 'tal', 'tnp', 'to', 'tpop']);
 const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() : 'generic');
+// The franchises, then every free agent in a panel of their own: steel, the empty crest, best kills per game first.
+type Panel = { code: string; name: string; style: string; image?: ImageMetadata; home?: { label: string; region?: string }; roster: { player: string; role: string }[] };
+const panels: Panel[] = [
+  ...s2Field.map((f) => ({ code: f.code, name: f.name, style: f.style, image: f.image, home: f.home, roster: rosters.get(f.code) ?? [] })),
+  ...(freeAgents.length
+    ? [{ code: FREE_AGENT.code, name: FREE_AGENT.name, style: FREE_AGENT.style, home: { label: 'Unsigned' }, roster: freeAgents.map((n) => ({ player: n, role: 'FA' })) }]
+    : []),
+];
 ---
 <Site current="franchises" inner title="Franchises · RBR World Tour" description={`The ${s2Field.length} franchises of Season ${season.season} of the Rocket Bot Royale World Tour.`}>
   <div class="depth">
@@ -30,15 +39,15 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
         </header>
         <div class="reveal">
           <div class="fband" id="fband">
-            {s2Field.map((f) => {
-              const roster = rosters.get(f.code) ?? [];
+            {panels.map((f) => {
+              const roster = f.roster;
               return (
                 <article class="fp cut" style={f.style} data-fx={fxOf(f.code)}>
                   <button type="button" class="fp-toggle" aria-expanded="false" aria-controls={`roster-${f.code.toLowerCase()}`} aria-label={`${f.code} ${f.name} roster`}></button>
                   <div class="fp-id">
                     <span class="fp-code">{f.code}</span>
                     <span class={`fp-art fx-${fxOf(f.code)}`}>
-                      {f.image && <Image class="fp-logo" src={f.image} alt={`${f.code} ${f.name} logo`} width={480} />}
+                      {f.image ? <Image class="fp-logo" src={f.image} alt={`${f.code} ${f.name} logo`} width={480} /> : f.code === FREE_AGENT.code && <Fragment set:html={crestSVG('fp-logo fa-crest')} />}
                       <FranchiseFx fx={fxOf(f.code)} />
                     </span>
                     <i class="fx-sweep" aria-hidden="true"></i>
@@ -51,7 +60,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                       <h2 class="fp-name slide"><span>{f.name}</span></h2>
                     </div>
                   </div>
-                  <div class="fp-roster" id={`roster-${f.code.toLowerCase()}`}>
+                  <div class={f.code === FREE_AGENT.code ? 'fp-roster fp-long' : 'fp-roster'} id={`roster-${f.code.toLowerCase()}`}>
                     <table class="fp-table">
                       <colgroup><col style="width:40px"><col><col style="width:104px"><col style="width:64px"><col class="kl" style="width:58px"><col class="gp" style="width:64px"><col class="rkc" style="width:54px"></colgroup>
                       <thead><tr><th>#</th><th>Player</th><th>Tier</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n rkc">Rank</th></tr></thead>
@@ -86,7 +95,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
       </div>
     </section>
   </div>
-  <PlayerCards />
+  <PlayerCards freeAgents />
   <script is:inline>
   // A click opens a team. On a wide screen it takes the whole row, its logo large beside its roster: it opens
   // where it was, growing out of its tile while the teams after it glide down a slot. On a narrow one its roster

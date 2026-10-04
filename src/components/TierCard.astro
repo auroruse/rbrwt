@@ -2,16 +2,17 @@
 // One player's card on the Tier List: a field in the franchise they wear (S2 if rostered, otherwise their
 // latest S1 tour's) with its code chip, then name, kills per game, kills and games, and award icons. The
 // editor moves these between tiers; the detail panel is built in the browser from the page's data.
-import { AWARDS, franchiseOrNull, type TierPlayer } from '../lib/data';
-import { AWARD_NAMES } from '../lib/tiers';
+import { AWARDS, FREE_AGENT, franchiseOrNull, type TierPlayer } from '../lib/data';
+import { AWARD_NAMES, crestSVG } from '../lib/tiers';
 interface Props { p: TierPlayer; logo?: string | null; pfp?: string | null }
 const { p, logo, pfp } = Astro.props;
-const f = franchiseOrNull(p.team ?? undefined);
+// A player on no S2 roster is a free agent here: neutral steel and the empty crest instead of a team.
+const f = p.fa ? FREE_AGENT : franchiseOrNull(p.team ?? undefined);
 const awards = AWARDS.filter((a) => p.awards[a]?.length).map((a) => ({ a, n: p.awards[a]!.length }));
-const teams = [...new Set([...p.teams, ...(p.s2 ? [p.s2.code] : [])])].join(' ');
+const teams = [...new Set([...p.teams, ...(p.s2 ? [p.s2.code] : []), ...(p.fa ? [FREE_AGENT.code] : [])])].join(' ');
 const said = [
   p.name,
-  f ? `${f.code} ${f.name}` : null,
+  p.fa ? 'Free agent' : f ? `${f.code} ${f.name}` : null,
   p.games ? `${p.kpg.toFixed(2)} kills per game, ${p.kills} kills in ${p.games} games` : 'no S1 games',
   ...awards.map(({ a, n }) => `${AWARD_NAMES[a]} ×${n}`),
 ].filter(Boolean).join(', ');
@@ -19,7 +20,7 @@ const said = [
 <div class="tc" role="button" tabindex="0" data-player={p.name} data-teams={teams} style={f?.style} aria-label={said}>
   <div class="tc-field" aria-hidden="true">
     <span class="tc-code">{f?.code ?? ''}</span>
-    {logo && <img class="tc-logo" src={logo} alt="" draggable="false" decoding="async" />}
+    {p.fa ? <Fragment set:html={crestSVG('tc-logo fa-crest')} /> : logo && <img class="tc-logo" src={logo} alt="" draggable="false" decoding="async" />}
     {pfp && <img class="tc-pfp" src={pfp} alt="" draggable="false" decoding="async" />}
   </div>
   <div class="tc-body" aria-hidden="true">

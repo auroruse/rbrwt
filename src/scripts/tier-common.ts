@@ -1,9 +1,9 @@
 // What both Tier List pages do in the browser: read the page's data, build a player's detail panel, and show
 // it beside a hovered or focused card (mouse) or in the bar along the bottom (touch).
-import { AWARD_LIST, AWARD_NAMES, TIERS, starsSVG, tierLabel, type Award, type TierId } from '../lib/tiers';
+import { AWARD_LIST, AWARD_NAMES, TIERS, crestSVG, starsSVG, tierLabel, type Award, type TierId } from '../lib/tiers';
 
 export type Player = {
-  name: string; team: string | null; teams: string[]; s2: { code: string; role: 'Starter' | 'Sub' | 'PS' } | null;
+  name: string; team: string | null; teams: string[]; s2: { code: string; role: 'Starter' | 'Sub' | 'PS' } | null; fa: boolean;
   kills: number; games: number; kpg: number;
   awards: Partial<Record<Award, string[]>>; titles: string[];
   tours: { num: string; team: string | null; kills: number; games: number }[];
@@ -14,6 +14,7 @@ export type Data = {
   players: Player[]; franchises: Record<string, Franchise>; order: string[]; aliases: Record<string, string>;
   official: { title: string | null; by: string | null; tiers: Record<TierId, string[]> } | null;
   wordmark: string; site: string;
+  freeAgents: boolean; // this page shows players on no S2 roster as free agents
 };
 
 export const data: Data = JSON.parse(document.getElementById('tl-data')?.textContent || '{}');
@@ -29,6 +30,7 @@ const styleOf = (code: string | null) => {
 };
 const mark = (code: string | null, cls = '') => {
   if (!code) return '';
+  if (code === 'FA') return crestSVG(`${cls} fa-crest`);
   const f = data.franchises[code];
   return f?.logo
     ? `<img class="${cls}" src="${f.logo}" alt="${esc(`${code} ${f.name}`)}" title="${esc(`${code} ${f.name}`)}">`
@@ -39,9 +41,10 @@ const icon = (a: Award) => `<svg viewBox="0 0 20 20" aria-hidden="true"><use hre
 const chips = (tours: string[]) => `<span class="tp-chips">${tours.map((n) => `<i class="tp-chip">${n}</i>`).join('')}</span>`;
 
 export function detailHTML(p: Player): string {
-  const f = p.team ? data.franchises[p.team] : null;
-  const head = `<div class="tp-head" style="${styleOf(p.team)}">${mark(p.team, 'tp-logo')}
-    <div class="tp-who"><span class="tp-name slide"><b>${esc(p.name)}</b></span><span class="tp-team">${f ? `${esc(p.team!)} ${esc(f.name)}` : ''}</span></div></div>`;
+  const code = data.freeAgents && p.fa ? 'FA' : p.team;
+  const f = code ? data.franchises[code] : null;
+  const head = `<div class="tp-head" style="${styleOf(code)}">${mark(code, 'tp-logo')}
+    <div class="tp-who"><span class="tp-name slide"><b>${esc(p.name)}</b></span><span class="tp-team">${code === 'FA' ? 'Free agent' : f ? `${esc(code!)} ${esc(f.name)}` : ''}</span></div></div>`;
   const placed = tierOf.get(p.name);
   const tier = `<span class="tf tf-tier">${placed
     ? `<b role="img" aria-label="${tierLabel(placed)}">${starsSVG(placed, 16, 2)}</b>`

@@ -3,10 +3,11 @@ import Site from '../../layouts/Site.astro';
 import TierBoard from '../../components/TierBoard.astro';
 import TierCard from '../../components/TierCard.astro';
 import AwardSprite from '../../components/AwardSprite.astro';
-import { franchises, hasOfficial, href, poolOrder, tierPlayers } from '../../lib/data';
+import { FREE_AGENT, franchises, hasOfficial, href, poolOrder, tierPlayers } from '../../lib/data';
+import { crestSVG } from '../../lib/tiers';
 import { tierAssets } from '../../lib/tier-assets';
 
-const { logos, pfps, json } = await tierAssets();
+const { logos, pfps, json } = await tierAssets({ freeAgents: true });
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
 const pool = poolOrder.map((n) => byName.get(n)!);
 // The team filter: every franchise with a player, the S2 field first.
@@ -49,6 +50,7 @@ const filterTeams = franchises
             <input class="tl-search" id="tl-search" type="search" placeholder="Search players" autocomplete="off" spellcheck="false" aria-label="Search players" />
             <div class="tl-teams" role="group" aria-label="Show one franchise">
               <button type="button" class="tl-team tl-all" data-team="" aria-pressed="true">All</button>
+              <button type="button" class="tl-team" data-team={FREE_AGENT.code} aria-pressed="false" title="Free agents" aria-label="Free agents" style={FREE_AGENT.style}><Fragment set:html={crestSVG('fa-crest')} /></button>
               {filterTeams.map((f) => (
                 <button type="button" class="tl-team" data-team={f.code} aria-pressed="false" title={`${f.code} ${f.name}`} aria-label={`${f.code} ${f.name}`}>
                   {logos[f.code] ? <img src={logos[f.code]} alt="" draggable="false" /> : <i class="chip" style={f.style}>{f.code}</i>}

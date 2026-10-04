@@ -6,7 +6,7 @@ import { hasOfficial, href, longDate, official, tierPlayers } from '../../lib/da
 import { tierAssets } from '../../lib/tier-assets';
 import { NEXT } from '../../lib/icons';
 
-const { logos, pfps, json } = await tierAssets();
+const { logos, pfps, json } = await tierAssets({ freeAgents: true });
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
 const rows = Object.fromEntries(official.tiers.map((t) => [t.id, t.players.map((n) => byName.get(n)!)]));
 const placed = official.tiers.reduce((n, t) => n + t.players.length, 0);

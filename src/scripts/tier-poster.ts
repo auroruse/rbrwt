@@ -1,6 +1,6 @@
 // Export PNG: the tier list drawn as a 1920px-wide broadcast poster, entirely in the browser, the same
 // whatever the screen. Loaded only when someone presses Export.
-import { AWARD_LIST, CARD, TIERS, drawAward, drawStars, type CardSize, type TierId } from '../lib/tiers';
+import { AWARD_LIST, CARD, TIERS, drawAward, drawCrest, drawStars, type CardSize, type TierId } from '../lib/tiers';
 import type { Data, Player } from './tier-common';
 
 type Input = { title: string; name: string; size: CardSize; tiers: Record<TierId, string[]> };
@@ -77,7 +77,8 @@ function drawCard(ctx: CanvasRenderingContext2D, p: Player, data: Data, imgs: Im
   const m = CARD[size];
   const s = K;
   const w = m.w * s, h = m.h * s, cut = 8 * s, fh = m.field * s, pad = m.pad * s;
-  const f = p.team ? data.franchises[p.team] : null;
+  const wear = p.fa ? 'FA' : p.team; // a free agent wears the steel and the crest
+  const f = wear ? data.franchises[wear] : null;
   const ink = f?.ink ?? C.text;
 
   ctx.save();
@@ -101,11 +102,10 @@ function drawCard(ctx: CanvasRenderingContext2D, p: Player, data: Data, imgs: Im
   ctx.fillStyle = f?.primary ?? '#0F2658';
   ctx.fillRect(x, y, w, fh);
   if (f) stripes(ctx, x, y, w, fh, f.secondary);
-  const logo = p.team ? imgs.get(`logo:${p.team}`) : null;
-  if (logo) {
-    const lw = w * 0.74;
-    ctx.drawImage(logo, x + w * 0.42, y + fh / 2 - lw / 2, lw, lw);
-  }
+  const logo = wear && !p.fa ? imgs.get(`logo:${wear}`) : null;
+  const lw = w * 0.74;
+  if (p.fa && f) drawCrest(ctx, x + w * 0.42, y + fh / 2 - lw / 2, lw, f.rim, f.secondary);
+  else if (logo) ctx.drawImage(logo, x + w * 0.42, y + fh / 2 - lw / 2, lw, lw);
   const pfp = p.pfp ? imgs.get(`pfp:${p.name}`) : null;
   if (pfp && size !== 's') {
     const ps = fh * 0.36;
@@ -134,7 +134,7 @@ function drawCard(ctx: CanvasRenderingContext2D, p: Player, data: Data, imgs: Im
 
   // The code chip.
   ctx.textBaseline = 'middle';
-  const code = p.team ?? '';
+  const code = wear ?? '';
   ctx.font = `700 ${m.small * s}px ${SANS}`;
   track(ctx, 0.14, m.small * s);
   const chipW = ctx.measureText(code).width + 10 * s;
@@ -220,7 +220,7 @@ export async function exportPoster(input: Input, data: Data) {
   const wanted = new Map<string, string | null>([['wordmark', data.wordmark]]);
   for (const r of rows) {
     for (const p of r.list) {
-      if (p.team) wanted.set(`logo:${p.team}`, data.franchises[p.team]?.logo ?? null);
+      if (p.team && !p.fa) wanted.set(`logo:${p.team}`, data.franchises[p.team]?.logo ?? null);
       if (p.pfp) wanted.set(`pfp:${p.name}`, p.pfp);
     }
   }

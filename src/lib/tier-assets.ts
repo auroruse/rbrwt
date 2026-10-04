@@ -3,9 +3,11 @@
 // and the same files serve the cards, the panels and the poster.
 import { getImage } from 'astro:assets';
 import barmark from '../../assets/header/wordmark.png';
-import { aliases, franchises, hasOfficial, official, poolOrder, tierPlayers } from './data';
+import { FREE_AGENT, aliases, franchises, hasOfficial, official, poolOrder, tierPlayers } from './data';
 
-export async function tierAssets() {
+// freeAgents: whether this page shows players on no S2 roster as free agents (the tier list and Franchises do;
+// Stats and History show the teams they played for).
+export async function tierAssets(opts: { freeAgents?: boolean } = {}) {
   const logos: Record<string, string> = {};
   for (const f of franchises) if (f.image) logos[f.code] = (await getImage({ src: f.image, width: 192 })).src;
   const pfps: Record<string, string> = {};
@@ -15,9 +17,13 @@ export async function tierAssets() {
 
   const payload = {
     players: tierPlayers.map(({ pfp: _, rank: _rank, ...p }) => ({ ...p, pfp: pfps[p.name] ?? null })),
-    franchises: Object.fromEntries(franchises.map((f) => [f.code, {
-      name: f.name, primary: f.primary, secondary: f.secondary, ink: f.inkHex, rim: f.rim, logo: logos[f.code] ?? null,
-    }])),
+    franchises: {
+      ...Object.fromEntries(franchises.map((f) => [f.code, {
+        name: f.name, primary: f.primary, secondary: f.secondary, ink: f.inkHex, rim: f.rim, logo: logos[f.code] ?? null,
+      }])),
+      [FREE_AGENT.code]: { name: FREE_AGENT.name, primary: FREE_AGENT.primary, secondary: FREE_AGENT.secondary, ink: FREE_AGENT.inkHex, rim: FREE_AGENT.rim, logo: null },
+    },
+    freeAgents: !!opts.freeAgents,
     order: poolOrder,
     aliases,
     official: hasOfficial ? { title: official.title, by: official.by, tiers: Object.fromEntries(official.tiers.map((t) => [t.id, t.players])) } : null,

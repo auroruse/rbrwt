@@ -43,6 +43,13 @@ function rimOf(primary: string, secondary: string): string {
   return lighten(base, t);
 }
 
+// Free agents (everyone on no S2 roster) wear neutral steel on the tier list and Franchises, under a code of
+// their own; Stats and History keep the teams they played for.
+export const FREE_AGENT = {
+  code: 'FA', name: 'Free Agents', primary: '#2C323D', secondary: '#8E99A8', inkHex: '#E6EBF2', rim: '#B8C2CF',
+  style: '--p:#2C323D; --s:#8E99A8; --ink-on:#E6EBF2; --rim:#B8C2CF',
+};
+
 export const franchises: Franchise[] = yaml<FranchiseRow[]>('src/data/franchises.yaml').map((f) => {
   const file = f.logo.toLowerCase();
   const inkHex = f.ink === 'dark' ? '#030A1F' : '#FFFFFF';
@@ -212,6 +219,7 @@ export type TierPlayer = {
   team: string | null; // the franchise the card wears: S2 if rostered, otherwise their latest S1 tour's
   teams: string[]; // every franchise they played for in S1
   s2: { code: string; role: 'Starter' | 'Sub' | 'PS' } | null;
+  fa: boolean; // on no S2 roster: a free agent on the tier list and Franchises
   kills: number; games: number; kpg: number; rank: number | null;
   awards: Partial<Record<Award, string[]>>; // award -> the tours it was won in
   titles: string[]; // tours won as a player, II to X (I has no sheet)
@@ -244,7 +252,13 @@ const boardRow = new Map(allTimeBoard.map((p, i) => [p.name, { ...p, at: i }]));
 const FREE_AGENTS = 'WC';
 const real = (code?: string | null): code is string => !!code && code !== FREE_AGENTS;
 
-export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2ByName.keys()])].map((name) => {
+// Free agents the site wouldn't otherwise know (no S2 roster, no S1 games), from src/data/free-agents.yaml.
+const newFreeAgents = (yaml<string[] | null>('src/data/free-agents.yaml') ?? []).map((n) => aliases[n] ?? n);
+for (const n of newFreeAgents) {
+  if (s2ByName.has(n)) throw new Error(`${n} is on ${s2ByName.get(n)!.code}'s roster: take them out of src/data/free-agents.yaml`);
+}
+
+export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2ByName.keys(), ...newFreeAgents])].map((name) => {
   const s1 = players.get(name);
   const row = boardRow.get(name);
   const highs = gameHighs.filter((g) => g.name === name);
@@ -256,6 +270,7 @@ export const tierPlayers: TierPlayer[] = [...new Set([...players.keys(), ...s2By
     team: s2ByName.get(name)?.code ?? byTour.at(-1) ?? teams.at(-1) ?? null,
     teams,
     s2: s2ByName.get(name) ?? null,
+    fa: !s2ByName.has(name),
     kills: s1?.kills ?? 0,
     games: s1?.games ?? 0,
     kpg: row?.kpg ?? 0,
@@ -277,10 +292,9 @@ export const hasCard = (name: string) => cardNames.has(name);
 // The pool's own order: the S2 field franchise by franchise in depth-chart order, then everyone else
 // by the franchise their card wears, best kills per game first.
 const atOf = (n: string) => boardRow.get(n)?.at ?? Number.MAX_SAFE_INTEGER;
-export const poolOrder: string[] = [
-  ...s2Field.flatMap((f) => (rosters.get(f.code) ?? []).map((r) => r.player)),
-  ...tierPlayers.filter((p) => !p.s2).sort((a, b) => (a.team ?? '~').localeCompare(b.team ?? '~') || atOf(a.name) - atOf(b.name)).map((p) => p.name),
-];
+// Every free agent, best kills per game first as the leaderboard ranks them, then those without S1 games by name.
+export const freeAgents: string[] = tierPlayers.filter((p) => p.fa).sort((a, b) => atOf(a.name) - atOf(b.name) || a.name.localeCompare(b.name)).map((p) => p.name);
+export const poolOrder: string[] = [...s2Field.flatMap((f) => (rosters.get(f.code) ?? []).map((r) => r.player)), ...freeAgents];
 
 // The official list, typed in from Kirin's screenshot. An unknown name stops the build rather than
 // publishing a list with a player missing.

@@ -2,7 +2,9 @@
 // The player card on pages outside the Tier List: any PlayerName opens the same readout a tier card shows.
 import AwardSprite from './AwardSprite.astro';
 import { tierAssets } from '../lib/tier-assets';
-const { json } = await tierAssets();
+// freeAgents: show players on no S2 roster as free agents, as Franchises does; Stats and History leave it off.
+interface Props { freeAgents?: boolean }
+const { json } = await tierAssets({ freeAgents: Astro.props.freeAgents });
 ---
 <AwardSprite />
 <div class="tl-pop" id="tl-pop" aria-hidden="true" hidden></div>

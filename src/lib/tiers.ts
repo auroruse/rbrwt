@@ -278,3 +278,27 @@ export function drawAward(ctx: CanvasRenderingContext2D, a: Award, x: number, y:
   }
   ctx.restore();
 }
+
+// The free agents' crest: an empty shield, its outline and a dashed line inside it, in a 100x100 box. It stands
+// where a team logo would on a free agent's tier card, the poster, the player card and the Franchises panel.
+export const FA_CREST = 'M50 7L87 19V47C87 70 71 86 50 94C29 86 13 70 13 47V19Z';
+export const FA_CREST_IN = 'M50 18L77 27V47C77 64 66 76 50 83C34 76 23 64 23 47V27Z';
+export const crestSVG = (cls: string) =>
+  `<svg class="${cls}" viewBox="0 0 100 100" aria-hidden="true"><path class="o" d="${FA_CREST}"/><path class="i" d="${FA_CREST_IN}"/></svg>`;
+export function drawCrest(ctx: CanvasRenderingContext2D, x: number, y: number, size: number, rim: string, line: string) {
+  ctx.save();
+  ctx.translate(x, y);
+  ctx.scale(size / 100, size / 100);
+  const o = new Path2D(FA_CREST);
+  ctx.fillStyle = 'rgba(255,255,255,0.05)';
+  ctx.fill(o);
+  ctx.lineJoin = 'round';
+  ctx.lineWidth = 4;
+  ctx.strokeStyle = rim;
+  ctx.stroke(o);
+  ctx.setLineDash([3, 3]);
+  ctx.lineWidth = 1.6;
+  ctx.strokeStyle = line;
+  ctx.stroke(new Path2D(FA_CREST_IN));
+  ctx.restore();
+}

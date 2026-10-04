@@ -1,0 +1,4 @@
+# Free agents the site wouldn't otherwise know: players on no S2 roster and with no S1 games. Everyone else off
+# a roster is a free agent already. When a franchise signs one, move them to rosters.tsv.
+- Omnicontrol
+- Nimux

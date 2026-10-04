@@ -5,7 +5,7 @@ import barmark from '../../assets/header/wordmark.png';
 import footLogo from '../assets/pieces/logo.png';
 import { href } from '../lib/data';
 
-interface Props { title: string; description: string; current: 'home' | 'tours' | 'franchises' | 'stats' | 'history' | 'tier-list'; inner?: boolean }
+interface Props { title: string; description: string; current?: 'home' | 'tours' | 'franchises' | 'stats' | 'history' | 'tier-list'; inner?: boolean }
 const { title, description, current, inner = false } = Astro.props;
 
 const links = [
@@ -42,6 +42,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site).href;
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Kode+Mono:wght@400..700&display=swap" rel="stylesheet">
+<slot name="head" />
 </head>
 <body class={inner ? 'inner' : undefined}>
 <a class="skip label" href="#main">Skip to content</a>

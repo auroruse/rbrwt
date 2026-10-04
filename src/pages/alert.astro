@@ -1,0 +1,81 @@
+---
+// The Alert maker, an unlisted page (no menu entry): NFL-style alert graphics with a photo on the left, a
+// franchise's logo in 3D on its colour on the right, the silver ALERT plate, and lines of text under it,
+// player names in bold over their stars on Kirin's List. Drawn in the browser and exported as a PNG.
+import { getImage } from 'astro:assets';
+import Site from '../layouts/Site.astro';
+import { aliases, franchises, official, s2Field, tierPlayers } from '../lib/data';
+
+// The S2 field first, then every former franchise with a logo. A franchise in a light colour (dark ink)
+// sits on its dark colour instead, so the white text reads.
+const teams = [...s2Field, ...franchises.filter((f) => !f.active)].filter((f) => f.image);
+const thumbs = await Promise.all(teams.map(async (f) => (await getImage({ src: f.image!, width: 88 })).src));
+const payload = {
+  teams: teams.map((f) => ({ code: f.code, name: f.name, logo: f.image!.src, bg: f.ink === 'dark' ? f.secondary : f.primary })),
+  players: tierPlayers.map((p) => p.name).sort((a, b) => a.localeCompare(b)),
+  aliases,
+  tiers: Object.fromEntries(official.tiers.flatMap((t) => t.players.map((n) => [n, t.id]))),
+};
+// Safe inside a <script> element: no "</script>" can close it early.
+const json = JSON.stringify(payload).replace(/</g, '\\u003c');
+---
+<Site inner title="Alert · RBR World Tour" description="Alert graphics for the Rocket Bot Royale World Tour.">
+  <Fragment slot="head">
+    <meta name="robots" content="noindex">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Antonio:wght@300&display=swap" rel="stylesheet">
+  </Fragment>
+  <div class="depth">
+    <section class="sec sec-first sec-last" aria-labelledby="al-h">
+      <div class="wrap">
+        <header class="sec-head reveal">
+          <h1 class="mega" id="al-h">Alert</h1>
+        </header>
+
+        <div class="al-work">
+          <div class="al-stage" id="al-stage">
+            <canvas id="al-canvas" width="1080" height="1440" aria-label="The alert graphic"></canvas>
+            <label class="al-drop" id="al-drop" for="al-photo">Upload a photo</label>
+          </div>
+
+          <div class="al-side">
+            <div class="al-group">
+              <span class="al-k">Photo</span>
+              <div class="al-row">
+                <label class="tl-btn al-file" for="al-photo">Upload photo</label>
+                <input type="file" id="al-photo" accept="image/*" hidden />
+                <label class="al-range"><span>Zoom</span><input type="range" id="al-pzoom" min="1" max="3" step="0.01" value="1" /></label>
+              </div>
+            </div>
+
+            <div class="al-group">
+              <span class="al-k" id="al-team-k">Franchise</span>
+              <div class="al-teams" role="group" aria-labelledby="al-team-k">
+                {teams.map((f, i) => (
+                  <button type="button" class="tl-team" data-team={f.code} aria-pressed={i === 0 ? 'true' : 'false'} title={`${f.code} ${f.name}`} aria-label={`${f.code} ${f.name}`}>
+                    <img src={thumbs[i]} alt="" draggable="false" />
+                  </button>
+                ))}
+              </div>
+              <label class="al-range"><span>Logo size</span><input type="range" id="al-lsize" min="0.5" max="1.8" step="0.01" value="1" /></label>
+            </div>
+
+            <div class="al-group">
+              <span class="al-k">Text</span>
+              <ol class="al-blocks" id="al-blocks"></ol>
+              <div class="al-row">
+                <button type="button" class="tl-btn" id="al-add-player">Add player</button>
+                <button type="button" class="tl-btn" id="al-add-text">Add text</button>
+              </div>
+            </div>
+
+            <button type="button" class="tl-btn tl-go al-export" id="al-export">Export PNG</button>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <datalist id="al-players">{payload.players.map((n) => <option value={n} />)}</datalist>
+  <script type="application/json" id="al-data" set:html={json}></script>
+  <script>import '../scripts/alert';</script>
+</Site>

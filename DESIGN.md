@@ -18,7 +18,7 @@ Decided with Moukden and Kirin, 2 October 2026. Reworked the same day after the 
 
 Home · Tours · Franchises · Stats · History · Tier List
 
-Every item is its own page. There is no About tab; the About section is the body of Home.
+Every item is its own page. There is no About tab; the About section is the body of Home. The Alert maker at `/alert/` is unlisted: no menu entry, and search engines are told to skip it (Kirin, 4 October 2026).
 
 ### Pages
 
@@ -44,6 +44,8 @@ Former franchises have no page; they live in History. A franchise that rejoins g
 **Tier List.** Kirin's List, read-only: the count of players in it and "Kirin's List" on the right of the head, its title and date over the tiers, then a gold "Make your own" button that opens the editor (`tier-list/editor/`). Never called the official list. While it is empty a placeholder panel stands where it goes. Kirin sends it as a screenshot and it is typed into `src/data/tier-list.yaml`; the first, Preseason, went up on 3 October 2026.
 
 **Editor.** The tiers on the left; the Unranked pool docked on the right, scrolling on its own so every card is in reach of every tier (under the tiers on phones and tablets). A card moves by dragging, with a mouse at once or with a finger after a short hold, or by tapping it and then tapping a tier. Cards reorder inside a tier. The pool has a search box and a row of franchise logos that narrows it to one franchise's players, S1 or S2. It keeps its own order: the S2 field franchise by franchise in depth-chart order, then everyone else by franchise, best kills per game first. Above the tiers: Title and Name fields, both optional (a blank title reads "RBRWT S2 Tier List"), the card size switch (S, M, L), "Start from Kirin's List" once there is one, Reset, and Export PNG. One list per browser, saved with every move. A first visit starts with everyone in Unranked. Reset and replacing a list with Kirin's ask once more on the button itself.
+
+**Alert** (unlisted). Makes NFL-style alert graphics. The picture on the left at its export size scaled down, the controls on the right (under it on phones): Upload photo (or drop one on the picture) with a Zoom slider, a row of franchise logos (the S2 field, then every former franchise) with a Logo size slider, the text as blocks of two kinds, Player and Text, each moved up or down or removed, Add player and Add text, and Export PNG. The photo and the logo move by dragging them on the picture. Player blocks suggest every name on the site. Nothing is saved between visits.
 
 ### Words
 
@@ -262,6 +264,8 @@ Kode Mono is monospaced, so count-ups, the countdown and sorted columns never ji
 
 **Player card.** Every player's name on the Franchises rosters, the Stats leaderboard and in History's records and award winners shows that same readout. A name is a plain button in its own type that takes a gold underline on hover. For a mouse the card shows beside the name while the pointer is on it (keyboard focus shows it too); on a touch screen a tap opens it in the bottom bar. No card carries a starter, sub or S1-only marker (Kirin, 3 October 2026). Franchise names and "Not awarded" stay plain text.
 
+**Alert graphic** (`/alert/`, 1080×1440). The NFL's alert format, measured off their own graphics: the photo fills the left 584px; a 16px silver rail; the franchise's colour on the right (its dark colour for a light franchise: CSS on navy, TPoP on dark grey-green), lit from above the logo, darker towards the corners and the bottom, with faint brushed streaks rising to the right. The logo is sculpted in 3D in the browser from the flat PNG: brighter shapes stand above darker ones with flat chamfered edges lit from the top left, a short dark side and a drop shadow; it sits large above the plate and runs off the panel's edges, and its default place and size come from the drawing's own bounds. The plate is bright metal with a bevelled edge and a shadow, from a chevron point over the photo to the right edge, ALERT cut into it in Anton with a light lip. Under it the blocks in white: Text in Antonio Light, Player in Anton, each squeezed to the NFL's widths, every line in capitals. A player's name runs first name over the rest, and their stars on Kirin's List sit under the name (none when they aren't on it). Text wraps past 300px, never starting a line on a small word ("EXPECTED TO / START WEEK 3"); a line typed on its own stays one; a block wider than the column shrinks, and the whole text shrinks to fit above the bottom margin. The PNG is the canvas itself.
+
 **Tier poster** (Export PNG). Drawn in the browser, 1920px wide, whatever the screen: the water background darkening downwards, the RBRWT S2 wordmark top left, "Tier list" in gold Mono over the title in Bold on the right, a gold rule, then the nine tiers with their plates, cards at the chosen size and counts (an empty tier stays as a slim row so the scale reads in full), and along the bottom "By <name>" with the date and auroruse.github.io/rbrwt. Unranked is left out.
 
 **Empty state.** Two or three words in Label, `--text-3`, centred in the space the content would fill.
@@ -286,7 +290,7 @@ No light theme. No cream, beige or off-white. No gradients beyond the tour gradi
 
 ## 6. Build
 
-Live at **auroruse.github.io/rbrwt**, from the public repository **github.com/auroruse/rbrwt**. Static Astro site, published to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`, under `/rbrwt`. Fonts: Kode Mono from Google Fonts; Neue Montreal from `assets/fonts/` once the files are there.
+Live at **auroruse.github.io/rbrwt**, from the public repository **github.com/auroruse/rbrwt**. Static Astro site, published to GitHub Pages by `.github/workflows/deploy.yml` on every push to `main`, under `/rbrwt`. Fonts: Kode Mono from Google Fonts; Neue Montreal from `assets/fonts/` once the files are there; Anton and Antonio Light from Google Fonts on the Alert page only.
 
 Everything on the page comes from files, read at build time:
 - `src/data/franchises.yaml`: every franchise's code, name, colours and home region. Whether one is in Season 2 is decided by its logo's folder, `assets/franchises/` or `assets/former franchises/`.

@@ -729,7 +729,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 /* ---------- Franchise animations: each team acts out its logo ----------
    .fx-preview is the short taste a resting mouse gets; .fx-full plays as the team opens. Positions are
    shares of the logo's box: the CSS barrel tip at 84% 18%, the SLD rocket's tail at 16.5% 57.5% (its axis climbs 21deg), the TO
-   hooves at 78% 76% and 36% 67%. */
+   hooves at 78% 76% and 36% 67%, the TNP ram's head at 50% 48% and its nose at 35% 64%. */
 .fx { position: absolute; inset: 0; }
 .fx > * { position: absolute; display: block; opacity: 0; }
 .fx-sweep { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transform: translateX(-120%);
@@ -858,6 +858,26 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .fp.fx-full .fx-to .v1 { animation: to-speed 600ms ease-out 100ms; }
 .fp.fx-full .fx-to .v2 { animation: to-speed 600ms ease-out 220ms; }
 .fp.fx-full .fx-to .v3 { animation: to-speed 600ms ease-out 340ms; }
+
+/* TNP Rams: the ram snorts, rears back and butts straight at you, an impact burst and two shockwaves breaking round its head */
+.fx-tnp .fx-burst { left: 50%; top: 48%; z-index: -1; width: 120cqw; height: 120cqw; margin: -60cqw 0 0 -60cqw; overflow: visible; fill: none;
+  stroke: var(--ink-on); stroke-width: 2.4; stroke-linecap: round; }
+.fx-tnp .fx-ring { left: 50%; top: 48%; z-index: -1; width: 70cqw; height: 70cqw; margin: -35cqw 0 0 -35cqw; border-radius: 50%; border: 1cqw solid var(--ink-on); }
+.fx-tnp .fx-snort { left: 35%; top: 64%; width: 9cqw; height: 9cqw; margin: -4.5cqw 0 0 -4.5cqw; border-radius: 50%; background: rgba(235, 240, 250, 0.8); }
+.fx-tnp .n1 { --dx: -12cqw; --dy: 5cqw; } .fx-tnp .n2 { --dx: -8cqw; --dy: 10cqw; }
+@keyframes tnp-butt { 0%, 100% { transform: none; } 24% { transform: translate(3%, -3%) rotate(5deg) scale(0.94); } 36% { transform: translate(-3%, 3%) rotate(-4deg) scale(1.12); }
+  44% { transform: translate(-2%, 2%) rotate(-2deg) scale(1.06); } 56% { transform: translate(1%, 0) rotate(2deg) scale(1.02); } 68% { transform: translate(-1%, 0) rotate(-1.5deg) scale(1.01); } 80% { transform: none; } }
+@keyframes tnp-butt-s { 0%, 100% { transform: none; } 40% { transform: translate(2%, -2%) rotate(4deg) scale(0.96); } 70% { transform: translate(-2%, 2%) rotate(-3deg) scale(1.08); } }
+@keyframes tnp-burst { 0% { opacity: 0; transform: scale(0.7); } 20% { opacity: 1; transform: scale(0.95); } 100% { opacity: 0; transform: scale(1.3); } }
+@keyframes tnp-ring { 0% { opacity: 0; transform: scale(0.45); } 15% { opacity: 0.9; } 100% { opacity: 0; transform: scale(1.9); } }
+.fp.fx-full .fx-tnp .fp-logo { animation: tnp-butt 1200ms ease-in-out; }
+.fp.fx-preview .fx-tnp .fp-logo { animation: tnp-butt-s 560ms ease-in-out; }
+.fp.fx-full .fx-tnp .n1, .fp.fx-preview .fx-tnp .n1 { animation: fx-puff 700ms ease-out 40ms; }
+.fp.fx-full .fx-tnp .n2 { animation: fx-puff 700ms ease-out 160ms; }
+.fp.fx-full .fx-tnp .fx-burst { animation: tnp-burst 700ms var(--ease-out) 430ms; }
+.fp.fx-preview .fx-tnp .fx-burst { animation: tnp-burst 500ms var(--ease-out) 380ms; }
+.fp.fx-full .fx-tnp .r1 { animation: tnp-ring 900ms ease-out 440ms; }
+.fp.fx-full .fx-tnp .r2 { animation: tnp-ring 1000ms ease-out 600ms; }
 
 /* TPoP Lightbringers: light rays burst from behind the figure, it flares, and a flash crosses the panel */
 .fx-tpop .fx-rays { left: 50%; top: 50%; z-index: -1; width: 150cqw; height: 150cqw; margin: -75cqw 0 0 -75cqw; border-radius: 50%;

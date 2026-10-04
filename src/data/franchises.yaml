@@ -99,6 +99,7 @@
   primary: "#01237C"
   secondary: "#FFFFFF"
   ink: white
+  home: { label: North Pacific, region: the_north_pacific }
 
 - code: TO
   name: Bushrangers

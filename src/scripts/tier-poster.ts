@@ -116,14 +116,19 @@ function drawCard(ctx: CanvasRenderingContext2D, p: Player, data: Data, imgs: Im
   }
   ctx.restore();
 
-  // The rim, with its diagonal along the cut.
+  // The rim round the whole card, along both cuts, in the franchise's brighter colour. The card's clip keeps
+  // the inner half of the stroke.
   if (f) {
-    ctx.strokeStyle = f.secondary;
-    ctx.lineWidth = s;
-    ctx.strokeRect(x + s / 2, y + s / 2, w - s, fh - s);
+    ctx.strokeStyle = f.rim;
+    ctx.lineWidth = 2 * s;
     ctx.beginPath();
-    ctx.moveTo(x, y + cut + s * 0.7);
-    ctx.lineTo(x + cut + s * 0.7, y);
+    ctx.moveTo(x + cut, y);
+    ctx.lineTo(x + w, y);
+    ctx.lineTo(x + w, y + h - cut);
+    ctx.lineTo(x + w - cut, y + h);
+    ctx.lineTo(x, y + h);
+    ctx.lineTo(x, y + cut);
+    ctx.closePath();
     ctx.stroke();
   }
 

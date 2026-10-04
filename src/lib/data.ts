@@ -16,7 +16,7 @@ type FranchiseRow = {
   code: string; name: string; logo: string; primary: string; secondary: string;
   ink: 'dark' | 'white'; home?: { label: string; region?: string };
 };
-export type Franchise = FranchiseRow & { active: boolean; image?: ImageMetadata; inkHex: string; style: string };
+export type Franchise = FranchiseRow & { active: boolean; image?: ImageMetadata; inkHex: string; rim: string; style: string };
 
 const s2Logos = import.meta.glob<{ default: ImageMetadata }>('/assets/franchises/*.png', { eager: true });
 const formerLogos = import.meta.glob<{ default: ImageMetadata }>('/assets/former franchises/*.png', { eager: true });
@@ -25,15 +25,35 @@ const byFile = (globbed: Record<string, { default: ImageMetadata }>) =>
 const s2Files = byFile(s2Logos);
 const formerFiles = byFile(formerLogos);
 
+// The rim round a franchise's tier card: whichever of its two colours stands out more against the dark tier
+// rows, lightened until it reaches 3:1 against them when both are dark.
+const ROWS = '#061433';
+const channels = (hex: string) => hex.replace('#', '').match(/../g)!.map((h) => parseInt(h, 16));
+const lum = (hex: string) => {
+  const [r, g, b] = channels(hex).map((v) => v / 255).map((v) => (v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4));
+  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
+};
+const contrast = (a: string, b: string) => (Math.max(lum(a), lum(b)) + 0.05) / (Math.min(lum(a), lum(b)) + 0.05);
+const lighten = (hex: string, t: number) =>
+  `#${channels(hex).map((v) => Math.round(v + (255 - v) * t).toString(16).padStart(2, '0')).join('').toUpperCase()}`;
+function rimOf(primary: string, secondary: string): string {
+  const base = contrast(primary, ROWS) >= contrast(secondary, ROWS) ? primary : secondary;
+  let t = 0;
+  while (contrast(lighten(base, t), ROWS) < 3 && t < 1) t += 0.05;
+  return lighten(base, t);
+}
+
 export const franchises: Franchise[] = yaml<FranchiseRow[]>('src/data/franchises.yaml').map((f) => {
   const file = f.logo.toLowerCase();
   const inkHex = f.ink === 'dark' ? '#030A1F' : '#FFFFFF';
+  const rim = rimOf(f.primary, f.secondary);
   return {
     ...f,
     active: s2Files.has(file),
     image: s2Files.get(file) ?? formerFiles.get(file),
     inkHex,
-    style: `--p:${f.primary}; --s:${f.secondary}; --ink-on:${inkHex}`,
+    rim,
+    style: `--p:${f.primary}; --s:${f.secondary}; --ink-on:${inkHex}; --rim:${rim}`,
   };
 });
 const fByCode = new Map(franchises.map((f) => [f.code, f]));

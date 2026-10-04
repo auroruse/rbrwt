@@ -16,7 +16,7 @@ export async function tierAssets() {
   const payload = {
     players: tierPlayers.map(({ pfp: _, rank: _rank, ...p }) => ({ ...p, pfp: pfps[p.name] ?? null })),
     franchises: Object.fromEntries(franchises.map((f) => [f.code, {
-      name: f.name, primary: f.primary, secondary: f.secondary, ink: f.inkHex, logo: logos[f.code] ?? null,
+      name: f.name, primary: f.primary, secondary: f.secondary, ink: f.inkHex, rim: f.rim, logo: logos[f.code] ?? null,
     }])),
     order: poolOrder,
     aliases,

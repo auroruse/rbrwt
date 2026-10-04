@@ -9,7 +9,7 @@ export type Player = {
   tours: { num: string; team: string | null; kills: number; games: number }[];
   best: { kills: number; tours: string[] } | null; pfp: string | null;
 };
-export type Franchise = { name: string; primary: string; secondary: string; ink: string; logo: string | null };
+export type Franchise = { name: string; primary: string; secondary: string; ink: string; rim: string; logo: string | null };
 export type Data = {
   players: Player[]; franchises: Record<string, Franchise>; order: string[]; aliases: Record<string, string>;
   official: { title: string | null; by: string | null; tiers: Record<TierId, string[]> } | null;

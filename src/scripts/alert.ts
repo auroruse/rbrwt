@@ -1,8 +1,7 @@
 // The Alert maker. One canvas at 1080×1440 is both the preview and the PNG: the photo on the left, the silver
-// rail, the franchise's colour with its logo in 3D, the ALERT plate, and the lines of text under it, player
-// names in bold over their stars on Kirin's List. The photo and the logo move by dragging them.
+// rail, the franchise's colour with its logo, the ALERT plate, and the lines of text under it, player names in
+// bold over their stars on Kirin's List. The photo moves by dragging it.
 import { TIERS, drawStars, type Tier, type TierId } from '../lib/tiers';
-import { sculpt, type Sculpted } from './alert-logo';
 
 type Team = { code: string; name: string; logo: string; bg: string };
 type Data = { teams: Team[]; players: string[]; aliases: Record<string, string>; tiers: Record<string, TierId> };
@@ -24,14 +23,13 @@ type Face = { family: string; weight: number; cap: number; squeeze: number; lead
 const BOLD: Face = { family: 'Anton', weight: 400, cap: 63, squeeze: 0.838, lead: 9 };
 const LIGHT: Face = { family: 'Antonio', weight: 300, cap: 63, squeeze: 0.85, lead: 10 };
 const STARS = { gap: 16, size: 34, step: 5 };
-// Where a logo's drawing sits by default: centred here and fitted into this box, running off the right edge.
-const LOGO = { cx: 860, cy: 345, w: 560, h: 600 };
+// Every logo the same: its drawing fitted into this box and centred in the panel above the plate.
+const LOGO = { cx: (PANEL + W) / 2, cy: PLATE.top / 2, w: 430, h: 490 };
 
 const state = {
   team: data.teams[0]?.code ?? '',
   photo: null as HTMLImageElement | null,
   pzoom: 1, px: 0, py: 0,
-  lsize: 1, lx: 0, ly: 0,
   blocks: [{ kind: 'player', text: '' }, { kind: 'text', text: '' }] as Block[],
 };
 
@@ -209,25 +207,37 @@ function panel(bg: string) {
   ctx.drawImage(brushed(), PANEL, 0);
 }
 
-function logo(s: Sculpted) {
-  const n = s.face.width;
-  const D = n * Math.min(LOGO.w / (s.box.w * n), LOGO.h / (s.box.h * n)) * state.lsize;
-  const x = LOGO.cx + state.lx - (s.box.x + s.box.w / 2) * D;
-  const y = LOGO.cy + state.ly - (s.box.y + s.box.h / 2) * D;
-  const depth = D * 0.014, steps = Math.max(1, Math.ceil(depth));
+// A logo as it is, with a drop shadow. It is centred on its drawing, not on the transparent square around it.
+type Logo = { img: HTMLImageElement; box: { x: number; y: number; w: number; h: number } };
+function bounds(img: HTMLImageElement): Logo['box'] {
+  const c = document.createElement('canvas');
+  c.width = img.naturalWidth;
+  c.height = img.naturalHeight;
+  const g = c.getContext('2d', { willReadFrequently: true })!;
+  g.drawImage(img, 0, 0);
+  const d = g.getImageData(0, 0, c.width, c.height).data;
+  let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+  for (let y = 0; y < c.height; y++) {
+    for (let x = 0; x < c.width; x++) {
+      if (d[(y * c.width + x) * 4 + 3] < 26) continue;
+      if (x < x0) x0 = x;
+      if (x > x1) x1 = x;
+      if (y < y0) y0 = y;
+      if (y > y1) y1 = y;
+    }
+  }
+  if (x1 < 0) return { x: 0, y: 0, w: 1, h: 1 };
+  return { x: x0 / c.width, y: y0 / c.height, w: (x1 - x0 + 1) / c.width, h: (y1 - y0 + 1) / c.height };
+}
+function logo(l: Logo) {
+  const k = Math.min(LOGO.w / (l.box.w * l.img.naturalWidth), LOGO.h / (l.box.h * l.img.naturalHeight));
+  const w = l.img.naturalWidth * k, h = l.img.naturalHeight * k;
   ctx.save();
-  ctx.beginPath();
-  ctx.rect(PANEL, 0, W - PANEL, H);
-  ctx.clip();
-  ctx.save();
-  ctx.shadowColor = 'rgba(0,0,0,0.55)';
-  ctx.shadowBlur = D * 0.045;
-  ctx.shadowOffsetX = D * 0.012;
-  ctx.shadowOffsetY = D * 0.022;
-  ctx.drawImage(s.side, x + 0.55 * depth, y + 0.85 * depth, D, D);
-  ctx.restore();
-  for (let i = steps; i >= 1; i--) ctx.drawImage(s.side, x + (0.55 * depth * i) / steps, y + (0.85 * depth * i) / steps, D, D);
-  ctx.drawImage(s.face, x, y, D, D);
+  ctx.shadowColor = 'rgba(0,0,0,0.5)';
+  ctx.shadowBlur = 28;
+  ctx.shadowOffsetX = 8;
+  ctx.shadowOffsetY = 14;
+  ctx.drawImage(l.img, LOGO.cx - (l.box.x + l.box.w / 2) * w, LOGO.cy - (l.box.y + l.box.h / 2) * h, w, h);
   ctx.restore();
 }
 
@@ -317,13 +327,13 @@ function plate() {
 }
 
 const teamOf = (code: string) => data.teams.find((t) => t.code === code);
-let sculpted: Sculpted | null = null;
+let shown: Logo | null = null;
 
 function render() {
   ctx.clearRect(0, 0, W, H);
   photo();
   panel(teamOf(state.team)?.bg ?? '#0b1328');
-  if (sculpted) logo(sculpted);
+  if (shown) logo(shown);
   rail();
   plate();
   text();
@@ -339,8 +349,8 @@ function draw() {
 }
 
 // ---------------------------------------------------------------- the controls
-const logos = new Map<string, Promise<Sculpted>>();
-function logoFor(t: Team): Promise<Sculpted> {
+const logos = new Map<string, Promise<Logo>>();
+function logoFor(t: Team): Promise<Logo> {
   let p = logos.get(t.code);
   if (!p) {
     p = new Promise<HTMLImageElement>((ok, no) => {
@@ -348,13 +358,12 @@ function logoFor(t: Team): Promise<Sculpted> {
       img.onload = () => ok(img);
       img.onerror = no;
       img.src = t.logo;
-    }).then((img) => sculpt(img));
+    }).then((img) => ({ img, box: bounds(img) }));
     logos.set(t.code, p);
   }
   return p;
 }
 
-const lsize = document.getElementById('al-lsize') as HTMLInputElement;
 const pzoom = document.getElementById('al-pzoom') as HTMLInputElement;
 const teamBtns = [...document.querySelectorAll<HTMLButtonElement>('.al-teams [data-team]')];
 
@@ -362,20 +371,16 @@ async function pickTeam(code: string) {
   const t = teamOf(code);
   if (!t) return;
   state.team = code;
-  state.lx = state.ly = 0;
-  state.lsize = 1;
-  lsize.value = '1';
   teamBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.team === code)));
-  sculpted = null;
+  shown = null;
   draw();
-  const s = await logoFor(t);
+  const l = await logoFor(t);
   if (state.team === code) {
-    sculpted = s;
+    shown = l;
     draw();
   }
 }
 teamBtns.forEach((b) => b.addEventListener('click', () => pickTeam(b.dataset.team!)));
-lsize.addEventListener('input', () => { state.lsize = +lsize.value; draw(); });
 pzoom.addEventListener('input', () => { state.pzoom = +pzoom.value; draw(); });
 
 // The photo: picked from a file or dropped on the picture.
@@ -408,38 +413,29 @@ stage.addEventListener('drop', (e) => {
   if (f) usePhoto(f);
 });
 
-// Dragging moves the photo on the left and the logo above the plate.
-type Mode = 'photo' | 'logo';
-let drag: { mode: Mode; x: number; y: number } | null = null;
+// Dragging the photo moves it.
+let drag: { x: number; y: number } | null = null;
 const at = (e: PointerEvent) => {
   const r = canvas.getBoundingClientRect();
   return { x: ((e.clientX - r.left) * W) / r.width, y: ((e.clientY - r.top) * H) / r.height };
 };
-const zone = (p: { x: number; y: number }): Mode | null =>
-  p.x < SPLIT ? (state.photo ? 'photo' : null) : p.x > PANEL && p.y < PLATE.top && sculpted ? 'logo' : null;
+const onPhoto = (p: { x: number; y: number }) => !!state.photo && p.x < SPLIT;
 canvas.addEventListener('pointerdown', (e) => {
   const p = at(e);
-  const mode = zone(p);
-  if (!mode) return;
-  drag = { mode, ...p };
+  if (!onPhoto(p)) return;
+  drag = p;
   canvas.setPointerCapture(e.pointerId);
   canvas.classList.add('is-dragging');
 });
 canvas.addEventListener('pointermove', (e) => {
   const p = at(e);
   if (!drag) {
-    canvas.classList.toggle('can-drag', !!zone(p));
+    canvas.classList.toggle('can-drag', onPhoto(p));
     return;
   }
-  if (drag.mode === 'photo') {
-    state.px += p.x - drag.x;
-    state.py += p.y - drag.y;
-  } else {
-    state.lx += p.x - drag.x;
-    state.ly += p.y - drag.y;
-  }
-  drag.x = p.x;
-  drag.y = p.y;
+  state.px += p.x - drag.x;
+  state.py += p.y - drag.y;
+  drag = p;
   draw();
 });
 const letGo = () => {

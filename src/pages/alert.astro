@@ -1,6 +1,6 @@
 ---
 // The Alert maker, an unlisted page (no menu entry): NFL-style alert graphics with a photo on the left, a
-// franchise's logo in 3D on its colour on the right, the silver ALERT plate, and lines of text under it,
+// franchise's logo on its colour on the right, the silver ALERT plate, and lines of text under it,
 // player names in bold over their stars on Kirin's List. Drawn in the browser and exported as a PNG.
 import { getImage } from 'astro:assets';
 import Site from '../layouts/Site.astro';
@@ -56,7 +56,6 @@ const json = JSON.stringify(payload).replace(/</g, '\\u003c');
                   </button>
                 ))}
               </div>
-              <label class="al-range"><span>Logo size</span><input type="range" id="al-lsize" min="0.5" max="1.8" step="0.01" value="1" /></label>
             </div>
 
             <div class="al-group">

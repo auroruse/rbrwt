@@ -144,8 +144,9 @@ a { color: inherit; text-decoration: none; }
 .block { margin-top: 88px; }
 
 /* ---------- Franchises: the S2 field as team rows, two to a row (one below 1100px); a click opens a team's roster under it ---------- */
-.fband { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 8px; }
-.fp { position: relative; min-width: 0; overflow: hidden; outline: none; background: var(--p); color: var(--ink-on); }
+.fband { --plate: 112px; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 8px; }
+.fp { position: relative; min-width: 0; overflow: hidden; outline: none; background: var(--p); color: var(--ink-on); scroll-margin: 96px 0 24px; }
+.fp.is-open { z-index: 1; }
 /* The 1px rim, drawn along both cut corners so it never breaks; gold when the team has keyboard focus */
 .fp::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 0 1px var(--s);
   background:
@@ -188,7 +189,23 @@ a { color: inherit; text-decoration: none; }
 .fp-table td.key { font-weight: 600; color: var(--gold); }
 .fp-table .kls .stars { display: block; width: auto; height: 14px; }
 .fp-table .kls .na { font-size: 10px; }
+/* An opening roster comes in row by row */
+@keyframes fp-in { from { opacity: 0; transform: translateY(8px); } }
+.fp.is-open .fp-table thead { animation: fp-in 320ms var(--ease-out) 100ms backwards; }
+.fp.is-open .fp-table tbody tr { animation: fp-in 360ms var(--ease-out) backwards; animation-delay: calc(140ms + var(--r, 0) * 40ms); }
+/* On a wide screen an open team takes the whole row: its identity in a 360px column, the logo large over a name
+   plate, and the roster beside it */
+@media (min-width: 1100px) {
+  .fband .fp.is-open { grid-column: 1 / -1; display: grid; grid-template-columns: 360px minmax(0, 1fr); }
+  .fp.is-open .fp-id { height: auto; min-height: 400px; }
+  .fp.is-open .fp-id::before { inset: 0 0 var(--plate) 0; }
+  .fp.is-open .fp-art { right: auto; left: 50%; top: calc((100% - var(--plate)) / 2); width: min(80%, 230px); transform: translate(-50%, -50%); }
+  .fp.is-open .fp-title { left: 0; right: 0; bottom: 0; height: var(--plate); padding: 26px 20px 0; border-top: 1px solid var(--s); }
+  .fp.is-open .fp-toggle { width: 360px; height: 100%; }
+  .fp.is-open .fp-roster { padding: 28px 30px; }
+}
 @media (max-width: 1099px) { .fband { grid-template-columns: minmax(0, 1fr); } }
+@media (prefers-reduced-motion: reduce) { .fp.is-open .fp-table thead, .fp.is-open .fp-table tbody tr { animation: none; } }
 @media (max-width: 639px) { .fp-table .kl, .fp-table .gp, .fp-table .rkc { display: none; } .fp-table td { font-size: 15px; } }
 
 /* Names never wrap and never shrink: one that does not fit slides sideways under an edge fade. */

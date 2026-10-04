@@ -61,7 +61,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                               const p = byName.get(r.player);
                               const groupEnd = k + 1 < roster.length && group(roster[k + 1].role) !== group(r.role);
                               return (
-                                <tr class={groupEnd ? 'group-end' : undefined}>
+                                <tr class={groupEnd ? 'group-end' : undefined} style={`--r:${k}`}>
                                   {isPS(r.role) ? <td class="rk" title="Practice squad">PS</td> : <td class="rk">{pad2(k + 1)}</td>}
                                   <td class="pl"><span class="slide"><span><PlayerName name={r.player} /></span></span></td>
                                   <td class="kls">{tierOf.get(r.player)
@@ -88,12 +88,17 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
   </div>
   <PlayerCards />
   <script is:inline>
-  // A click opens a team's roster under it and plays its animation; a click on it again, a click outside the
-  // teams or Escape shuts it. A mouse resting on a closed team plays a short preview of its animation.
+  // A click opens a team. On a wide screen it takes the whole row, its logo large beside its roster: it opens
+  // where it was, growing out of its tile while the teams after it glide down a slot. On a narrow one its roster
+  // opens under it. A click on it again, a click outside the teams or Escape shuts it. A mouse resting on a
+  // closed team plays a short preview of its animation.
   (function () {
     var band = document.getElementById('fband');
     if (!band) { return; }
-    var panels = band.querySelectorAll('.fp');
+    var panels = Array.prototype.slice.call(band.querySelectorAll('.fp'));
+    var wide = window.matchMedia('(min-width: 1100px)');
+    var still = window.matchMedia('(prefers-reduced-motion: reduce)');
+    var EASE = 'cubic-bezier(0.2, 0.8, 0.2, 1)';
     function play(p, kind, ms) {
       p.classList.remove('fx-preview', 'fx-full');
       void p.offsetWidth;
@@ -101,15 +106,45 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
       clearTimeout(p.fxTimer);
       p.fxTimer = setTimeout(function () { p.classList.remove(kind); }, ms);
     }
+    // An open team in the right column moves in front of its partner, so it opens in its own row.
+    function arrange() {
+      var i = panels.indexOf(band.querySelector('.fp.is-open'));
+      var lift = wide.matches && i % 2 === 1;
+      panels.forEach(function (o, k) { o.style.order = lift ? String(k === i ? i * 2 - 3 : k * 2) : ''; });
+    }
+    // The panel's cut-cornered outline between two corners, in px inside it.
+    function outline(x0, y0, x1, y1) {
+      var c = parseFloat(getComputedStyle(band).getPropertyValue('--cut')) || 14;
+      return 'polygon(' + (x0 + c) + 'px ' + y0 + 'px, ' + x1 + 'px ' + y0 + 'px, ' + x1 + 'px ' + (y1 - c) + 'px, ' +
+        (x1 - c) + 'px ' + y1 + 'px, ' + x0 + 'px ' + y1 + 'px, ' + x0 + 'px ' + (y0 + c) + 'px)';
+    }
     function open(p) {
+      var was = band.querySelector('.fp.is-open');
+      var first = panels.map(function (o) { return o.getBoundingClientRect(); });
       panels.forEach(function (o) {
         var on = o === p;
         o.classList.toggle('is-open', on);
         o.querySelector('.fp-toggle').setAttribute('aria-expanded', on ? 'true' : 'false');
       });
       band.classList.toggle('has-open', !!p);
+      arrange();
       if (p) { play(p, 'fx-full', 2500); }
+      if (still.matches) { return; }
+      panels.forEach(function (o, k) {
+        var a = first[k], b = o.getBoundingClientRect();
+        var move = 'translate(' + (a.left - b.left) + 'px, ' + (a.top - b.top) + 'px)';
+        if (o === p) {
+          o.animate([{ clipPath: outline(a.left - b.left, a.top - b.top, a.right - b.left, a.bottom - b.top) }, { clipPath: outline(0, 0, b.width, b.height) }],
+            { duration: 480, easing: EASE });
+        } else if (o === was) {
+          o.animate([{ opacity: 0, transform: move }, { opacity: 1, transform: 'none' }], { duration: 480, easing: EASE });
+        } else if (a.left !== b.left || a.top !== b.top) {
+          o.animate([{ transform: move }, { transform: 'none' }], { duration: 480, easing: EASE });
+        }
+      });
+      if (p) { setTimeout(function () { p.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 480); }
     }
+    wide.addEventListener('change', arrange);
     panels.forEach(function (p) {
       p.querySelector('.fp-toggle').addEventListener('click', function () { open(p.classList.contains('is-open') ? null : p); });
       p.addEventListener('pointerenter', function (e) {

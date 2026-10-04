@@ -710,7 +710,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 /* ---------- Franchise animations: each team acts out its logo ----------
    .fx-preview is the short taste a resting mouse gets; .fx-full plays as the team opens. Positions are
    shares of the logo's box: the CSS barrel tip at 84% 18%, the SLD rocket's tail at 16.5% 57.5% (its axis climbs 21deg), the TO
-   hooves at 78% 76% and 36% 67%, the TNP ram's head at 50% 48% and its nose at 35% 64%. */
+   hooves at 78% 76% and 36% 67%, the TNP ram's head at 50% 48% and its nose at 35% 64%, the SO trident's prong tips at 51% 82%. */
 .fx { position: absolute; inset: 0; }
 .fx > * { position: absolute; display: block; opacity: 0; }
 .fx-sweep { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transform: translateX(-120%);
@@ -839,6 +839,31 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .fp.fx-full .fx-to .v1 { animation: to-speed 600ms ease-out 100ms; }
 .fp.fx-full .fx-to .v2 { animation: to-speed 600ms ease-out 220ms; }
 .fp.fx-full .fx-to .v3 { animation: to-speed 600ms ease-out 340ms; }
+
+/* SO Mariners: the trident drives down into the water, ripples spread from its prongs, spray flies up, a swell rolls across
+   and the logo bobs as if afloat */
+.fx-so .fx-swell { left: -50cqw; top: 78%; z-index: -1; width: 200cqw; height: 14cqw; overflow: visible; fill: none; stroke: rgba(200, 245, 245, 0.7);
+  stroke-width: 1.4; stroke-linecap: round; }
+.fx-so .fx-swell .w2 { stroke: rgba(200, 245, 245, 0.4); }
+.fx-so .fx-ripple { left: 51%; top: 84%; z-index: -1; width: 46cqw; height: 11cqw; margin: -5.5cqw 0 0 -23cqw; border-radius: 50%; border: 0.9cqw solid rgba(200, 245, 245, 0.85); }
+.fx-so .fx-drop { left: 51%; top: 82%; width: 4cqw; height: 4cqw; margin: -2cqw 0 0 -2cqw; border-radius: 50%; background: rgba(210, 248, 248, 0.92); }
+.fx-so .o1 { --dx: -22cqw; --dy: -30cqw; } .fx-so .o2 { --dx: -10cqw; --dy: -40cqw; } .fx-so .o3 { --dx: 2cqw; --dy: -46cqw; }
+.fx-so .o4 { --dx: 13cqw; --dy: -38cqw; } .fx-so .o5 { --dx: 24cqw; --dy: -28cqw; }
+@keyframes so-strike { 0%, 100% { transform: none; } 20% { transform: translateY(-6%); } 32% { transform: translateY(5%) scale(1.02); } 44% { transform: translateY(-2%); }
+  58% { transform: translateY(1.5%); } 72% { transform: translateY(-0.8%); } 86% { transform: none; } }
+@keyframes so-strike-s { 0%, 100% { transform: none; } 40% { transform: translateY(-5%); } 65% { transform: translateY(4%); } }
+@keyframes so-ripple { 0% { opacity: 0; transform: scale(0.25); } 15% { opacity: 1; } 100% { opacity: 0; transform: scale(2.3); } }
+@keyframes so-drop { 0% { opacity: 0; transform: translate(0, 0) scale(0.6); } 10% { opacity: 1; } 50% { transform: translate(calc(var(--dx) * 0.6), var(--dy)) scale(1); }
+  100% { opacity: 0; transform: translate(var(--dx), calc(var(--dy) * -0.15)) scale(0.6); } }
+@keyframes so-swell { 0% { opacity: 0; transform: translateX(-25cqw); } 25% { opacity: 1; } 100% { opacity: 0; transform: translateX(0); } }
+.fp.fx-full .fx-so .fp-logo { animation: so-strike 1300ms ease-in-out; }
+.fp.fx-preview .fx-so .fp-logo { animation: so-strike-s 600ms ease-in-out; }
+.fp.fx-full .fx-so .p1, .fp.fx-preview .fx-so .p1 { animation: so-ripple 900ms ease-out 400ms; }
+.fp.fx-full .fx-so .p2 { animation: so-ripple 1000ms ease-out 540ms; }
+.fp.fx-full .fx-so .p3 { animation: so-ripple 1100ms ease-out 700ms; }
+.fp.fx-full .fx-so .fx-drop { animation: so-drop 800ms cubic-bezier(0.2, 0.6, 0.4, 1) 410ms; }
+.fp.fx-full .fx-so .o2, .fp.fx-full .fx-so .o4 { animation-delay: 450ms; }
+.fp.fx-full .fx-so .fx-swell { animation: so-swell 1500ms ease-in-out 380ms; }
 
 /* TNP Rams: the ram snorts, rears back and butts straight at you, an impact burst and two shockwaves breaking round its head */
 .fx-tnp .fx-burst { left: 50%; top: 48%; z-index: -1; width: 120cqw; height: 120cqw; margin: -60cqw 0 0 -60cqw; overflow: visible; fill: none;

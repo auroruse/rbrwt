@@ -34,6 +34,13 @@ const { fx } = Astro.props;
       <i class="fx-dust d1"></i><i class="fx-dust d2"></i><i class="fx-dust d3"></i>
     </Fragment>
   )}
+  {fx === 'so' && (
+    <Fragment>
+      <svg class="fx-swell" viewBox="0 0 200 20" preserveAspectRatio="none"><path class="w1" d="M0 8Q12.5 2 25 8T50 8T75 8T100 8T125 8T150 8T175 8T200 8" /><path class="w2" d="M0 14Q12.5 8 25 14T50 14T75 14T100 14T125 14T150 14T175 14T200 14" /></svg>
+      <i class="fx-ripple p1"></i><i class="fx-ripple p2"></i><i class="fx-ripple p3"></i>
+      <i class="fx-drop o1"></i><i class="fx-drop o2"></i><i class="fx-drop o3"></i><i class="fx-drop o4"></i><i class="fx-drop o5"></i>
+    </Fragment>
+  )}
   {fx === 'tnp' && (
     <Fragment>
       <svg class="fx-burst" viewBox="-50 -50 100 100"><path d="M0 -31V-46M22 -22L33 -33M31 0H46M22 22L33 33M0 31V46M-22 22L-33 33M-31 0H-46M-22 -22L-33 -33" /></svg>

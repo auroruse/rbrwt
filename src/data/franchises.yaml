@@ -78,6 +78,7 @@
   primary: "#002D59"
   secondary: "#066768"
   ink: white
+  home: { label: Saint Osmund, region: saint_osmund }
 
 - code: STL
   name: Hyperion Guards

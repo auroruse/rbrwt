@@ -143,12 +143,9 @@ a { color: inherit; text-decoration: none; }
 .sec-meta .label { color: var(--text-2); white-space: nowrap; }
 .block { margin-top: 88px; }
 
-/* ---------- Franchises: the S2 field as one band; hovering a team opens it across the band with its roster ---------- */
-.fband { --plate: 112px; display: flex; gap: 8px; height: 440px; }
-.fp { position: relative; flex: 1 1 0; min-width: 0; overflow: hidden; outline: none; background: var(--p); color: var(--ink-on);
-  transition: flex-grow var(--slow) var(--ease-out); }
-.fband.has-open .fp { flex-grow: 0.32; }
-.fband .fp.is-open { flex-grow: 5; }
+/* ---------- Franchises: the S2 field as team rows, two to a row (one below 1100px); a click opens a team's roster under it ---------- */
+.fband { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: 8px; }
+.fp { position: relative; min-width: 0; overflow: hidden; outline: none; background: var(--p); color: var(--ink-on); }
 /* The 1px rim, drawn along both cut corners so it never breaks; gold when the team has keyboard focus */
 .fp::after { content: ""; position: absolute; inset: 0; z-index: 3; pointer-events: none; box-shadow: inset 0 0 0 1px var(--s);
   background:
@@ -158,47 +155,30 @@ a { color: inherit; text-decoration: none; }
   background:
     linear-gradient(to bottom right, transparent 50%, var(--gold) 50% calc(50% + 2px), transparent calc(50% + 2px)) 0 0 / var(--cut) var(--cut) no-repeat,
     linear-gradient(to top left, transparent 50%, var(--gold) 50% calc(50% + 2px), transparent calc(50% + 2px)) 100% 100% / var(--cut) var(--cut) no-repeat; }
-/* The team itself: code, logo, home region and name on its colour */
-.fp-id { position: absolute; inset: 0 auto 0 0; width: 100%; overflow: hidden; transition: width var(--slow) var(--ease-out), opacity var(--base); }
-.fp.is-open .fp-id { width: 300px; }
-/* The stripes stop at the name plate, so they never cross the name */
-.fp-id::before { content: ""; position: absolute; inset: 0 0 var(--plate) 0; opacity: 0.95;
+/* The team itself: code, home region and name on the left of its colour, the logo off the right edge */
+.fp-id { position: relative; height: 132px; overflow: hidden; }
+.fp-id::before { content: ""; position: absolute; inset: 0; opacity: 0.95;
   background: linear-gradient(118deg, transparent 0 50%, var(--s) 50% 55%, transparent 55% 60%, var(--s) 60% 61.5%, transparent 61.5%); }
 .fp-code { position: absolute; left: 18px; top: 16px; z-index: 1; padding: 5px 9px 4px; font-weight: 700; font-size: 12px; letter-spacing: 0.16em;
   background: var(--ink-on); color: var(--p); }
-.fp-art { position: absolute; left: 50%; top: calc((100% - var(--plate)) / 2); width: min(80%, 230px); aspect-ratio: 1; transform: translate(-50%, -50%);
-  container-type: size; isolation: isolate; pointer-events: none; }
+.fp-art { position: absolute; right: -10px; top: 50%; width: 150px; aspect-ratio: 1; transform: translateY(-50%); container-type: size; isolation: isolate; pointer-events: none; }
 .fp-logo { display: block; width: 100%; height: 100%; }
-.fp-title { position: absolute; left: 0; right: 0; bottom: 0; height: var(--plate); padding: 26px 20px 0; border-top: 1px solid var(--s); }
+.fp-title { position: absolute; left: 20px; right: 150px; bottom: 20px; }
 .fp-home { position: relative; z-index: 3; margin-bottom: 8px; font-weight: 500; font-size: 11px; line-height: 1.3; letter-spacing: 0.14em; text-transform: uppercase; }
 .fp-home a { display: inline-flex; align-items: center; gap: 6px; }
 .fp-home a svg { width: 9px; height: 9px; flex: none; }
 .fp-home a:hover { text-decoration: underline; text-underline-offset: 3px; }
-.fp-name { font-weight: 700; font-size: 21px; line-height: 1; letter-spacing: -0.03em; text-transform: uppercase; }
-.fp.is-open .fp-name { font-size: 26px; }
-/* A narrowed team: its logo and its name running up the strip */
-.fp-strip { position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; align-items: center; gap: 16px; padding-top: 18px;
-  opacity: 0; pointer-events: none; transition: opacity var(--base); }
-.fp-strip img { width: 36px; height: 36px; object-fit: contain; }
-.fp-strip b { writing-mode: vertical-rl; transform: rotate(180deg); font-weight: 700; font-size: 13px; letter-spacing: 0.2em; text-transform: uppercase; white-space: nowrap; }
-.fband.has-open .fp:not(.is-open) .fp-id { opacity: 0; }
-.fband.has-open .fp:not(.is-open) .fp-strip { opacity: 1; }
-/* The whole closed team is one button; once open, only its identity column is */
-.fp-toggle { position: absolute; inset: 0; z-index: 2; padding: 0; border: 0; background: transparent; cursor: pointer; }
-.fp.is-open .fp-toggle { right: auto; width: 300px; }
+.fp-name { font-weight: 700; font-size: 26px; line-height: 1; letter-spacing: -0.03em; text-transform: uppercase; }
+/* The whole team is one button */
+.fp-toggle { position: absolute; left: 0; top: 0; z-index: 2; width: 100%; height: 132px; padding: 0; border: 0; background: transparent; cursor: pointer; }
 .fp-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: -5px; }
-/* The roster, on the team's right once it opens */
-.fp-roster { position: absolute; inset: 0 0 0 300px; min-width: 560px; padding: 28px 30px 0; background: var(--deep); color: var(--text);
-  opacity: 0; visibility: hidden; transition: opacity var(--base) var(--ease-out), visibility 0s linear var(--base); }
-.fp.is-open .fp-roster { opacity: 1; visibility: visible; transition: opacity var(--base) var(--ease-out) 140ms, visibility 0s; }
+/* The roster, under the team once it opens */
+.fp-roster { display: none; padding: 14px 16px 16px; background: var(--deep); color: var(--text); }
+.fp.is-open .fp-roster { display: block; }
 .fp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-/* Six rows fill the panel. Past six the roster scrolls inside it: the head stays put, and the next row shows its top
-   half under a fade at the bottom edge so there is plainly more below. */
-.fp-scroll { height: 100%; padding-bottom: 44px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
-  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 44px), transparent); }
-.fp-table th { position: sticky; top: 0; z-index: 1; padding: 0 10px 12px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.14em;
-  text-transform: uppercase; color: var(--text-3); background: var(--deep); box-shadow: inset 0 -1px 0 rgba(169, 186, 224, 0.28); white-space: nowrap; }
-.fp-table td { height: 57px; padding: 0 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-size: 16px; }
+.fp-table th { padding: 0 10px 12px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-3); border-bottom: 1px solid rgba(169, 186, 224, 0.28); white-space: nowrap; }
+.fp-table td { height: 46px; padding: 0 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-size: 16px; }
 .fp-table tbody tr:last-child td { border-bottom: 0; }
 .fp-table tr.group-end td { border-bottom: 1px dashed var(--line-strong); }
 .fp-table .rk { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
@@ -208,22 +188,7 @@ a { color: inherit; text-decoration: none; }
 .fp-table td.key { font-weight: 600; color: var(--gold); }
 .fp-table .kls .stars { display: block; width: auto; height: 14px; }
 .fp-table .kls .na { font-size: 10px; }
-@media (max-width: 1099px) {
-  .fband { flex-direction: column; height: auto; }
-  .fp { flex: none; }
-  .fp-id, .fp.is-open .fp-id { position: relative; width: 100%; height: 132px; }
-  .fp-id::before { inset: 0; }
-  .fp-art { left: auto; right: -10px; top: 50%; width: 150px; transform: translateY(-50%); }
-  .fp-title { left: 20px; right: 150px; bottom: 20px; height: auto; padding: 0; border-top: 0; }
-  .fp-toggle, .fp.is-open .fp-toggle { width: 100%; height: 132px; bottom: auto; }
-  .fp-name, .fp.is-open .fp-name { font-size: 26px; }
-  .fp-strip { display: none; }
-  .fband.has-open .fp:not(.is-open) .fp-id { opacity: 1; }
-  .fp-roster, .fp.is-open .fp-roster { position: static; display: none; min-width: 0; padding: 14px 16px 16px; opacity: 1; visibility: visible; }
-  .fp-scroll { height: auto; padding-bottom: 0; overflow: visible; -webkit-mask-image: none; mask-image: none; }
-  .fp-table td { height: 46px; }
-  .fp.is-open .fp-roster { display: block; }
-}
+@media (max-width: 1099px) { .fband { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 639px) { .fp-table .kl, .fp-table .gp, .fp-table .rkc { display: none; } .fp-table td { font-size: 15px; } }
 
 /* Names never wrap and never shrink: one that does not fit slides sideways under an edge fade. */
@@ -443,7 +408,6 @@ footer { position: relative; background: var(--abyss); border-top: 1px solid var
   .hud::after, .stats::after { display: none; }
   .slide.is-over > * { animation: none; }
   .flag-body, .tours tbody tr { transition: none; }
-  .fp, .fp-id, .fp-strip, .fp-roster { transition: none !important; }
 }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
 

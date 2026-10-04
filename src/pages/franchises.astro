@@ -51,9 +51,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                       <h2 class="fp-name slide"><span>{f.name}</span></h2>
                     </div>
                   </div>
-                  <span class="fp-strip" aria-hidden="true">{f.image && <Image src={f.image} alt="" width={96} />}<b>{f.name}</b></span>
                   <div class="fp-roster" id={`roster-${f.code.toLowerCase()}`}>
-                    <div class="fp-scroll">
                     <table class="fp-table">
                       <colgroup><col style="width:40px"><col><col style="width:104px"><col style="width:64px"><col class="kl" style="width:58px"><col class="gp" style="width:64px"><col class="rkc" style="width:54px"></colgroup>
                       <thead><tr><th>#</th><th>Player</th><th>Tier</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n rkc">Rank</th></tr></thead>
@@ -79,7 +77,6 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                           : <tr><td class="rk">00</td><td class="pl"><span class="na">Roster TBA</span></td><td></td><td></td><td class="kl"></td><td class="gp"></td><td class="rkc"></td></tr>}
                       </tbody>
                     </table>
-                    </div>
                   </div>
                 </article>
               );
@@ -91,8 +88,8 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
   </div>
   <PlayerCards />
   <script is:inline>
-  // A click opens a team across the band and plays its animation; a click on it again, a click outside the
-  // band or Escape shuts it. A mouse resting on a closed team plays a short preview of its animation.
+  // A click opens a team's roster under it and plays its animation; a click on it again, a click outside the
+  // teams or Escape shuts it. A mouse resting on a closed team plays a short preview of its animation.
   (function () {
     var band = document.getElementById('fband');
     if (!band) { return; }

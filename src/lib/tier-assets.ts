@@ -5,8 +5,8 @@ import { getImage } from 'astro:assets';
 import barmark from '../../assets/header/wordmark.png';
 import { FREE_AGENT, aliases, franchises, hasOfficial, official, poolOrder, tierPlayers } from './data';
 
-// freeAgents: whether this page shows players on no S2 roster as free agents (the tier list and Franchises do;
-// Stats and History show the teams they played for).
+// freeAgents: whether this page shows players on no S2 roster as free agents (the tier list does; the other
+// pages show the teams they played for).
 export async function tierAssets(opts: { freeAgents?: boolean } = {}) {
   const logos: Record<string, string> = {};
   for (const f of franchises) if (f.image) logos[f.code] = (await getImage({ src: f.image, width: 192 })).src;

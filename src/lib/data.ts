@@ -43,8 +43,8 @@ function rimOf(primary: string, secondary: string): string {
   return lighten(base, t);
 }
 
-// Free agents (everyone on no S2 roster) wear neutral steel on the tier list and Franchises, under a code of
-// their own; Stats and History keep the teams they played for.
+// Free agents (everyone on no S2 roster) wear neutral steel on the tier list, under a code of their own; the
+// other pages keep the teams they played for.
 export const FREE_AGENT = {
   code: 'FA', name: 'Free Agents', primary: '#2C323D', secondary: '#8E99A8', inkHex: '#E6EBF2', rim: '#B8C2CF',
   style: '--p:#2C323D; --s:#8E99A8; --ink-on:#E6EBF2; --rim:#B8C2CF',
@@ -219,7 +219,7 @@ export type TierPlayer = {
   team: string | null; // the franchise the card wears: S2 if rostered, otherwise their latest S1 tour's
   teams: string[]; // every franchise they played for in S1
   s2: { code: string; role: 'Starter' | 'Sub' | 'PS' } | null;
-  fa: boolean; // on no S2 roster: a free agent on the tier list and Franchises
+  fa: boolean; // on no S2 roster: a free agent on the tier list
   kills: number; games: number; kpg: number; rank: number | null;
   awards: Partial<Record<Award, string[]>>; // award -> the tours it was won in
   titles: string[]; // tours won as a player, II to X (I has no sheet)

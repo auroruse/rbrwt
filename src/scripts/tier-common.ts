@@ -3,7 +3,7 @@
 import { AWARD_LIST, AWARD_NAMES, TIERS, starsSVG, tierLabel, type Award, type TierId } from '../lib/tiers';
 
 export type Player = {
-  name: string; team: string | null; teams: string[]; s2: { code: string; role: 'Starter' | 'Sub' } | null;
+  name: string; team: string | null; teams: string[]; s2: { code: string; role: 'Starter' | 'Sub' | 'PS' } | null;
   kills: number; games: number; kpg: number;
   awards: Partial<Record<Award, string[]>>; titles: string[];
   tours: { num: string; team: string | null; kills: number; games: number }[];

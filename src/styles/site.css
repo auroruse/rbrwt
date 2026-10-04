@@ -188,15 +188,19 @@ a { color: inherit; text-decoration: none; }
 .fp.is-open .fp-toggle { right: auto; width: 300px; }
 .fp-toggle:focus-visible { outline: 2px solid var(--gold); outline-offset: -5px; }
 /* The roster, on the team's right once it opens */
-.fp-roster { position: absolute; inset: 0 0 0 300px; min-width: 560px; padding: 28px 30px; background: var(--deep); color: var(--text);
+.fp-roster { position: absolute; inset: 0 0 0 300px; min-width: 560px; padding: 28px 30px 0; background: var(--deep); color: var(--text);
   opacity: 0; visibility: hidden; transition: opacity var(--base) var(--ease-out), visibility 0s linear var(--base); }
 .fp.is-open .fp-roster { opacity: 1; visibility: visible; transition: opacity var(--base) var(--ease-out) 140ms, visibility 0s; }
 .fp-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.fp-table th { padding: 0 10px 12px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase;
-  color: var(--text-3); border-bottom: 1px solid rgba(169, 186, 224, 0.28); white-space: nowrap; }
-.fp-table td { height: 46px; padding: 0 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-size: 16px; }
+/* Six rows fill the panel. Past six the roster scrolls inside it: the head stays put, and the next row shows its top
+   half under a fade at the bottom edge so there is plainly more below. */
+.fp-scroll { height: 100%; padding-bottom: 44px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; scrollbar-color: var(--line-strong) transparent;
+  -webkit-mask-image: linear-gradient(180deg, #000 calc(100% - 44px), transparent); mask-image: linear-gradient(180deg, #000 calc(100% - 44px), transparent); }
+.fp-table th { position: sticky; top: 0; z-index: 1; padding: 0 10px 12px; text-align: left; font-family: var(--mono); font-weight: 500; font-size: 11px; letter-spacing: 0.14em;
+  text-transform: uppercase; color: var(--text-3); background: var(--deep); box-shadow: inset 0 -1px 0 rgba(169, 186, 224, 0.28); white-space: nowrap; }
+.fp-table td { height: 57px; padding: 0 10px; border-bottom: 1px solid var(--line); white-space: nowrap; font-size: 16px; }
 .fp-table tbody tr:last-child td { border-bottom: 0; }
-.fp-table tr.last-starter td { border-bottom: 1px dashed var(--line-strong); }
+.fp-table tr.group-end td { border-bottom: 1px dashed var(--line-strong); }
 .fp-table .rk { font-family: var(--mono); font-size: 13px; color: var(--text-3); }
 .fp-table .pl { font-weight: 700; }
 .fp-table th.n, .fp-table td.n { text-align: right; }
@@ -216,6 +220,8 @@ a { color: inherit; text-decoration: none; }
   .fp-strip { display: none; }
   .fband.has-open .fp:not(.is-open) .fp-id { opacity: 1; }
   .fp-roster, .fp.is-open .fp-roster { position: static; display: none; min-width: 0; padding: 14px 16px 16px; opacity: 1; visibility: visible; }
+  .fp-scroll { height: auto; padding-bottom: 0; overflow: visible; -webkit-mask-image: none; mask-image: none; }
+  .fp-table td { height: 46px; }
   .fp.is-open .fp-roster { display: block; }
 }
 @media (max-width: 639px) { .fp-table .kl, .fp-table .gp, .fp-table .rkc { display: none; } .fp-table td { font-size: 15px; } }

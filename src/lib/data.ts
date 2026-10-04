@@ -191,7 +191,7 @@ export type TierPlayer = {
   name: string;
   team: string | null; // the franchise the card wears: S2 if rostered, otherwise their latest S1 tour's
   teams: string[]; // every franchise they played for in S1
-  s2: { code: string; role: 'Starter' | 'Sub' } | null;
+  s2: { code: string; role: 'Starter' | 'Sub' | 'PS' } | null;
   kills: number; games: number; kpg: number; rank: number | null;
   awards: Partial<Record<Award, string[]>>; // award -> the tours it was won in
   titles: string[]; // tours won as a player, II to X (I has no sheet)
@@ -203,9 +203,9 @@ export type TierPlayer = {
 const pfpFiles = import.meta.glob<{ default: ImageMetadata }>('/assets/pfps/*.{png,jpg,jpeg,webp}', { eager: true });
 const pfpByName = new Map(Object.entries(pfpFiles).map(([k, v]) => [path.basename(k).replace(/\.[^.]+$/, '').toLowerCase(), v.default]));
 
-const s2ByName = new Map<string, { code: string; role: 'Starter' | 'Sub' }>();
+const s2ByName = new Map<string, { code: string; role: 'Starter' | 'Sub' | 'PS' }>();
 for (const f of s2Field) {
-  for (const r of rosters.get(f.code) ?? []) s2ByName.set(r.player, { code: f.code, role: r.role.toLowerCase() === 'sub' ? 'Sub' : 'Starter' });
+  for (const r of rosters.get(f.code) ?? []) s2ByName.set(r.player, { code: f.code, role: r.role.toLowerCase() === 'sub' ? 'Sub' : r.role.toLowerCase() === 'ps' ? 'PS' : 'Starter' });
 }
 const awardsBy = new Map<string, Partial<Record<Award, string[]>>>();
 for (const t of tours) {

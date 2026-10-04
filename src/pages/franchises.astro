@@ -10,7 +10,9 @@ import { TIERS, starsSVG } from '../lib/tiers';
 
 const pad2 = (n: number) => String(n).padStart(2, '0');
 const byName = new Map(tierPlayers.map((p) => [p.name, p]));
-const isSub = (role: string) => role.toLowerCase() === 'sub';
+// Starters, then subs, then the practice squad, with a dashed rule where one group gives way to the next.
+const isPS = (role: string) => role.toLowerCase() === 'ps';
+const group = (role: string) => (isPS(role) ? 2 : role.toLowerCase() === 'sub' ? 1 : 0);
 // Each player's tier on Kirin's List, shown in its mineral stars.
 const tierOf = new Map(official.tiers.flatMap((t) => t.players.map((n) => [n, TIERS.find((x) => x.id === t.id)!] as const)));
 // The franchises with an animation of their own; any other gets the generic one.
@@ -51,6 +53,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                   </div>
                   <span class="fp-strip" aria-hidden="true">{f.image && <Image src={f.image} alt="" width={96} />}<b>{f.name}</b></span>
                   <div class="fp-roster" id={`roster-${f.code.toLowerCase()}`}>
+                    <div class="fp-scroll">
                     <table class="fp-table">
                       <colgroup><col style="width:40px"><col><col style="width:104px"><col style="width:64px"><col class="kl" style="width:58px"><col class="gp" style="width:64px"><col class="rkc" style="width:54px"></colgroup>
                       <thead><tr><th>#</th><th>Player</th><th>Tier</th><th class="n">K/G</th><th class="n kl">Kills</th><th class="n gp">Games</th><th class="n rkc">Rank</th></tr></thead>
@@ -58,10 +61,10 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                         {roster.length
                           ? roster.map((r, k) => {
                               const p = byName.get(r.player);
-                              const lastStarter = !isSub(r.role) && k + 1 < roster.length && isSub(roster[k + 1].role);
+                              const groupEnd = k + 1 < roster.length && group(roster[k + 1].role) !== group(r.role);
                               return (
-                                <tr class={lastStarter ? 'last-starter' : undefined}>
-                                  <td class="rk">{pad2(k + 1)}</td>
+                                <tr class={groupEnd ? 'group-end' : undefined}>
+                                  {isPS(r.role) ? <td class="rk" title="Practice squad">PS</td> : <td class="rk">{pad2(k + 1)}</td>}
                                   <td class="pl"><span class="slide"><span><PlayerName name={r.player} /></span></span></td>
                                   <td class="kls">{tierOf.get(r.player)
                                     ? <span class="kls-stars" title={`${tierOf.get(r.player)!.stars} stars`}><Fragment set:html={starsSVG(tierOf.get(r.player)!, 14, 2)} /></span>
@@ -76,6 +79,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                           : <tr><td class="rk">00</td><td class="pl"><span class="na">Roster TBA</span></td><td></td><td></td><td class="kl"></td><td class="gp"></td><td class="rkc"></td></tr>}
                       </tbody>
                     </table>
+                    </div>
                   </div>
                 </article>
               );

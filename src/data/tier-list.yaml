@@ -3,7 +3,7 @@
 # While no tier has anyone in it, the Tier List page shows a placeholder.
 title: Preseason
 by: Kirin
-date: 2026-10-03
+date: 2026-10-04
 tiers:
   "5": [Wizard, Garbelia]
   "4.5": [Kirin, New Opolopia]
@@ -12,5 +12,5 @@ tiers:
   "3": [Alfonzo]
   "2.5": [Arty]
   "2": [Hermitland]
-  "1.5": [John Laurens]
-  "1": []
+  "1.5": [John Laurens, Valdenmere]
+  "1": [Graves]

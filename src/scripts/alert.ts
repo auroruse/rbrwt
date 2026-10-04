@@ -1,6 +1,6 @@
 // The Alert maker. One canvas at 1080×1440 is both the preview and the PNG: the photo on the left, the silver
 // rail, the franchise's colour with its logo, the ALERT plate, and the lines of text under it, player names in
-// bold over their stars on Kirin's List. The photo moves by dragging it.
+// bold over their stars on Kirin's List. The photo and the logo move by dragging them.
 import { TIERS, drawStars, type Tier, type TierId } from '../lib/tiers';
 
 type Team = { code: string; name: string; logo: string; bg: string };
@@ -23,14 +23,16 @@ type Face = { family: string; weight: number; cap: number; squeeze: number; lead
 const BOLD: Face = { family: 'Anton', weight: 400, cap: 63, squeeze: 0.838, lead: 9 };
 const LIGHT: Face = { family: 'Antonio', weight: 300, cap: 63, squeeze: 0.85, lead: 10 };
 const STARS = { gap: 16, size: 34, step: 5 };
-// Every logo the same: its drawing fitted into this box, centred across the panel and wider than it, so it
-// runs off both sides as the NFL's do; a tall one goes down behind the plate rather than off the top.
+// Where every logo starts: its drawing fitted into this box, centred across the panel and wider than it, so it
+// runs off both sides as the NFL's do; a tall one goes down behind the plate rather than off the top. Dragging
+// and Logo size move it from there.
 const LOGO = { cx: (PANEL + W) / 2, cy: 350, w: 600, h: 640 };
 
 const state = {
   team: data.teams[0]?.code ?? '',
   photo: null as HTMLImageElement | null,
   pzoom: 1, px: 0, py: 0,
+  lsize: 1, lx: 0, ly: 0,
   blocks: [{ kind: 'player', text: '' }, { kind: 'text', text: '' }] as Block[],
 };
 
@@ -231,7 +233,7 @@ function bounds(img: HTMLImageElement): Logo['box'] {
   return { x: x0 / c.width, y: y0 / c.height, w: (x1 - x0 + 1) / c.width, h: (y1 - y0 + 1) / c.height };
 }
 function logo(l: Logo) {
-  const k = Math.min(LOGO.w / (l.box.w * l.img.naturalWidth), LOGO.h / (l.box.h * l.img.naturalHeight));
+  const k = Math.min(LOGO.w / (l.box.w * l.img.naturalWidth), LOGO.h / (l.box.h * l.img.naturalHeight)) * state.lsize;
   const w = l.img.naturalWidth * k, h = l.img.naturalHeight * k;
   ctx.save();
   ctx.beginPath();
@@ -241,7 +243,7 @@ function logo(l: Logo) {
   ctx.shadowBlur = 28;
   ctx.shadowOffsetX = 8;
   ctx.shadowOffsetY = 14;
-  ctx.drawImage(l.img, LOGO.cx - (l.box.x + l.box.w / 2) * w, LOGO.cy - (l.box.y + l.box.h / 2) * h, w, h);
+  ctx.drawImage(l.img, LOGO.cx + state.lx - (l.box.x + l.box.w / 2) * w, LOGO.cy + state.ly - (l.box.y + l.box.h / 2) * h, w, h);
   ctx.restore();
 }
 
@@ -368,6 +370,7 @@ function logoFor(t: Team): Promise<Logo> {
   return p;
 }
 
+const lsize = document.getElementById('al-lsize') as HTMLInputElement;
 const pzoom = document.getElementById('al-pzoom') as HTMLInputElement;
 const teamBtns = [...document.querySelectorAll<HTMLButtonElement>('.al-teams [data-team]')];
 
@@ -375,6 +378,9 @@ async function pickTeam(code: string) {
   const t = teamOf(code);
   if (!t) return;
   state.team = code;
+  state.lx = state.ly = 0;
+  state.lsize = 1;
+  lsize.value = '1';
   teamBtns.forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.team === code)));
   shown = null;
   draw();
@@ -385,6 +391,7 @@ async function pickTeam(code: string) {
   }
 }
 teamBtns.forEach((b) => b.addEventListener('click', () => pickTeam(b.dataset.team!)));
+lsize.addEventListener('input', () => { state.lsize = +lsize.value; draw(); });
 pzoom.addEventListener('input', () => { state.pzoom = +pzoom.value; draw(); });
 
 // The photo: picked from a file or dropped on the picture.
@@ -417,29 +424,38 @@ stage.addEventListener('drop', (e) => {
   if (f) usePhoto(f);
 });
 
-// Dragging the photo moves it.
-let drag: { x: number; y: number } | null = null;
+// Dragging moves the photo on the left and the logo above the plate.
+type Mode = 'photo' | 'logo';
+let drag: { mode: Mode; x: number; y: number } | null = null;
 const at = (e: PointerEvent) => {
   const r = canvas.getBoundingClientRect();
   return { x: ((e.clientX - r.left) * W) / r.width, y: ((e.clientY - r.top) * H) / r.height };
 };
-const onPhoto = (p: { x: number; y: number }) => !!state.photo && p.x < SPLIT;
+const zone = (p: { x: number; y: number }): Mode | null =>
+  p.x < SPLIT ? (state.photo ? 'photo' : null) : p.x > PANEL && p.y < PLATE.top && shown ? 'logo' : null;
 canvas.addEventListener('pointerdown', (e) => {
   const p = at(e);
-  if (!onPhoto(p)) return;
-  drag = p;
+  const mode = zone(p);
+  if (!mode) return;
+  drag = { mode, ...p };
   canvas.setPointerCapture(e.pointerId);
   canvas.classList.add('is-dragging');
 });
 canvas.addEventListener('pointermove', (e) => {
   const p = at(e);
   if (!drag) {
-    canvas.classList.toggle('can-drag', onPhoto(p));
+    canvas.classList.toggle('can-drag', !!zone(p));
     return;
   }
-  state.px += p.x - drag.x;
-  state.py += p.y - drag.y;
-  drag = p;
+  if (drag.mode === 'photo') {
+    state.px += p.x - drag.x;
+    state.py += p.y - drag.y;
+  } else {
+    state.lx += p.x - drag.x;
+    state.ly += p.y - drag.y;
+  }
+  drag.x = p.x;
+  drag.y = p.y;
   draw();
 });
 const letGo = () => {

@@ -3,9 +3,9 @@
 # While no tier has anyone in it, the Tier List page shows a placeholder.
 title: Preseason
 by: Kirin
-date: 2026-10-04
+date: 2026-10-05
 tiers:
-  "5": [Wizard, Garbelia]
+  "5": [Garbelia]
   "4.5": [Kirin, New Opolopia]
   "4": [Priola]
   "3.5": [Missouria, Magrusa]
@@ -13,4 +13,4 @@ tiers:
   "2.5": [Arty, Peanu-Butteria]
   "2": [Valdenmere, Hermitland]
   "1.5": [John Laurens]
-  "1": [Graves, Omnicontrol, Nimux]
+  "1": [Omnicontrol]

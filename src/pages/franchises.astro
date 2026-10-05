@@ -16,7 +16,7 @@ const group = (role: string) => (isPS(role) ? 2 : role.toLowerCase() === 'sub' ?
 // Each player's tier on Kirin's List, shown in its mineral stars.
 const tierOf = new Map(official.tiers.flatMap((t) => t.players.map((n) => [n, TIERS.find((x) => x.id === t.id)!] as const)));
 // The franchises with an animation of their own; any other gets the generic one.
-const FX = new Set(['css', 'sld', 'so', 'tal', 'tnp', 'to', 'tpop']);
+const FX = new Set(['css', 'nbb', 'sld', 'so', 'tal', 'tnp', 'to', 'tpop']);
 const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() : 'generic');
 ---
 <Site current="franchises" inner title="Franchises · RBR World Tour" description={`The ${s2Field.length} franchises of Season ${season.season} of the Rocket Bot Royale World Tour.`}>
@@ -39,7 +39,7 @@ const fxOf = (code: string) => (FX.has(code.toLowerCase()) ? code.toLowerCase() 
                     <span class="fp-code">{f.code}</span>
                     <span class={`fp-art fx-${fxOf(f.code)}`}>
                       {f.image && <Image class="fp-logo" src={f.image} alt={`${f.code} ${f.name} logo`} width={480} />}
-                      <FranchiseFx fx={fxOf(f.code)} />
+                      <FranchiseFx fx={fxOf(f.code)} image={f.image} />
                     </span>
                     <i class="fx-sweep" aria-hidden="true"></i>
                     <div class="fp-title">

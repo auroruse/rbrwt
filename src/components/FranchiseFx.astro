@@ -1,8 +1,15 @@
 ---
 // The pieces each franchise's animation moves, laid over its logo. The motion itself is in site.css under
 // "Franchise animations". A franchise with no animation of its own gets the generic one.
-interface Props { fx: string }
-const { fx } = Astro.props;
+import { Image } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
+interface Props { fx: string; image?: ImageMetadata }
+const { fx, image } = Astro.props;
+// The NBB dog's arcs of sound, one bark's worth: three rings opening forward from its mouth.
+const rings = [10, 18, 26].map((r) => {
+  const x = (r * Math.cos(Math.PI * 38 / 180)).toFixed(2), y = (r * Math.sin(Math.PI * 38 / 180)).toFixed(2);
+  return `M${x} -${y}A${r} ${r} 0 0 1 ${x} ${y}`;
+});
 ---
 <span class="fx" aria-hidden="true">
   {fx === 'css' && <Fragment><i class="fx-smoke s1"></i><i class="fx-smoke s2"></i><i class="fx-smoke s3"></i><i class="fx-shell"></i><i class="fx-flash"></i></Fragment>}
@@ -49,4 +56,13 @@ const { fx } = Astro.props;
     </Fragment>
   )}
   {fx === 'tpop' && <i class="fx-rays"></i>}
+  {fx === 'nbb' && image && (
+    <Fragment>
+      <i class="fx-mouth"></i>
+      <svg class="fx-fangs" viewBox="0 0 500 500"><path d="M381 256.1L391 254.7L386.5 268ZM366 258.1L373 257.2L369.5 265.5Z" /></svg>
+      <span class="fx-jaw"><span class="fx-jaw-in"><svg viewBox="0 0 500 500"><path d="M371 261.4L380 260.2L376.5 249.5Z" /></svg><Image src={image} alt="" width={480} /></span></span>
+      <svg class="fx-bark b1" viewBox="-50 -50 100 100">{rings.map((d) => <path d={d} />)}</svg>
+      <svg class="fx-bark b2" viewBox="-50 -50 100 100">{rings.map((d) => <path d={d} />)}</svg>
+    </Fragment>
+  )}
 </span>

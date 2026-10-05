@@ -713,7 +713,8 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 /* ---------- Franchise animations: each team acts out its logo ----------
    .fx-preview is the short taste a resting mouse gets; .fx-full plays as the team opens. Positions are
    shares of the logo's box: the CSS barrel tip at 84% 18%, the SLD rocket's tail at 16.5% 57.5% (its axis climbs 21deg), the TO
-   hooves at 78% 76% and 36% 67%, the TNP ram's head at 50% 48% and its nose at 35% 64%, the SO trident's prong tips at 51% 82%. */
+   hooves at 78% 76% and 36% 67%, the TNP ram's head at 50% 48% and its nose at 35% 64%, the SO trident's prong tips at 51% 82%,
+   the NBB dog's jaw hinge at 64.4% 53.2% and its open mouth at 84% 50%. */
 .fx { position: absolute; inset: 0; }
 .fx > * { position: absolute; display: block; opacity: 0; }
 .fx-sweep { position: absolute; inset: 0; z-index: 1; pointer-events: none; opacity: 0; transform: translateX(-120%);
@@ -888,6 +889,47 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 .fp.fx-full .fx-tnp .r1 { animation: tnp-ring 900ms ease-out 440ms; }
 .fp.fx-full .fx-tnp .r2 { animation: tnp-ring 1000ms ease-out 600ms; }
 
+/* NBB Watchdogs: the dog barks twice, its head snapping forward as its jaw drops open on a dark mouth and fangs, and
+   rings of sound open out from its muzzle. While it plays, the logo loses its lower jaw (everything right of the hinge and
+   under the mouth line) and a copy of the logo cut to just the jaw sits behind it and swings open about the hinge, the
+   mouth showing in the gap. The copy reaches a little past both cuts, hidden under the logo when the jaw is shut, so no
+   seam shows. Logo, jaw, fangs and mouth share one head movement. */
+.fx-nbb .fp-logo, .fx-nbb .fx-jaw, .fx-nbb .fx-mouth, .fx-nbb .fx-fangs { transform-origin: 38% 72%; }
+.fx-nbb .fx-jaw, .fx-nbb .fx-mouth, .fx-nbb .fx-fangs { inset: 0; width: 100%; height: 100%; }
+/* The mouth: the wedge the jaw can open through, filled by a dark plane hinged with the jaw, so only the gap shows */
+.fx-nbb .fx-mouth { z-index: -3; clip-path: polygon(64.4% 53.2%, 82.8% 50.73%, 82.95% 53.97%, 82.53% 57.17%, 81.57% 60.26%); }
+.fx-nbb .fx-mouth::before { content: ""; position: absolute; inset: 0; background: #1C0407; transform-origin: 64.4% 53.2%;
+  clip-path: polygon(63.61% 53.31%, 90.17% 49.74%, 87.25% 27.94%, 60.68% 31.5%); }
+.fx-nbb .fx-fangs { z-index: -2; fill: #F5F2E9; }
+.fx-nbb .fx-jaw { z-index: -1; }
+.fx-nbb .fx-jaw-in { position: absolute; inset: 0; transform-origin: 64.4% 53.2%; }
+.fx-nbb .fx-jaw-in svg { position: absolute; inset: 0; width: 100%; height: 100%; fill: #F5F2E9; }
+.fx-nbb .fx-jaw-in img { position: relative; display: block; width: 100%; height: 100%; clip-path: polygon(64.1% 53%, 100% 48.19%, 100% 100%, 64.1% 100%); }
+.fx-nbb .fx-bark { left: 84.3%; top: 49.6%; width: 60cqw; height: 60cqw; margin: -30cqw 0 0 -30cqw; overflow: visible; fill: none;
+  stroke: var(--ink-on); stroke-width: 3; stroke-linecap: round; }
+@keyframes nbb-head { 0%, 100% { transform: none; } 7% { transform: translate(-1.5%, 1.2%) rotate(2.5deg); } 15% { transform: translate(2.5%, -1.5%) rotate(-4deg); }
+  25% { transform: translate(1.5%, -0.8%) rotate(-2.5deg); } 35% { transform: translate(-1.2%, 1%) rotate(2deg); } 44% { transform: translate(3%, -2%) rotate(-5deg); }
+  55% { transform: translate(1.8%, -1%) rotate(-3deg); } 68% { transform: translate(-0.6%, 0.5%) rotate(1deg); } 82% { transform: translate(0.3%, -0.2%) rotate(-0.4deg); } }
+@keyframes nbb-jaw { 0%, 7%, 33%, 37%, 65%, 100% { transform: none; } 15% { transform: rotate(24deg); } 25% { transform: rotate(18deg); }
+  44% { transform: rotate(27deg); } 55% { transform: rotate(20deg); } }
+@keyframes nbb-head-s { 0%, 100% { transform: none; } 15% { transform: translate(-1%, 0.8%) rotate(1.5deg); } 35% { transform: translate(2.5%, -1.5%) rotate(-4deg); }
+  60% { transform: translate(0.8%, -0.4%) rotate(-1deg); } }
+@keyframes nbb-jaw-s { 0%, 15%, 66%, 100% { transform: none; } 35% { transform: rotate(24deg); } 52% { transform: rotate(16deg); } }
+@keyframes nbb-wave { from { opacity: 1; transform: scale(0.55); } to { opacity: 1; transform: scale(1.3); } }
+@keyframes nbb-ring { 0% { opacity: 0; } 20% { opacity: 1; } 100% { opacity: 0; } }
+.fp.fx-full .fx-nbb .fp-logo, .fp.fx-preview .fx-nbb .fp-logo { clip-path: polygon(0 0, 100% 0, 100% 48.43%, 64.4% 53.2%, 64.4% 100%, 0 100%); }
+.fp.fx-full .fx-nbb :is(.fx-mouth, .fx-fangs, .fx-jaw), .fp.fx-preview .fx-nbb :is(.fx-mouth, .fx-fangs, .fx-jaw) { opacity: 1; }
+.fp.fx-full .fx-nbb :is(.fp-logo, .fx-mouth, .fx-fangs, .fx-jaw) { animation: nbb-head 1100ms ease-in-out; }
+.fp.fx-full .fx-nbb .fx-jaw-in, .fp.fx-full .fx-nbb .fx-mouth::before { animation: nbb-jaw 1100ms ease-in-out; }
+.fp.fx-preview .fx-nbb :is(.fp-logo, .fx-mouth, .fx-fangs, .fx-jaw) { animation: nbb-head-s 600ms ease-in-out; }
+.fp.fx-preview .fx-nbb .fx-jaw-in, .fp.fx-preview .fx-nbb .fx-mouth::before { animation: nbb-jaw-s 600ms ease-in-out; }
+/* Each bark's rings open one after another as the jaw drops */
+.fp.fx-full .fx-nbb .b1 { --at: 150ms; } .fp.fx-full .fx-nbb .b2 { --at: 470ms; } .fp.fx-preview .fx-nbb .b1 { --at: 195ms; }
+.fp.fx-full .fx-nbb .fx-bark, .fp.fx-preview .fx-nbb .b1 { animation: nbb-wave 560ms ease-out var(--at); }
+.fp.fx-full .fx-nbb .fx-bark path, .fp.fx-preview .fx-nbb .b1 path { animation: nbb-ring 440ms ease-out var(--at) both; }
+.fp.fx-full .fx-nbb .fx-bark path:nth-child(2), .fp.fx-preview .fx-nbb .b1 path:nth-child(2) { animation-delay: calc(var(--at) + 60ms); }
+.fp.fx-full .fx-nbb .fx-bark path:nth-child(3), .fp.fx-preview .fx-nbb .b1 path:nth-child(3) { animation-delay: calc(var(--at) + 120ms); }
+
 /* TPoP Lightbringers: light rays burst from behind the figure, it flares, and a flash crosses the panel */
 .fx-tpop .fx-rays { left: 50%; top: 50%; z-index: -1; width: 150cqw; height: 150cqw; margin: -75cqw 0 0 -75cqw; border-radius: 50%;
   background: repeating-conic-gradient(from 0deg, rgba(255, 244, 196, 0.6) 0 5deg, transparent 5deg 15deg);
@@ -905,7 +947,7 @@ button.tl-plate:focus-visible { outline: 2px solid var(--gold); outline-offset: 
 
 @media (prefers-reduced-motion: reduce) {
   .fx, .fx-sweep { display: none; }
-  .fp .fp-logo { animation: none !important; }
+  .fp .fp-logo { animation: none !important; clip-path: none !important; }
 }
 
 /* ---------- Alert maker (unlisted): the picture on the left, its controls on the right ---------- */

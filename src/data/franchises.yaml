@@ -71,6 +71,7 @@
   primary: "#D0010A"
   secondary: "#0071FB"
   ink: white
+  home: { label: No Big Banks, region: the_region_that_has_no_big_banks }
 
 - code: SO
   name: Mariners
